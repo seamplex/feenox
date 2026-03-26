@@ -9,6 +9,7 @@ if [ -z "${functions_found}" ]; then
    exit 1
 fi
 
+checkgsl
 checkpde thermal
 
 answerzero Barra1D_a_Estac.fee 5e-3

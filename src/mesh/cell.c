@@ -21,40 +21,40 @@
  */
 #include "../feenox.h"
 
-int feenox_mesh_element2cell(mesh_t *this) {
+int feenox_mesh_element2cell(mesh_t *mesh) {
   
   int i_element, i_cell;
   
-  if (this->cell != NULL) {
+  if (mesh->cell != NULL) {
     return FEENOX_OK;
   }
   feenox.mesh.need_cells = 1;
   
   // contamos cuantas celdas hay
   // una celda = un elemento de la dimension del problema
-  this->n_cells = 0;
-  for (i_element = 0; i_element < this->n_elements; i_element++) {
-    if (this->element[i_element].type != NULL && this->element[i_element].type->dim == this->dim) {
-      this->n_cells++;
+  mesh->n_cells = 0;
+  for (i_element = 0; i_element < mesh->n_elements; i_element++) {
+    if (mesh->element[i_element].type != NULL && mesh->element[i_element].type->dim == mesh->dim) {
+      mesh->n_cells++;
     }
   }
   // alocamos las celdas
-  feenox_check_alloc(this->cell = calloc(this->n_cells, sizeof(cell_t)));
+  feenox_check_alloc(mesh->cell = calloc(mesh->n_cells, sizeof(cell_t)));
   
 
   i_cell = 0;
-  for (i_element = 0; i_element < this->n_elements; i_element++) {
-    if (this->element[i_element].type != NULL && this->element[i_element].type->dim == this->dim) {
+  for (i_element = 0; i_element < mesh->n_elements; i_element++) {
+    if (mesh->element[i_element].type != NULL && mesh->element[i_element].type->dim == mesh->dim) {
   
       // las id las empezamos en uno
-      this->cell[i_cell].id = i_cell+1;
+      mesh->cell[i_cell].id = i_cell+1;
       
       // elemento (ida y vuelta)
-      this->cell[i_cell].element = &this->element[i_element];
-      this->element[i_element].cell = &this->cell[i_cell];
+      mesh->cell[i_cell].element = &mesh->element[i_element];
+      mesh->element[i_element].cell = &mesh->cell[i_cell];
     
       // holder para vecinos
-      feenox_check_alloc(this->cell[i_cell].ineighbor = calloc(this->element[i_element].type->faces, sizeof(int)));
+      feenox_check_alloc(mesh->cell[i_cell].ineighbor = calloc(mesh->element[i_element].type->faces, sizeof(int)));
 
       // coordenadas del centro
 /*      
@@ -66,9 +66,9 @@ int feenox_mesh_element2cell(mesh_t *this) {
         this->cell[i_cell].x[i_dim] /= (double)(this->cell[i_cell].element->type->nodes);
       }
  */
-      feenox_call(feenox_mesh_compute_element_barycenter(this->cell[i_cell].element, this->cell[i_cell].x));
+      feenox_call(feenox_mesh_compute_element_barycenter(mesh->cell[i_cell].element, mesh->cell[i_cell].x));
       
-      this->cell[i_cell].volume = this->cell[i_cell].element->type->volume(this->cell[i_cell].element);      
+      mesh->cell[i_cell].volume = mesh->cell[i_cell].element->type->volume(mesh->cell[i_cell].element);      
       
       i_cell++;
 
@@ -80,30 +80,30 @@ int feenox_mesh_element2cell(mesh_t *this) {
 }
 
 
-int mesh_compute_coords(mesh_t *this) {
+int mesh_compute_coords(mesh_t *mesh) {
 
   size_t i = 0;
-  for (i = 0; i < this->n_cells; i++) {
-    feenox_call(feenox_mesh_compute_element_barycenter(this->cell[i].element, this->cell[i].x));
-    this->cell[i].volume = this->cell[i].element->type->volume(this->cell[i].element);
+  for (i = 0; i < mesh->n_cells; i++) {
+    feenox_call(feenox_mesh_compute_element_barycenter(mesh->cell[i].element, mesh->cell[i].x));
+    mesh->cell[i].volume = mesh->cell[i].element->type->volume(mesh->cell[i].element);
   }
   
   return FEENOX_OK;
 }
 
 
-int mesh_cell_indexes(mesh_t *this, int dofs) {
+int mesh_cell_indexes(mesh_t *mesh, int dofs) {
   
-  this->degrees_of_freedom = dofs;
+  mesh->degrees_of_freedom = dofs;
   
   size_t i = 0;
   unsigned int g = 0;
   size_t index = 0;
-  for (i = 0; i < this->n_cells; i++) {
+  for (i = 0; i < mesh->n_cells; i++) {
     // holder para indices y resultados
-    feenox_check_alloc(this->cell[i].index = calloc(this->degrees_of_freedom, sizeof(int)));
-    for (g = 0; g < this->degrees_of_freedom; g++) {
-      this->cell[i].index[g] = index++;
+    feenox_check_alloc(mesh->cell[i].index = calloc(mesh->degrees_of_freedom, sizeof(int)));
+    for (g = 0; g < mesh->degrees_of_freedom; g++) {
+      mesh->cell[i].index[g] = index++;
     }
   }
   

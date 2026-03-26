@@ -272,14 +272,14 @@ int feenox_mesh_add_element_to_list(element_ll_t **list, element_t *e) {
   
 }
 
-int feenox_mesh_compute_element_barycenter(element_t *this, double barycenter[]) {
+int feenox_mesh_compute_element_barycenter(element_t *element, double barycenter[]) {
   
-  int J = this->type->nodes;
+  int J = element->type->nodes;
   barycenter[0] = barycenter[1] = barycenter[2] = 0;
   for (unsigned int j = 0; j < J; j++) {
-    barycenter[0] += this->node[j]->x[0];
-    barycenter[1] += this->node[j]->x[1];
-    barycenter[2] += this->node[j]->x[2];
+    barycenter[0] += element->node[j]->x[0];
+    barycenter[1] += element->node[j]->x[1];
+    barycenter[2] += element->node[j]->x[2];
   }
   barycenter[0] /= J; 
   barycenter[1] /= J; 
@@ -289,14 +289,14 @@ int feenox_mesh_compute_element_barycenter(element_t *this, double barycenter[])
 }
 
 
-int feenox_mesh_init_nodal_indexes(mesh_t *this, int dofs) {
+int feenox_mesh_init_nodal_indexes(mesh_t *mesh, int dofs) {
   
-  this->degrees_of_freedom = dofs;
+  mesh->degrees_of_freedom = dofs;
 
-  for (size_t j = 0; j < this->n_nodes; j++) {
-    feenox_check_alloc(this->node[j].index_dof = malloc(this->degrees_of_freedom*sizeof(size_t)));
-    for (unsigned int g = 0; g < this->degrees_of_freedom; g++) {
-      this->node[j].index_dof[g] = this->degrees_of_freedom*j + g;
+  for (size_t j = 0; j < mesh->n_nodes; j++) {
+    feenox_check_alloc(mesh->node[j].index_dof = malloc(mesh->degrees_of_freedom*sizeof(size_t)));
+    for (unsigned int g = 0; g < mesh->degrees_of_freedom; g++) {
+      mesh->node[j].index_dof[g] = mesh->degrees_of_freedom*j + g;
     }
   }  
   

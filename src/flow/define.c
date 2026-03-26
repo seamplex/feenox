@@ -29,26 +29,26 @@ extern builtin_functional_t builtin_functional[N_BUILTIN_FUNCTIONALS];
 
 extern const char factorseparators[];
 
-int feenox_realloc_variable_ptr(var_t *this, double *newptr, int copy_contents) {
+int feenox_realloc_variable_ptr(var_t *var, double *newptr, int copy_contents) {
   
   // si copy_contents es true copiamos el contenido del vector de feenox
   // antes de tirar el apuntador a la basura
   if (copy_contents) {
-    *newptr = feenox_var_value(this);
+    *newptr = feenox_var_value(var);
   }
   
   // si el puntero es de feenox, lo liberamos
-  if (this->reallocated == 0) {
-    feenox_free(feenox_value_ptr(this));
+  if (var->reallocated == 0) {
+    feenox_free(feenox_value_ptr(var));
   }
   
-  this->reallocated = 1;
-  feenox_value_ptr(this) = newptr;
+  var->reallocated = 1;
+  feenox_value_ptr(var) = newptr;
   
   return FEENOX_OK;
 }
 
-int feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents) {
+int feenox_realloc_vector_ptr(vector_t *vector, double *newptr, int copy_contents) {
   
   if (newptr == NULL) {
     feenox_push_error_message("newptr is null");
@@ -56,38 +56,38 @@ int feenox_realloc_vector_ptr(vector_t *this, double *newptr, int copy_contents)
   }
   
   double *oldptr = NULL;
-  if (feenox_value_ptr(this) != NULL) {
-    oldptr = gsl_vector_ptr(feenox_value_ptr(this), 0);
+  if (feenox_value_ptr(vector) != NULL) {
+    oldptr = gsl_vector_ptr(feenox_value_ptr(vector), 0);
 
     // if copy_contents is true we copy the contents before throwing the pointer away
     if (copy_contents) {
-      memcpy(newptr, oldptr, this->size * sizeof(double));
+      memcpy(newptr, oldptr, vector->size * sizeof(double));
     }
   }
 
   if (oldptr == NULL) {
-    feenox_check_alloc(feenox_value_ptr(this) = gsl_vector_alloc(this->size));
+    feenox_check_alloc(feenox_value_ptr(vector) = gsl_vector_alloc(vector->size));
   }
   
-  if (this->reallocated == 0) {
-    if (feenox_value_ptr(this)->stride != 1) {
-      feenox_push_error_message("vector '%s' cannot be realloced: stride not equal to 1", this->name);
+  if (vector->reallocated == 0) {
+    if (feenox_value_ptr(vector)->stride != 1) {
+      feenox_push_error_message("vector '%s' cannot be realloced: stride not equal to 1", vector->name);
       return FEENOX_ERROR;
     }
-    if (feenox_value_ptr(this)->owner == 0) {
-      feenox_push_error_message("vector '%s' cannot be realloced: not the data owner", this->name);
+    if (feenox_value_ptr(vector)->owner == 0) {
+      feenox_push_error_message("vector '%s' cannot be realloced: not the data owner", vector->name);
       return FEENOX_ERROR;
     }
-    if (feenox_value_ptr(this)->block->data != feenox_value_ptr(this)->data) {
-      feenox_push_error_message("vector '%s' cannot be realloced: data not pointing to block", this->name);
+    if (feenox_value_ptr(vector)->block->data != feenox_value_ptr(vector)->data) {
+      feenox_push_error_message("vector '%s' cannot be realloced: data not pointing to block", vector->name);
       return FEENOX_ERROR;
     }
 
     feenox_free(oldptr);
   }
   
-  this->reallocated = 1;
-  feenox_value_ptr(this)->data = newptr;
+  vector->reallocated = 1;
+  feenox_value_ptr(vector)->data = newptr;
   
   return FEENOX_OK;
 }

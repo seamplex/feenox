@@ -9,7 +9,7 @@ if [ -z "${functions_found}" ]; then
    exit 1
 fi
 
-# checkgmsh
+checkgsl
 checkpde neutron_sn
 
 # the gmsh version in ubuntu 20 gives a segfault for these .geos

@@ -179,32 +179,32 @@ double feenox_mesh_line2_dhdr(int j, int d, double *vec_xi) {
 
 
 
-int feenox_mesh_point_in_line(element_t *this, const double *x) {
-  return ((x[0] >= this->node[0]->x[0] && x[0] <= this->node[1]->x[0]) ||
-          (x[0] >= this->node[1]->x[0] && x[0] <= this->node[0]->x[0]));
+int feenox_mesh_point_in_line(element_t *element, const double *x) {
+  return ((x[0] >= element->node[0]->x[0] && x[0] <= element->node[1]->x[0]) ||
+          (x[0] >= element->node[1]->x[0] && x[0] <= element->node[0]->x[0]));
 }
 
 
-double feenox_mesh_line_volume(element_t *this) {
+double feenox_mesh_line_volume(element_t *element) {
   
-  if (this->volume == 0) {
-    this->volume = fabs(this->node[1]->x[0] - this->node[0]->x[0]);
+  if (element->volume == 0) {
+    element->volume = fabs(element->node[1]->x[0] - element->node[0]->x[0]);
   }  
-  return this->volume;
+  return element->volume;
 }
 
-double feenox_mesh_line_area(element_t *this) {
+double feenox_mesh_line_area(element_t *element) {
   
-  if (this->area == 0) {
-    this->area = 1;
+  if (element->area == 0) {
+    element->area = 1;
   }  
-  return this->area;
+  return element->area;
 }
 
-double feenox_mesh_line_size(element_t *this) {
+double feenox_mesh_line_size(element_t *element) {
   
-  if (this->size == 0) {
-    this->size = feenox_mesh_line_volume(this);
+  if (element->size == 0) {
+    element->size = feenox_mesh_line_volume(element);
   }  
-  return this->size;
+  return element->size;
 }

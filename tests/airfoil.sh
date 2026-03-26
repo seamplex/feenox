@@ -9,6 +9,7 @@ if [ -z "${functions_found}" ]; then
    exit 1
 fi
 
+checkgsl
 checkpde laplace
 
 answer airfoil.fee "2.4 2.5 2.5 2.5 2.6 -0.0"

@@ -157,7 +157,7 @@ int feenox_read_arguments(char *string, int n_arguments, char ***arg, size_t *n_
 
 
 //  parse a string with an algebraic expression and fill in the struct expr
-int feenox_expression_parse(expr_t *this, const char *orig_string) {
+int feenox_expression_parse(expr_t *expr, const char *orig_string) {
 
   if (orig_string == NULL || strcmp(orig_string, "") == 0) {
     return FEENOX_OK;
@@ -168,7 +168,7 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
   feenox_check_alloc(string_copy = strdup(orig_string));
 
   // the expr structure contains another copy of the original string for debugging purposes
-  feenox_check_alloc(this->string = strdup(string_copy));
+  feenox_check_alloc(expr->string = strdup(string_copy));
   
   char *string = string_copy;
   char *oper = NULL;
@@ -212,13 +212,13 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
         item->type = EXPR_CONSTANT;
         item->constant = 0;
         item->level = level; 
-        LL_APPEND(this->items, item);
+        LL_APPEND(expr->items, item);
           
         feenox_check_alloc(item = calloc(1, sizeof(expr_item_t)));
         item->type = EXPR_OPERATOR;
         item->oper = (string[0] == '+') ? 7 : 8; // hard-coded location of '+'/'-' within operators
         item->level = level+((item->oper-1)/2)*2;
-        LL_APPEND(this->items, item);
+        LL_APPEND(expr->items, item);
         
         string++;
         
@@ -229,14 +229,14 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
           return FEENOX_ERROR;
         }
         item->level = level;
-        LL_APPEND(this->items, item);
+        LL_APPEND(expr->items, item);
         
         string += item->n_chars;
         last_op = '\0';
         oper = NULL;  // reset the operator because it was not an actual operator
             
-        feenox_pull_dependencies_variables(&this->variables, item->variables);
-        feenox_pull_dependencies_functions(&this->functions, item->functions);
+        feenox_pull_dependencies_variables(&expr->variables, item->variables);
+        feenox_pull_dependencies_functions(&expr->functions, item->functions);
             
       } else if (last_op == '\0' || last_op == ')') {
         
@@ -252,7 +252,7 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
         size_t incr = (delta - (delta % 2));
         item->oper = delta + 1;
         item->level = level + incr;
-        LL_APPEND(this->items, item);
+        LL_APPEND(expr->items, item);
         
         string++;
         last_op = *oper;
@@ -270,7 +270,7 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
         feenox_free(string_copy);
         return FEENOX_ERROR;
       }
-      LL_APPEND(this->items, item);
+      LL_APPEND(expr->items, item);
       item->level = level;
       if (item->n_chars <= 0) {
         feenox_free(string_copy);
@@ -279,8 +279,8 @@ int feenox_expression_parse(expr_t *this, const char *orig_string) {
       string += item->n_chars;
       last_op = '\0';
       
-      feenox_pull_dependencies_variables(&this->variables, item->variables);
-      feenox_pull_dependencies_functions(&this->functions, item->functions);
+      feenox_pull_dependencies_variables(&expr->variables, item->variables);
+      feenox_pull_dependencies_functions(&expr->functions, item->functions);
     }
   }
 
@@ -632,9 +632,9 @@ expr_item_t *feenox_expression_parse_item(const char *string) {
 
 
 
-double feenox_expression_eval(expr_t *this) {
+double feenox_expression_eval(expr_t *expr) {
 
-  if (this == NULL || this->items == NULL) {
+  if (expr == NULL || expr->items == NULL) {
     return 0;
   }
 
@@ -642,7 +642,7 @@ double feenox_expression_eval(expr_t *this) {
   size_t j = 0;
   expr_item_t *item = NULL;
   
-  LL_FOREACH(this->items, item) {
+  LL_FOREACH(expr->items, item) {
     item->tmp_level = item->level;
 
     // TODO: replace the switch by pointer to functions (i.e. virtual methods in C++ slang)?
@@ -747,7 +747,7 @@ double feenox_expression_eval(expr_t *this) {
 
   // get the highest level
   size_t level = 0;
-  LL_FOREACH(this->items, item) {
+  LL_FOREACH(expr->items, item) {
     if (item->level > level) {
       level = item->level;
     }
@@ -759,7 +759,7 @@ double feenox_expression_eval(expr_t *this) {
   
   while (level > 0) {
 
-    for (E = P = this->items; E != NULL; E->tmp_level != 0 && !E->oper ? P=E : NULL, E = E->next) {
+    for (E = P = expr->items; E != NULL; E->tmp_level != 0 && !E->oper ? P=E : NULL, E = E->next) {
       
       if (E->tmp_level == level && E->oper != 0) {
         tmp_operator = operators[E->oper-1];
@@ -821,13 +821,13 @@ double feenox_expression_eval(expr_t *this) {
 
   }
 
-  if (gsl_isnan(this->items->value) || gsl_isinf(this->items->value)) {
+  if (gsl_isnan(expr->items->value) || gsl_isinf(expr->items->value)) {
 //    feenox_push_error_message("in '%s'", this->string);
     feenox_nan_error();
   }
 
 
-  return this->items->value;
+  return expr->items->value;
 
 }
 

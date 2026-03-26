@@ -319,37 +319,37 @@ int feenox_mesh_point_in_quadrangle(element_t *element, const double *x) {
   return 0;
 }
 
-double feenox_mesh_quad_volume(element_t *this) {
+double feenox_mesh_quad_volume(element_t *element) {
 
-  if (this->volume == 0) {
-    this->volume = fabs(0.5*
-                           ((this->node[2]->x[0]-this->node[0]->x[0])*(this->node[3]->x[1]-this->node[1]->x[1])
-                           +(this->node[1]->x[0]-this->node[3]->x[0])*(this->node[2]->x[1]-this->node[0]->x[1]))
+  if (element->volume == 0) {
+    element->volume = fabs(0.5*
+                           ((element->node[2]->x[0]-element->node[0]->x[0])*(element->node[3]->x[1]-element->node[1]->x[1])
+                           +(element->node[1]->x[0]-element->node[3]->x[0])*(element->node[2]->x[1]-element->node[0]->x[1]))
                           );
   }  
   
-  return this->volume;
+  return element->volume;
 }
 
-double feenox_mesh_quad_area(element_t *this) {
+double feenox_mesh_quad_area(element_t *element) {
 
-  if (this->area == 0) {
-    this->area += sqrt(gsl_pow_2(this->node[0]->x[0] - this->node[1]->x[0]) + gsl_pow_2(this->node[0]->x[1] - this->node[1]->x[1]));
-    this->area += sqrt(gsl_pow_2(this->node[1]->x[0] - this->node[2]->x[0]) + gsl_pow_2(this->node[1]->x[1] - this->node[2]->x[1]));
-    this->area += sqrt(gsl_pow_2(this->node[2]->x[0] - this->node[3]->x[0]) + gsl_pow_2(this->node[2]->x[1] - this->node[3]->x[1]));
-    this->area += sqrt(gsl_pow_2(this->node[3]->x[0] - this->node[0]->x[0]) + gsl_pow_2(this->node[3]->x[1] - this->node[0]->x[1]));
+  if (element->area == 0) {
+    element->area += sqrt(gsl_pow_2(element->node[0]->x[0] - element->node[1]->x[0]) + gsl_pow_2(element->node[0]->x[1] - element->node[1]->x[1]));
+    element->area += sqrt(gsl_pow_2(element->node[1]->x[0] - element->node[2]->x[0]) + gsl_pow_2(element->node[1]->x[1] - element->node[2]->x[1]));
+    element->area += sqrt(gsl_pow_2(element->node[2]->x[0] - element->node[3]->x[0]) + gsl_pow_2(element->node[2]->x[1] - element->node[3]->x[1]));
+    element->area += sqrt(gsl_pow_2(element->node[3]->x[0] - element->node[0]->x[0]) + gsl_pow_2(element->node[3]->x[1] - element->node[0]->x[1]));
   }  
   
-  return this->area;
+  return element->area;
 }
 
 
-double feenox_mesh_quad_size(element_t *this) {
+double feenox_mesh_quad_size(element_t *element) {
 
-  if (this->size == 0) {
-    this->size = 1.0/2.0 * (feenox_mesh_subtract_module(this->node[0]->x, this->node[2]->x) +
-                            feenox_mesh_subtract_module(this->node[1]->x, this->node[3]->x));
+  if (element->size == 0) {
+    element->size = 1.0/2.0 * (feenox_mesh_subtract_module(element->node[0]->x, element->node[2]->x) +
+                            feenox_mesh_subtract_module(element->node[1]->x, element->node[3]->x));
   }  
   
-  return this->size;
+  return element->size;
 }

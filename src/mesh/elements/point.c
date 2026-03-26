@@ -63,6 +63,6 @@ double feenox_mesh_one_node_point_dhdr(int i, int j, double *vec_r) {
   return 0;
 }
 
-double feenox_mesh_point_volume(element_t *this) {
+double feenox_mesh_point_volume(element_t *element) {
   return 0;
 }
