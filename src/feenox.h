@@ -2123,7 +2123,7 @@ extern int feenox_read_arguments(char *string, int n_arguments, char ***arg, siz
 
 
 // file.c
-char *feenox_evaluate_string(const char *restrict format, int n_args, expr_t *arg);
+char *feenox_evaluate_string(const char *restrict fmt, int n_args, expr_t *arg);
 extern int feenox_instruction_file(void *arg);
 FILE *feenox_fopen(const char *filepath, const char *mode);
 extern int feenox_instruction_file_open(void *arg);

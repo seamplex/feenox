@@ -41,38 +41,38 @@ FILE *feenox_fopen(const char *filepath, const char *mode) {
   
 }
 
-char *feenox_evaluate_string(const char *restrict format, int n_args, expr_t *arg) {
+char *feenox_evaluate_string(const char *restrict fmt, int n_args, expr_t *arg) {
 
   char *string = NULL;
   
   switch (n_args) {
     case 0:
-      feenox_check_minusone_null(asprintf(&string, "%s", format));
+      feenox_check_minusone_null(asprintf(&string, "%s", fmt));
     break;
     case 1:
-      feenox_check_minusone_null(asprintf(&string, format,
+      feenox_check_minusone_null(asprintf(&string, fmt,
               feenox_expression_eval(&arg[0])));
     break;
     case 2:
-      feenox_check_minusone_null(asprintf(&string, format,
+      feenox_check_minusone_null(asprintf(&string, fmt,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1])));
     break;
     case 3:
-      feenox_check_minusone_null(asprintf(&string, format,
+      feenox_check_minusone_null(asprintf(&string, fmt,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2])));
     break;
     case 4:
-      feenox_check_minusone_null(asprintf(&string, format,
+      feenox_check_minusone_null(asprintf(&string, fmt,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]),
               feenox_expression_eval(&arg[3])));
     break;
     case 5:
-      feenox_check_minusone_null(asprintf(&string, format,
+      feenox_check_minusone_null(asprintf(&string, fmt,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]),
@@ -80,7 +80,7 @@ char *feenox_evaluate_string(const char *restrict format, int n_args, expr_t *ar
               feenox_expression_eval(&arg[4])));
     break;
     case 6:
-      feenox_check_minusone_null(asprintf(&string, format,
+      feenox_check_minusone_null(asprintf(&string, fmt,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]),
@@ -89,7 +89,7 @@ char *feenox_evaluate_string(const char *restrict format, int n_args, expr_t *ar
               feenox_expression_eval(&arg[5])));
     break;
     case 7:
-      feenox_check_minusone_null(asprintf(&string, format,
+      feenox_check_minusone_null(asprintf(&string, fmt,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]),
@@ -99,7 +99,7 @@ char *feenox_evaluate_string(const char *restrict format, int n_args, expr_t *ar
               feenox_expression_eval(&arg[6])));
     break;
     case 8:
-      feenox_check_minusone_null(asprintf(&string, format,
+      feenox_check_minusone_null(asprintf(&string, fmt,
               feenox_expression_eval(&arg[0]),
               feenox_expression_eval(&arg[1]),
               feenox_expression_eval(&arg[2]),
