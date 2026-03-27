@@ -23,16 +23,16 @@
 
 int feenox_instruction_mesh_read(void *arg) {
 
-  mesh_t *this = (mesh_t *)arg;
+  mesh_t *mesh = (mesh_t *)arg;
   
-  if (this->initialized) {
-    if (this->update_each_step == 0) {
+  if (mesh->initialized) {
+    if (mesh->update_each_step == 0) {
       // we are not supposed to read the mesh all over again
       return FEENOX_OK;
     } else {
       // we have to re-read the mesh, but we already have one
       // so we get need to get rid of the current one
-      feenox_mesh_free(this);
+      feenox_mesh_free(mesh);
     }
   }
   
@@ -43,69 +43,69 @@ int feenox_instruction_mesh_read(void *arg) {
 #endif
   
   // read the actual mesh with a format-dependent reader (who needs C++?)
-  feenox_call(this->reader(this));
+  feenox_call(mesh->reader(mesh));
   
   // check that the number of partitions and ranks match
   if (feenox.mpi_size < 2) {
-    this->mpi_matches_partitions = mpi_matches_partitions_serial;
-  } else if (this->n_partitions > 0 && this->n_partitions == feenox.mpi_size) {
-    this->mpi_matches_partitions = mpi_matches_partitions_one_to_one;
-  } else if (this->n_partitions > 0 && (this->n_partitions % feenox.mpi_size) == 0) {
-    this->mpi_matches_partitions = mpi_matches_partitions_one_to_many;
+    mesh->mpi_matches_partitions = mpi_matches_partitions_serial;
+  } else if (mesh->n_partitions > 0 && mesh->n_partitions == feenox.mpi_size) {
+    mesh->mpi_matches_partitions = mpi_matches_partitions_one_to_one;
+  } else if (mesh->n_partitions > 0 && (mesh->n_partitions % feenox.mpi_size) == 0) {
+    mesh->mpi_matches_partitions = mpi_matches_partitions_one_to_many;
   } else {
-    this->mpi_matches_partitions = mpi_matches_partitions_no;
+    mesh->mpi_matches_partitions = mpi_matches_partitions_no;
   }
   
   // check if we found everything
   node_data_t *node_data = NULL;
-  LL_FOREACH(this->node_datas, node_data) {
+  LL_FOREACH(mesh->node_datas, node_data) {
     if (node_data->found == 0) {
-      feenox_push_error_message("requested function '%s' was not found in the mesh '%s'", node_data->name_in_mesh, this->file->name);
+      feenox_push_error_message("requested function '%s' was not found in the mesh '%s'", node_data->name_in_mesh, mesh->file->name);
       return FEENOX_ERROR;
     }
   }
   
   // sweep nodes and define the bounding box
   // TODO: see if this can go inside one of the kd loops
-  this->bounding_box_min.index_mesh = SIZE_MAX;
-  this->bounding_box_max.index_mesh = SIZE_MAX;
-  this->bounding_box_min.index_dof = NULL;
-  this->bounding_box_max.index_dof = NULL;
-  this->bounding_box_min.element_list = NULL;
-  this->bounding_box_max.element_list = NULL;
+  mesh->bounding_box_min.index_mesh = SIZE_MAX;
+  mesh->bounding_box_max.index_mesh = SIZE_MAX;
+  mesh->bounding_box_min.index_dof = NULL;
+  mesh->bounding_box_max.index_dof = NULL;
+  mesh->bounding_box_min.element_list = NULL;
+  mesh->bounding_box_max.element_list = NULL;
   
-  double scale_factor = feenox_expression_eval(&this->scale_factor);
+  double scale_factor = feenox_expression_eval(&mesh->scale_factor);
   double offset[3];
-  offset[0] = feenox_expression_eval(&this->offset_x);
-  offset[1] = feenox_expression_eval(&this->offset_y);
-  offset[2] = feenox_expression_eval(&this->offset_z);
+  offset[0] = feenox_expression_eval(&mesh->offset_x);
+  offset[1] = feenox_expression_eval(&mesh->offset_y);
+  offset[2] = feenox_expression_eval(&mesh->offset_z);
 
   double x_max[3] = {-MESH_INF, -MESH_INF, -MESH_INF};
   double x_min[3] = {+MESH_INF, +MESH_INF, +MESH_INF};
 
   unsigned int dim = 0;
-  for (size_t j = 0; j < this->n_nodes; j++) {
+  for (size_t j = 0; j < mesh->n_nodes; j++) {
     for (unsigned int m = 0; m < 3; m++) {
       if (scale_factor != 0 || offset[m] != 0) {
-        this->node[j].x[m] -= offset[m];
-        this->node[j].x[m] *= scale_factor;
+        mesh->node[j].x[m] -= offset[m];
+        mesh->node[j].x[m] *= scale_factor;
       }
       
-      if (dim < 1 && fabs(this->node[j].x[0]) > MESH_TOL) {
+      if (dim < 1 && fabs(mesh->node[j].x[0]) > MESH_TOL) {
         dim = 1;
       }
-      if (dim < 2 && fabs(this->node[j].x[1]) > MESH_TOL) {
+      if (dim < 2 && fabs(mesh->node[j].x[1]) > MESH_TOL) {
         dim = 2;
       }
-      if (dim < 3 && fabs(this->node[j].x[2]) > MESH_TOL) {
+      if (dim < 3 && fabs(mesh->node[j].x[2]) > MESH_TOL) {
         dim = 3;
       }
       
-      if (this->node[j].x[m] < x_min[m]) {
-        x_min[m] = this->bounding_box_min.x[m] = this->node[j].x[m];
+      if (mesh->node[j].x[m] < x_min[m]) {
+        x_min[m] = mesh->bounding_box_min.x[m] = mesh->node[j].x[m];
       }
-      if (this->node[j].x[m] > x_max[m]) {
-        x_max[m] = this->bounding_box_max.x[m] = this->node[j].x[m];
+      if (mesh->node[j].x[m] > x_max[m]) {
+        x_max[m] = mesh->bounding_box_max.x[m] = mesh->node[j].x[m];
       }
     }
   }
@@ -123,79 +123,79 @@ int feenox_instruction_mesh_read(void *arg) {
   // allocate arrays for the elements that belong to a physical group
   // (arrays are more efficient than a linked list)
   physical_group_t *physical_group = NULL;
-  for (physical_group = this->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
+  for (physical_group = mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
     if (physical_group->n_elements != 0) {
       feenox_check_alloc(physical_group->element = calloc(physical_group->n_elements, sizeof(size_t)));
     }
     // check out what the highest tag is to allocate temporary arrays
-    if (physical_group->tag > this->physical_tag_max) {
-      this->physical_tag_max = physical_group->tag;
+    if (physical_group->tag > mesh->physical_tag_max) {
+      mesh->physical_tag_max = physical_group->tag;
     }
   }
   
-  for (size_t i = 0; i < this->n_elements; i++) {
+  for (size_t i = 0; i < mesh->n_elements; i++) {
     
     // check the dimension of the element, the higher is the topological dim of the mes
-    if (this->element[i].type->dim > this->dim_topo) {
-      this->dim_topo = this->element[i].type->dim;
+    if (mesh->element[i].type->dim > mesh->dim_topo) {
+      mesh->dim_topo = mesh->element[i].type->dim;
     }
 
     // same for order
-    if (this->element[i].type->order > this->order) {
-      this->order = this->element[i].type->order;
+    if (mesh->element[i].type->order > mesh->order) {
+      mesh->order = mesh->element[i].type->order;
     }
 
     // remember the element with the largest number of nodes
-    if (this->element[i].type->nodes > this->max_nodes_per_element) {
-      this->max_nodes_per_element = this->element[i].type->nodes;
+    if (mesh->element[i].type->nodes > mesh->max_nodes_per_element) {
+      mesh->max_nodes_per_element = mesh->element[i].type->nodes;
     }
 
     // and the one with most neighbors
-    if (this->element[i].type->faces > this->max_faces_per_element) {
-      this->max_faces_per_element = this->element[i].type->faces;
+    if (mesh->element[i].type->faces > mesh->max_faces_per_element) {
+      mesh->max_faces_per_element = mesh->element[i].type->faces;
     }
 
     // create the list of element for the entity
-    physical_group = this->element[i].physical_group;
+    physical_group = mesh->element[i].physical_group;
     if (physical_group != NULL && physical_group->i_element < physical_group->n_elements) {
       physical_group->element[physical_group->i_element++] = i;
     }
   }
  
   // check the dimensions match
-  if (this->dim == 0) {
-    this->dim = dim;
-  } else if (this->dim != dim) {
-    feenox_push_error_message("mesh '%s' has DIMENSION %d but the highest-dimensional element has %d", this->file->name, this->dim, dim);
+  if (mesh->dim == 0) {
+    mesh->dim = dim;
+  } else if (mesh->dim != dim) {
+    feenox_push_error_message("mesh '%s' has DIMENSION %d but the highest-dimensional element has %d", mesh->file->name, mesh->dim, dim);
     return FEENOX_ERROR;
   }
     
   // fill an array of nodes that can be used as arguments of functions
-  if (this->nodes_argument == NULL) {
-    feenox_call(feenox_mesh_create_nodes_argument(this));
+  if (mesh->nodes_argument == NULL) {
+    feenox_call(feenox_mesh_create_nodes_argument(mesh));
   }
   
   // see if we need to create cells and allocate space for arguments
   feenox.mesh.need_cells |= feenox.mesh.vars.cells->used;
   if (feenox.mesh.need_cells) {
-    feenox_call(feenox_mesh_element2cell(this));
-    feenox_check_alloc(this->cells_argument = calloc(this->dim, sizeof(double *)));
-    for (unsigned int m = 0; m < this->dim; m++) {
-      feenox_check_alloc(this->cells_argument[m] = gsl_vector_alloc(this->n_cells));
-      for (size_t i = 0; i < this->n_cells; i++) {
-        gsl_vector_set(this->cells_argument[m], i, this->cell[i].x[m]); 
+    feenox_call(feenox_mesh_element2cell(mesh));
+    feenox_check_alloc(mesh->cells_argument = calloc(mesh->dim, sizeof(double *)));
+    for (unsigned int m = 0; m < mesh->dim; m++) {
+      feenox_check_alloc(mesh->cells_argument[m] = gsl_vector_alloc(mesh->n_cells));
+      for (size_t i = 0; i < mesh->n_cells; i++) {
+        gsl_vector_set(mesh->cells_argument[m], i, mesh->cell[i].x[m]); 
       }
     }
   }
 
-  if (this->n_cells == 0) {
-    this->n_cells = this->n_elements_per_dim[this->dim];
+  if (mesh->n_cells == 0) {
+    mesh->n_cells = mesh->n_elements_per_dim[mesh->dim];
   }
   
-  if (this == feenox.mesh.mesh_main) {
-    feenox_var_value(feenox.mesh.vars.cells) = (double)this->n_cells;
-    feenox_var_value(feenox.mesh.vars.nodes) = (double)this->n_nodes;
-    feenox_var_value(feenox.mesh.vars.elements) = (double)this->n_elements;
+  if (mesh == feenox.mesh.mesh_main) {
+    feenox_var_value(feenox.mesh.vars.cells) = (double)mesh->n_cells;
+    feenox_var_value(feenox.mesh.vars.nodes) = (double)mesh->n_nodes;
+    feenox_var_value(feenox.mesh.vars.elements) = (double)mesh->n_elements;
   }
   
   // see if there was any un-read scalar function
@@ -215,7 +215,7 @@ int feenox_instruction_mesh_read(void *arg) {
   // compute the volume (or area or length) and center of gravity of the groups
   // but only if the variable groupname_vol or the vector groupname_cog 
   // are used in one of the expressions
-  for (physical_group = this->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
+  for (physical_group = mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
     
     // if there is a single material, that's our guy
     if (n_materials == 1 && physical_group->dimension == feenox.pde.dim && physical_group->material == NULL) {
@@ -233,10 +233,10 @@ int feenox_instruction_mesh_read(void *arg) {
       physical_group->cog[2] = 0;
         
       for (size_t i = 0; i < physical_group->n_elements; i++) {
-        element_t *element = &this->element[physical_group->element[i]];
-        for (unsigned int q = 0; q < element->type->gauss[this->integration].Q; q++) {
-          double wdet = feenox_fem_compute_w_det_at_gauss_integration(element, q, this->integration);
-          gsl_matrix *H_c = feenox_fem_compute_H_c_at_gauss(element, q, this->integration);
+        element_t *element = &mesh->element[physical_group->element[i]];
+        for (unsigned int q = 0; q < element->type->gauss[mesh->integration].Q; q++) {
+          double wdet = feenox_fem_compute_w_det_at_gauss_integration(element, q, mesh->integration);
+          gsl_matrix *H_c = feenox_fem_compute_H_c_at_gauss(element, q, mesh->integration);
 
           for (unsigned int j = 0; j < element->type->nodes; j++) {
             double wdeth = wdet * gsl_matrix_get(H_c, 0, j);
@@ -263,15 +263,15 @@ int feenox_instruction_mesh_read(void *arg) {
   }
 
   // create a k-dimensional tree and try to figure out what the maximum number of neighbours each node has
-  if (this->kd_nodes == NULL) {
-    this->kd_nodes = kd_create(this->dim);
-    for (size_t j = 0; j < this->n_nodes; j++) {
-      kd_insert(this->kd_nodes, this->node[j].x, &this->node[j]);
+  if (mesh->kd_nodes == NULL) {
+    mesh->kd_nodes = kd_create(mesh->dim);
+    for (size_t j = 0; j < mesh->n_nodes; j++) {
+      kd_insert(mesh->kd_nodes, mesh->node[j].x, &mesh->node[j]);
     
       size_t first_neighbor_nodes = 1;  // el nodo mismo
       element_ll_t *element_item;
-      LL_FOREACH(this->node[j].element_list, element_item) {
-        if (element_item->element->type->dim == this->dim) {
+      LL_FOREACH(mesh->node[j].element_list, element_item) {
+        if (element_item->element->type->dim == mesh->dim) {
           if (element_item->element->type->id == ELEMENT_TYPE_TETRAHEDRON4 ||
               element_item->element->type->id == ELEMENT_TYPE_TETRAHEDRON10) {
             // los tetrahedros son "buenos" y con esta cuenta nos ahorramos memoria
@@ -282,8 +282,8 @@ int feenox_instruction_mesh_read(void *arg) {
           }
         }
       }
-      if (first_neighbor_nodes > this->max_first_neighbor_nodes) {
-        this->max_first_neighbor_nodes = first_neighbor_nodes;
+      if (first_neighbor_nodes > mesh->max_first_neighbor_nodes) {
+        mesh->max_first_neighbor_nodes = first_neighbor_nodes;
       }
     }
   }  
@@ -296,9 +296,9 @@ int feenox_instruction_mesh_read(void *arg) {
     feenox_check_minusone(asprintf(&name, "mesh_%c", 'x'+d));
     vector_t *vec_coords = feenox_get_vector_ptr(name);
     if (vec_coords != NULL && feenox_vector_get_size(vec_coords) == 0) {
-      feenox_call(feenox_vector_set_size(vec_coords, this->n_nodes));
+      feenox_call(feenox_vector_set_size(vec_coords, mesh->n_nodes));
       feenox_call(feenox_vector_init(vec_coords, FEENOX_VECTOR_NO_INITIAL));
-      feenox_realloc_vector_ptr(vec_coords, gsl_vector_ptr(this->nodes_argument[0], 0), 0);
+      feenox_realloc_vector_ptr(vec_coords, gsl_vector_ptr(mesh->nodes_argument[0], 0), 0);
     }
     feenox_free(name);
   }
@@ -306,34 +306,34 @@ int feenox_instruction_mesh_read(void *arg) {
   // loop over all functions and see if some of them needs us
   function_t *function = NULL;
   for (function = feenox.functions; function != NULL; function = function->hh.next) {
-    if (function->mesh == this && function->vector_argument != NULL) {
+    if (function->mesh == mesh && function->vector_argument != NULL) {
       
       // TODO: cells
       if (function->data_size == 0) {
-        function->data_size = this->n_nodes;
-      } else if (function->data_size != this->n_nodes) {
-        feenox_push_error_message("internal mismatch, data size = %ld != n_ndoes = %ld", function->data_size, this->n_nodes);
+        function->data_size = mesh->n_nodes;
+      } else if (function->data_size != mesh->n_nodes) {
+        feenox_push_error_message("internal mismatch, data size = %ld != n_ndoes = %ld", function->data_size, mesh->n_nodes);
       }
-      for (unsigned int d = 0; d < this->dim; d++) {
+      for (unsigned int d = 0; d < mesh->dim; d++) {
         feenox_call(feenox_vector_set_size(function->vector_argument[d], function->data_size));
         feenox_call(feenox_vector_init(function->vector_argument[d], FEENOX_VECTOR_NO_INITIAL));
-        feenox_realloc_vector_ptr(function->vector_argument[d], gsl_vector_ptr(this->nodes_argument[d], 0), 0);
+        feenox_realloc_vector_ptr(function->vector_argument[d], gsl_vector_ptr(mesh->nodes_argument[d], 0), 0);
       }
       function->vector_value->size = function->data_size;
       feenox_call(feenox_vector_init(function->vector_value, FEENOX_VECTOR_NO_INITIAL));
     }
   }
   
-  this->initialized = 1;
+  mesh->initialized = 1;
 
   return FEENOX_OK;
 
 }
 
-node_t *feenox_mesh_find_nearest_node(mesh_t *this, const double *x) {
+node_t *feenox_mesh_find_nearest_node(mesh_t *mesh, const double *x) {
   
   // TODO: if kd_nodes is null, initialize it here
-  void *res_item = kd_nearest(this->kd_nodes, x);
+  void *res_item = kd_nearest(mesh->kd_nodes, x);
   node_t *node = (node_t *)(kd_res_item(res_item, NULL));
   kd_res_free(res_item);    
 
@@ -694,37 +694,15 @@ mesh_t *feenox_get_mesh_ptr(const char *name) {
 }
 
 
-int feenox_mesh_create_nodes_argument(mesh_t *this) {
+int feenox_mesh_create_nodes_argument(mesh_t *mesh) {
   
-  feenox_check_alloc(this->nodes_argument = calloc(this->dim, sizeof(double *)));
-  for (unsigned int d = 0; d < this->dim; d++) {
-    feenox_check_alloc(this->nodes_argument[d] = gsl_vector_alloc(this->n_nodes));
-    for (size_t j = 0; j < this->n_nodes; j++) {
-      gsl_vector_set(this->nodes_argument[d], j, this->node[j].x[d]); 
+  feenox_check_alloc(mesh->nodes_argument = calloc(mesh->dim, sizeof(double *)));
+  for (unsigned int d = 0; d < mesh->dim; d++) {
+    feenox_check_alloc(mesh->nodes_argument[d] = gsl_vector_alloc(mesh->n_nodes));
+    for (size_t j = 0; j < mesh->n_nodes; j++) {
+      gsl_vector_set(mesh->nodes_argument[d], j, mesh->node[j].x[d]); 
     }  
   }
   
   return FEENOX_OK;
 }
-
-/*
-int feenox_mesh_create_index2tag(mesh_t *this) {
-    
-  if (this->index2tag != NULL) {
-    feenox_call(tag_index_map_free(this->index2tag));
-    feenox_free(this->index2tag);
-  }
-  this->index2tag = calloc(1, sizeof(tag_index_map_t));
-  tag_index_map_init(this->index2tag, this->node_tag_min, this->node_tag_max, this->n_nodes, 4);
-  size_t index = 0;
-  size_t n_nodes = 0;
-  for (size_t tag = this->node_tag_min; tag <= this->node_tag_max; tag++) {
-    if ((index = this->tag2index_from_tag_min[tag]) != SIZE_MAX) {
-      tag_index_map_insert(this->index2tag, tag, index);
-      n_nodes++;
-    }
-  }
-  
-  return FEENOX_OK;
-}
-*/

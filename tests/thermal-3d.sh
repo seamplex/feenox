@@ -10,6 +10,7 @@ if [ -z "${functions_found}" ]; then
 fi
 
 checkpde thermal
+checkgsl
 checkgmsh
 
 gmsh -v 0 -3 ${dir}/heater-cylinder-inches.geo || exit $?

@@ -41,38 +41,17 @@
 #endif
 
 // for inlining as much as possible GSL
+#ifdef HAVE_GSL
 #define HAVE_INLINE
 #define GSL_RANGE_CHECK_OFF
+#endif
 
 #ifndef sunrealtype
 #define sunrealtype realtype
 #endif
 
-// we need all the includes here so they all follow the inline directive above
-#include <gsl/gsl_blas.h>
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_deriv.h>
-#include <gsl/gsl_heapsort.h>
-#include <gsl/gsl_integration.h>
-#include <gsl/gsl_interp.h>
-#include <gsl/gsl_linalg.h>
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_matrix.h>
-#include <gsl/gsl_min.h>
-#include <gsl/gsl_multifit_nlinear.h>
-#include <gsl/gsl_multimin.h>
-#include <gsl/gsl_multiroots.h>
-#include <gsl/gsl_qrng.h>
-#include <gsl/gsl_randist.h>
-#include <gsl/gsl_rng.h>
-#include <gsl/gsl_roots.h>
-#include <gsl/gsl_spline.h>
-#include <gsl/gsl_sf.h>
-#include <gsl/gsl_statistics.h>
-#include <gsl/gsl_sort_double.h>
-#include <gsl/gsl_sort_vector_double.h>
-#include <gsl/gsl_vector.h>
-#include <gsl/gsl_version.h>
+// Include linear algebra layer (GSL or compatibility implementation)
+#include "math/linalg.h"
 
 #ifdef HAVE_SUNDIALS
  #include <ida/ida.h>
@@ -162,7 +141,11 @@ extern "C++" {
 // reasonable defaults
 #define DEFAULT_DT                         1.0/16.0
 #define DEFAULT_DAE_RTOL                   1e-6
+#ifdef HAVE_GSL
 #define DEFAULT_RANDOM_METHOD              gsl_rng_mt19937
+#else
+#define DEFAULT_RANDOM_METHOD              NULL
+#endif
 
 #define DEFAULT_PRINT_FORMAT               "%g"
 #define DEFAULT_PRINT_SEPARATOR            "\t"
@@ -187,7 +170,11 @@ extern "C++" {
 #define DEFAULT_FIT_GTOL                   1e-8
 #define DEFAULT_FIT_FTOL                   0.0
 
+#ifdef HAVE_GSL
 #define DEFAULT_SOLVE_METHOD               gsl_multiroot_fsolver_dnewton
+#else
+#define DEFAULT_SOLVE_METHOD               NULL
+#endif
 #define DEFAULT_SOLVE_EPSREL               0   // zero means do not look for deltas in derivatives
 #define DEFAULT_SOLVE_EPSABS               1e-6
 #define DEFAULT_SOLVE_MAX_ITER             128
@@ -231,7 +218,9 @@ extern "C++" {
 #define ELEMENT_TYPE_PRISM15        18
 #define NUMBER_ELEMENT_TYPE         19
 
+#ifndef M_SQRT5
 #define M_SQRT5 2.23606797749978969640917366873127623544061835961152572427089
+#endif
 
 #define FEENOX_SOLUTION_NOT_GRADIENT  0
 #define FEENOX_SOLUTION_GRADIENT      1
@@ -1430,8 +1419,8 @@ struct mesh_write_t {
   
   int (*write_header)(mesh_t *mesh, FILE *file);
   int (*write_mesh)(mesh_t *mesh, FILE *file, int no_physical_names);
-  int (*write_data)(mesh_write_t *this, mesh_write_dist_t *dist);
-  int (*write_footer)(mesh_write_t *this);
+  int (*write_data)(mesh_write_t *mesh, mesh_write_dist_t *dist);
+  int (*write_footer)(mesh_write_t *mesh);
    
   // these two are to know if we have to change the type in VTK
   int point_init;
@@ -1538,7 +1527,11 @@ struct solve_t {
   int max_iter;
   int verbose;
 
+#ifdef HAVE_GSL
   const gsl_multiroot_fsolver_type *type;
+#else
+  const void *type;
+#endif
   
   solve_t *next;  
 };
@@ -2130,7 +2123,7 @@ extern int feenox_read_arguments(char *string, int n_arguments, char ***arg, siz
 
 
 // file.c
-char *feenox_evaluate_string(const char *restrict format, int n_args, expr_t *arg);
+char *feenox_evaluate_string(const char *restrict fmt, int n_args, expr_t *arg);
 extern int feenox_instruction_file(void *arg);
 FILE *feenox_fopen(const char *filepath, const char *mode);
 extern int feenox_instruction_file_open(void *arg);
@@ -2303,7 +2296,7 @@ extern double feenox_gsl_function(double x, void *params);
 // mesh.c
 extern int feenox_instruction_mesh_read(void *arg);
 extern int feenox_mesh_create_nodes_argument(mesh_t *);
-extern int feenox_mesh_create_index2tag(mesh_t *this);
+extern int feenox_mesh_create_index2tag(mesh_t *mesh);
 extern int feenox_mesh_free(mesh_t *);
 
 extern int feenox_mesh_read_vtk(mesh_t *);
@@ -2427,13 +2420,13 @@ extern int feenox_mesh_write_header_vtk(mesh_t *mesh, FILE *file);
 extern int feenox_mesh_write_vtk_cells(mesh_t *mesh, FILE * file, int with_size);
 extern int feenox_mesh_write_vtk_types(mesh_t *mesh, FILE * file);
 extern int feenox_mesh_write_mesh_vtk(mesh_t *mesh, FILE *file, int dummy);
-extern int feenox_mesh_write_data_vtk(mesh_write_t *this, mesh_write_dist_t *dist);
+extern int feenox_mesh_write_data_vtk(mesh_write_t *mesh, mesh_write_dist_t *dist);
 
 // vtu.c
 extern int feenox_mesh_write_header_vtu(mesh_t *mesh, FILE *file);
 extern int feenox_mesh_write_mesh_vtu(mesh_t *, FILE *file, int dummy);
-extern int feenox_mesh_write_data_vtu(mesh_write_t *this, mesh_write_dist_t *dist);
-extern int feenox_mesh_write_footer_vtu(mesh_write_t *this);
+extern int feenox_mesh_write_data_vtu(mesh_write_t *mesh, mesh_write_dist_t *dist);
+extern int feenox_mesh_write_footer_vtu(mesh_write_t *mesh);
 
 // neighbors.c
 extern element_t *feenox_mesh_find_element_volumetric_neighbor(element_t *e)  __attribute__((noinline));

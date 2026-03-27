@@ -420,33 +420,33 @@ int feenox_mesh_point_in_prism(element_t *element, const double *x) {
 }
     
 // TODO: generalizar a prismas no paralelos
-double feenox_mesh_prism_volume(element_t *this) {
+double feenox_mesh_prism_volume(element_t *element) {
 
 //  return 0.5 * fabs(element->node[0]->x[2]-element->node[3]->x[2])* fabs(feenox_mesh_subtract_cross_2d(element->node[0]->x, element->node[1]->x, element->node[2]->x));
 
-  if (this->volume == 0) {
+  if (element->volume == 0) {
   
     double a[3], b[3], c[3];
     double v1, v2, v3;
   
-    feenox_mesh_subtract(this->node[0]->x, this->node[1]->x, a);
-    feenox_mesh_subtract(this->node[0]->x, this->node[2]->x, b);
-    feenox_mesh_subtract(this->node[0]->x, this->node[3]->x, c);
+    feenox_mesh_subtract(element->node[0]->x, element->node[1]->x, a);
+    feenox_mesh_subtract(element->node[0]->x, element->node[2]->x, b);
+    feenox_mesh_subtract(element->node[0]->x, element->node[3]->x, c);
     v1 = fabs(feenox_mesh_cross_dot(a, b, c));
   
-    feenox_mesh_subtract(this->node[4]->x, this->node[3]->x, a);
-    feenox_mesh_subtract(this->node[4]->x, this->node[5]->x, b);
-    feenox_mesh_subtract(this->node[4]->x, this->node[1]->x, c);
+    feenox_mesh_subtract(element->node[4]->x, element->node[3]->x, a);
+    feenox_mesh_subtract(element->node[4]->x, element->node[5]->x, b);
+    feenox_mesh_subtract(element->node[4]->x, element->node[1]->x, c);
     v2 = fabs(feenox_mesh_cross_dot(a, b, c));
   
-    feenox_mesh_subtract(this->node[2]->x, this->node[3]->x, a);
-    feenox_mesh_subtract(this->node[2]->x, this->node[5]->x, b);
-    feenox_mesh_subtract(this->node[2]->x, this->node[1]->x, c);
+    feenox_mesh_subtract(element->node[2]->x, element->node[3]->x, a);
+    feenox_mesh_subtract(element->node[2]->x, element->node[5]->x, b);
+    feenox_mesh_subtract(element->node[2]->x, element->node[1]->x, c);
     v3 = fabs(feenox_mesh_cross_dot(a, b, c));
 
-    this->volume = 1.0/(1.0*2.0*3.0) * (v1+v2+v3);
+    element->volume = 1.0/(1.0*2.0*3.0) * (v1+v2+v3);
   }
   
-  return this->volume;
+  return element->volume;
 
 }

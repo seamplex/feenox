@@ -634,14 +634,14 @@ double feenox_mesh_hex_volume(element_t *element) {
 
 }
 
-double feenox_mesh_hex_size(element_t *this) {
+double feenox_mesh_hex_size(element_t *element) {
 
-  if (this->size == 0) {
-    this->size = 1.0/4.0 * (feenox_mesh_subtract_module(this->node[0]->x, this->node[5]->x) +
-                            feenox_mesh_subtract_module(this->node[1]->x, this->node[6]->x) +
-                            feenox_mesh_subtract_module(this->node[2]->x, this->node[7]->x) +
-                            feenox_mesh_subtract_module(this->node[3]->x, this->node[8]->x));
+  if (element->size == 0) {
+    element->size = 1.0/4.0 * (feenox_mesh_subtract_module(element->node[0]->x, element->node[5]->x) +
+                            feenox_mesh_subtract_module(element->node[1]->x, element->node[6]->x) +
+                            feenox_mesh_subtract_module(element->node[2]->x, element->node[7]->x) +
+                            feenox_mesh_subtract_module(element->node[3]->x, element->node[8]->x));
   }  
   
-  return this->size;
+  return element->size;
 }

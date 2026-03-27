@@ -15,6 +15,7 @@ if [ "x${arch}" = "xppc64" ] || [ "x${arch}" = "xs390x" ] ; then
   exit 77
 fi
 
+checkgsl
 checkpde thermal
 
 answer thermal-two-squares-material-explicit-uniform.fee "0.750"

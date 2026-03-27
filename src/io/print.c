@@ -509,9 +509,9 @@ int feenox_instruction_print_vector(void *arg) {
 
 }
 
-char *feenox_print_vector_current_format_reset(print_vector_t *this) {
-  char *current_format = (this->tokens != NULL) ? this->tokens->format : NULL;
-  if (this->tokens == NULL || this->tokens->format == NULL) {
+char *feenox_print_vector_current_format_reset(print_vector_t *print_vector) {
+  char *current_format = (print_vector->tokens != NULL) ? print_vector->tokens->format : NULL;
+  if (print_vector->tokens == NULL || print_vector->tokens->format == NULL) {
     current_format = DEFAULT_PRINT_FORMAT;
   }
   

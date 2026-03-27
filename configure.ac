@@ -313,7 +313,15 @@ AM_CONDITIONAL([INCLUDE_SLEPC], [test "x${have_slepc}" = "xyes"])
 
 
 ######################
-# see if we have --enable-download-gsl
+# check for GSL (optional)
+AC_ARG_WITH([gsl],
+  [AS_HELP_STRING([--with-gsl],
+    [use GSL for advanced math features @<:@default=check@:>@])],
+  [],
+  [with_gsl=check]
+)
+
+have_gsl="no"
 gslver=2.8
 gsldist=gsl-${gslver}
 gslmirror=http://ftpmirror.gnu.org/gsl/${gsldist}.tar.gz
@@ -323,59 +331,92 @@ AC_ARG_ENABLE([download-gsl],
  [download_gsl=yes],
  [download_gsl=no])
 
-# if gsl directory does not exist, see if we have to uncompress and/or download
-AS_IF([test ! -e ${gsldist}],[
- AS_IF([test ! -e ${gsldist}.tar.gz],[
-  AS_IF([test "x$download_gsl" = "xyes"],[
-   AS_IF([test "x$(which wget)" != "x"],[
-    AC_MSG_NOTICE([downloading ${gslmirror}])
-    wget -c ${gslmirror}
-   ],[
-    AC_MSG_ERROR([file ${gsldist}.tar.gz not found and wget not installed])
-   ])
+AS_IF([test "x${with_gsl}" != "xno"], [
+  # if gsl directory does not exist, see if we have to uncompress and/or download
+  AS_IF([test ! -e ${gsldist}],[
    AS_IF([test ! -e ${gsldist}.tar.gz],[
-    AC_MSG_ERROR([file ${gsldist}.tar.gz could not be downloaded, copy it manually and re-try.])
+    AS_IF([test "x$download_gsl" = "xyes"],[
+     AS_IF([test "x$(which wget)" != "x"],[
+      AC_MSG_NOTICE([downloading ${gslmirror}])
+      wget -c ${gslmirror}
+     ],[
+      AS_IF([test "x${with_gsl}" != "xcheck"], [
+        AC_MSG_ERROR([file ${gsldist}.tar.gz not found and wget not installed])
+      ])
+     ])
+     AS_IF([test ! -e ${gsldist}.tar.gz],[
+      AS_IF([test "x${with_gsl}" != "xcheck"], [
+        AC_MSG_ERROR([file ${gsldist}.tar.gz could not be downloaded])
+      ])
+     ])
+    ])
+   ])
+   
+   AS_IF([test -e ${gsldist}.tar.gz],[
+    AC_MSG_NOTICE([uncompressing ${gsldist}.tar.gz])
+    tar xzf ${gsldist}.tar.gz
    ])
   ])
- ])
- 
- AS_IF([test -e ${gsldist}.tar.gz],[
-  AC_MSG_NOTICE([uncompressing ${gsldist}.tar.gz])
-  tar xzf ${gsldist}.tar.gz
- ])
-])
 
-# if gsl directory exists, see if we have to compile it
-AS_IF([test -e ${gsldist}],[
- AS_IF([test -e ${gsldist}/.libs/libgsl.a],[
-  AC_MSG_NOTICE([using already-compiled GSL library ${gsldist}/.libs/libgsl.a])
- ],[
-  AC_MSG_NOTICE([configuring ${gsldist}])
-  cd ${gsldist} 
-  ./configure --prefix=${prefix} --host=${host}
-  AC_MSG_NOTICE([compiling ${gsldist}])
-  make
-  cd ..
- ])
- 
- AC_SUBST([DOWNLOADED_GSL_LIBS], ["../${gsldist}/.libs/libgsl.a ../${gsldist}/cblas/.libs/libgslcblas.a"])
- AC_SUBST([DOWNLOADED_GSL_INCLUDES], ["-I ../${gsldist} -I ../../${gsldist}"])
- gsl_version="${gslver} (downloaded and statically linked)"
-],[ 
- # traditional test for GSL
- # check for GSL & CBLAS (required)
- AC_CHECK_HEADER([gsl/gsl_vector.h],    [], AC_MSG_ERROR([GNU Scientific library headers libgsl-dev not found.
-Either install them with your package manager or configure with --enable-download-gsl]))
+  # if gsl directory exists, see if we have to compile it
+  AS_IF([test -e ${gsldist}],[
+   AS_IF([test -e ${gsldist}/.libs/libgsl.a],[
+    AC_MSG_NOTICE([using already-compiled GSL library ${gsldist}/.libs/libgsl.a])
+   ],[
+    AC_MSG_NOTICE([configuring ${gsldist}])
+    cd ${gsldist} 
+    ./configure --prefix=${prefix} --host=${host}
+    AC_MSG_NOTICE([compiling ${gsldist}])
+    make
+    cd ..
+   ])
+   
+   AC_SUBST([DOWNLOADED_GSL_LIBS], ["../${gsldist}/.libs/libgsl.a ../${gsldist}/cblas/.libs/libgslcblas.a"])
+   AC_SUBST([DOWNLOADED_GSL_INCLUDES], ["-I ../${gsldist} -I ../../${gsldist}"])
+   gsl_version="${gslver} (downloaded and statically linked)"
+   have_gsl="yes"
+  ],[ 
+   # traditional test for GSL
+   # check for GSL & CBLAS
+   AC_CHECK_HEADER([gsl/gsl_vector.h], [], [
+    AS_IF([test "x${with_gsl}" != "xcheck"], [
+      AC_MSG_FAILURE([--with-gsl was given but GSL headers libgsl-dev not found])
+    ])
+   ])
 
- # TODO: the original idea is that
- # if we found PETSc, we use whatever BLAS it has, otherwise we use GSL's CBLAS
- # but this does not work in Fedora since even though the library flexiblas
- # that is used by PETSc does contain cblas_dgemm, it is not found by the linker
- #AS_IF([test "x${have_petsc}" != "xyes"],
-  AC_CHECK_LIB([gslcblas],[cblas_dgemm], [], AC_MSG_ERROR([GNU Scientific library CBLAS libgsl-dev not found]))
- #)
- AC_CHECK_LIB([gsl],[gsl_blas_dgemm],   [], AC_MSG_ERROR([GNU Scientific library libgsl-dev not found]))
- gsl_version="from system"
+   # TODO: the original idea is that
+   # if we found PETSc, we use whatever BLAS it has, otherwise we use GSL's CBLAS
+   # but this does not work in Fedora since even though the library flexiblas
+   # that is used by PETSc does contain cblas_dgemm, it is not found by the linker
+   #AS_IF([test "x${have_petsc}" != "xyes"],
+    AC_CHECK_LIB([gslcblas],[cblas_dgemm], [], [
+      AS_IF([test "x${with_gsl}" != "xcheck"], [
+        AC_MSG_FAILURE([--with-gsl was given but GSL CBLAS libgsl-dev not found])
+      ])
+    ])
+   #)
+   AC_CHECK_LIB([gsl],[gsl_blas_dgemm], [], [
+    AS_IF([test "x${with_gsl}" != "xcheck"], [
+      AC_MSG_FAILURE([--with-gsl was given but GSL library libgsl-dev not found])
+    ])
+   ])
+   
+   # check if we have everything
+   AS_IF([test "x${ac_cv_lib_gsl_gsl_blas_dgemm}" = "xyes" -a \
+               "x${ac_cv_header_gsl_gsl_vector_h}" = "xyes"],
+     [
+       gsl_version="from system"
+       have_gsl="yes"
+     ]
+   )
+  ])
+
+  # Define HAVE_GSL if we found it
+  AS_IF([test "x${have_gsl}" = "xyes"],
+    [
+      AC_DEFINE([HAVE_GSL], [1], [GSL is available])
+    ]
+  )
 ])
 
 
@@ -424,22 +465,32 @@ AS_IF([test "x${enable_fee2ccx}" = "xyes"] , [
 
 
 AS_BOX([Summary of dependencies])
-AS_ECHO(  ["  GNU Scientific Library  ${gsl_version}"])
+AS_ECHO_N(  ["  GNU Scientific Library  ${have_gsl}"])
+AS_IF([test "x${have_gsl}" = "xyes"],
+ AS_ECHO([" ${gsl_version}"]),
+ AS_ECHO
+)
+
 # AS_ECHO(  ["  Readline                ${have_readline}"])
+
 AS_ECHO(  ["  SUNDIALS                ${have_sundials}"])
+
 AS_ECHO_N(["  PETSc                   ${have_petsc}"])
 AS_IF([test "x${have_petsc}" = "xyes"],
  AS_ECHO([" ${PETSC_DIR} ${PETSC_ARCH}"]),
  AS_ECHO
 )
+
 AS_ECHO_N(["  SLEPc                   ${have_slepc}"])
 AS_IF([test "x${have_slepc}" = "xyes"],
  AS_ECHO([" ${SLEPC_DIR}"]),
  AS_ECHO
 )
+
 AS_ECHO(  ["  Compile fee2ccx         ${enable_fee2ccx}"])
 AS_ECHO(  ["  Compiler                ${compiler_show}"])
 AS_ECHO(  ["  Compiler flags          ${CFLAGS}"])
+AS_ECHO(  ["  Compiler version        ${compiler_version}"])
 # AS_ECHO(  ["  Linker flags            ${LDFLAGS}"])
 
 AC_OUTPUT

@@ -21,76 +21,76 @@
  */
 #include "feenox.h"
 
-double feenox_matrix_get(matrix_t *this, const size_t i,  const size_t j) {
+double feenox_matrix_get(matrix_t *matrix, const size_t i,  const size_t j) {
   
-  if (!this->initialized) {
-    feenox_call(feenox_matrix_init(this));
+  if (!matrix->initialized) {
+    feenox_call(feenox_matrix_init(matrix));
   }
   
-  return gsl_matrix_get(feenox_value_ptr(this), i, j);
+  return gsl_matrix_get(feenox_value_ptr(matrix), i, j);
 }
 
-double feenox_matrix_get_initial_static(matrix_t *this, const size_t i,  const size_t j) {
+double feenox_matrix_get_initial_static(matrix_t *matrix, const size_t i,  const size_t j) {
   
-  if (!this->initialized) {
-    feenox_call(feenox_matrix_init(this));
+  if (!matrix->initialized) {
+    feenox_call(feenox_matrix_init(matrix));
   }
   
-  return gsl_matrix_get(this->initial_static, i, j);
+  return gsl_matrix_get(matrix->initial_static, i, j);
 }
 
-double feenox_matrix_get_initial_transient(matrix_t *this, const size_t i,  const size_t j) {
+double feenox_matrix_get_initial_transient(matrix_t *matrix, const size_t i,  const size_t j) {
   
-  if (!this->initialized) {
-    feenox_call(feenox_matrix_init(this));
+  if (!matrix->initialized) {
+    feenox_call(feenox_matrix_init(matrix));
   }
   
-  return gsl_matrix_get(this->initial_transient, i, j);
+  return gsl_matrix_get(matrix->initial_transient, i, j);
 }
 
 
-int feenox_matrix_init(matrix_t *this) {
+int feenox_matrix_init(matrix_t *matrix) {
 
   int rows, cols;
   int i, j;
   expr_t *data;
 
-  if ((rows = (int)(round(feenox_expression_eval(&this->rows_expr)))) == 0 &&
-      (rows = this->rows) == 0) {
-    feenox_push_error_message("matrix '%s' has zero rows", this->name);
+  if ((rows = (int)(round(feenox_expression_eval(&matrix->rows_expr)))) == 0 &&
+      (rows = matrix->rows) == 0) {
+    feenox_push_error_message("matrix '%s' has zero rows", matrix->name);
     return FEENOX_ERROR;
   } else if (rows < 0) {
-    feenox_push_error_message("matrix '%s' has negative rows %d", this->name, rows);
+    feenox_push_error_message("matrix '%s' has negative rows %d", matrix->name, rows);
     return FEENOX_ERROR;
   }
   
-  if ((cols = (int)(round(feenox_expression_eval(&this->cols_expr)))) == 0  && (cols = this->cols) == 0) {
-    feenox_push_error_message("matrix '%s' has zero cols", this->name);
+  if ((cols = (int)(round(feenox_expression_eval(&matrix->cols_expr)))) == 0  && (cols = matrix->cols) == 0) {
+    feenox_push_error_message("matrix '%s' has zero cols", matrix->name);
     return FEENOX_ERROR;
   } else if (cols < 0) {
-    feenox_push_error_message("matrix '%s' has negative cols %d", this->name, cols);
+    feenox_push_error_message("matrix '%s' has negative cols %d", matrix->name, cols);
     return FEENOX_ERROR;
   }
   
-  this->rows = rows;
-  this->cols = cols;
-  feenox_value_ptr(this) = gsl_matrix_calloc(rows, cols);
-  this->initial_static = gsl_matrix_calloc(rows, cols);
-  this->initial_transient = gsl_matrix_calloc(rows, cols);
+  matrix->rows = rows;
+  matrix->cols = cols;
+  feenox_value_ptr(matrix) = gsl_matrix_calloc(rows, cols);
+  matrix->initial_static = gsl_matrix_calloc(rows, cols);
+  matrix->initial_transient = gsl_matrix_calloc(rows, cols);
   
-  if (this->datas != NULL) {
+  if (matrix->datas != NULL) {
     i = 0;
     j = 0;
-    LL_FOREACH(this->datas, data) {
-      gsl_matrix_set(feenox_value_ptr(this), i, j++, feenox_expression_eval(data));
-      if (j == this->cols) {
+    LL_FOREACH(matrix->datas, data) {
+      gsl_matrix_set(feenox_value_ptr(matrix), i, j++, feenox_expression_eval(data));
+      if (j == matrix->cols) {
         j = 0;
         i++;
       }
     }
   }
   
-  this->initialized = 1;
+  matrix->initialized = 1;
   
   return FEENOX_OK;
 

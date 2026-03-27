@@ -26,6 +26,7 @@ feenox_parser_t feenox_parser;
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 #if HAVE_SYSCONF
  #include <unistd.h>
 #endif
@@ -3945,7 +3946,8 @@ int feenox_parse_dump(void) {
 }
 
 int feenox_parse_solve(void) {
-  
+
+#ifdef HAVE_GSL
   solve_t *solve = NULL;
   feenox_check_alloc(solve = calloc(1, sizeof(solve_t)));
   size_t n_equations = 0;
@@ -3962,15 +3964,15 @@ int feenox_parse_solve(void) {
 
       feenox_check_alloc(solve->unknown = calloc(solve->n_unknowns, sizeof(var_t *)));
       feenox_check_alloc(solve->residual = calloc(solve->n_unknowns, sizeof(expr_t)));
-      
+
 ///kw+SOLVE+usage UNKNOWNS <var_1> <var_2> ... <var_n>
     } else if (strcasecmp(token, "UNKNOWNS") == 0) {
-      
+
       if (solve->n_unknowns == 0) {
         feenox_push_error_message("FOR should become before UNKNOWNS");
         return FEENOX_ERROR;
       }
-      
+
       for (unsigned int i = 0; i < solve->n_unknowns; i++) {
         if ((token = feenox_get_next_token(NULL)) == NULL) {
           feenox_push_error_message("expected %d variables and found only %d", solve->n_unknowns, i);
@@ -3979,7 +3981,7 @@ int feenox_parse_solve(void) {
           return FEENOX_ERROR;
         }
       }
-      
+
 ///kw+SOLVE+usage [ METHOD
     } else if (strcasecmp(token, "METHOD") == 0) {
 
@@ -4003,7 +4005,7 @@ int feenox_parse_solve(void) {
         solve->type = gsl_multiroot_fsolver_hybrid;
 ///kw+SOLVE+usage ]@
       }
-          
+
 ///kw+SOLVE+usage [ EPSABS <expr> ]
     } else if (strcasecmp(token, "EPSABS") == 0) {
       feenox_call(feenox_parser_expression(&solve->epsabs));
@@ -4022,8 +4024,8 @@ int feenox_parse_solve(void) {
 
 //kw+SOLVE+usage [ VERBOSE ]@
     } else if (strcasecmp(token, "VERBOSE") == 0) {
-      solve->verbose = 1;          
-          
+      solve->verbose = 1;
+
     } else {
 //kw+SOLVE+usage <equation_1> <equation_2> ... <equation_n>
       if (solve->n_unknowns == 0) {
@@ -4035,7 +4037,7 @@ int feenox_parse_solve(void) {
         feenox_push_error_message("more equations than unknowns");
         return FEENOX_ERROR;
       }
-      
+
       char *equal_sign = strchr(token, '=');
       if (equal_sign == NULL) {
         // no equal sign means residual (equal to zero)
@@ -4054,7 +4056,7 @@ int feenox_parse_solve(void) {
     feenox_push_error_message("do not know the number of unknowns");
     return FEENOX_ERROR;
   }
-  
+
   if (n_equations == 0) {
     feenox_push_error_message("no equations to solve");
     return FEENOX_ERROR;
@@ -4063,15 +4065,18 @@ int feenox_parse_solve(void) {
     feenox_push_error_message("less equations (%ld) than unknowns (%ld)", n_equations, solve->n_unknowns);
     return FEENOX_ERROR;
   }
-      
+
   if (solve->type == NULL) {
     solve->type = DEFAULT_SOLVE_METHOD;
   }
 
   feenox_call(feenox_add_instruction(feenox_instruction_solve, solve));
   LL_APPEND(feenox.solves, solve);
-      
-  return FEENOX_OK;        
+
+  return FEENOX_OK;
+#else
+  feenox_push_error_message("SOLVE instruction needs FeenoX compiled with GSL");
+#endif
 }
 
 mesh_t *feenox_parser_mesh(void) {

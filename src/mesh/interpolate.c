@@ -133,7 +133,7 @@ int feenox_mesh_interp_solve_for_r(element_t *this, const double *x, double *r) 
         return FEENOX_ERROR;
       }
       gsl_status = gsl_multiroot_test_residual(s->f, feenox_var_value(feenox.mesh.vars.eps));
-    } while (gsl_status == GSL_CONTINUE && iter < 10);
+    } while (gsl_status == -2 /* GSL_CONTINUE */ && iter < 10);
 
     for (m = 0; m < this->type->dim; m++) {
       r[m] = gsl_vector_get(gsl_multiroot_fdfsolver_root(s), m);

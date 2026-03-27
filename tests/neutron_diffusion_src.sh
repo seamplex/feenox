@@ -9,6 +9,7 @@ if [ -z "${functions_found}" ]; then
    exit 1
 fi
 
+checkgsl
 checkpde neutron_diffusion
 
 answer ud20-1-0-sl-src.fee "0.474 0.495"

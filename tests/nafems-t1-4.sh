@@ -9,6 +9,7 @@ if [ -z "${functions_found}" ]; then
    exit 1
 fi
 
+checkgsl
 
 # t1 and t4 are separated from t2 & t3 because they needs gmsh
 checkgmsh

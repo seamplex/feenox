@@ -21,6 +21,8 @@
  */
 #include "feenox.h"
 
+#ifdef HAVE_GSL
+
 int feenox_fit_f(const gsl_vector *via, void *arg, gsl_vector *f);
 int feenox_fit_df(const gsl_vector *via, void *arg, gsl_matrix *J);
 int feenox_fit_in_range(fit_t *this);
@@ -225,3 +227,40 @@ void feenox_fit_print_state(const size_t iter, void *arg, const gsl_multifit_nli
   
   return;
 }
+
+#else // !HAVE_GSL
+
+int feenox_instruction_fit(void *arg) {
+  feenox_push_error_message("FIT instruction needs FeenoX to be compiled with GSL support");
+  return FEENOX_ERROR;
+}
+
+int feenox_fit_f(const gsl_vector *via, void *arg, gsl_vector *f) {
+  return -1;  // GSL_FAILURE
+}
+
+int feenox_fit_df(const gsl_vector *via, void *arg, gsl_matrix *J) {
+  return -1;  // GSL_FAILURE
+}
+
+int feenox_fit_in_range(fit_t *this) {
+  return 0;
+}
+
+void feenox_fit_update_x(fit_t *this, size_t j) {
+  return;
+}
+
+void feenox_fit_update_vias(fit_t *this, const gsl_vector *via) {
+  return;
+}
+
+// Forward declaration for workspace type
+typedef struct gsl_multifit_nlinear_workspace gsl_multifit_nlinear_workspace;
+
+void feenox_fit_print_state(const size_t iter, void *arg, const gsl_multifit_nlinear_workspace *w) {
+  return;
+}
+
+#endif // HAVE_GSL
+

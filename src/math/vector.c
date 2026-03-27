@@ -53,117 +53,117 @@ int feenox_create_pointwise_function_vectors(function_t *function) {
   return FEENOX_OK;
 }
 
-double feenox_vector_get(vector_t *this, const size_t i) {
+double feenox_vector_get(vector_t *vector, const size_t i) {
 
-  if (this->initialized == 0) {
-    if (feenox_vector_init(this, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
-      feenox_push_error_message("initialization of vector '%s' failed", this->name);
+  if (vector->initialized == 0) {
+    if (feenox_vector_init(vector, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
+      feenox_push_error_message("initialization of vector '%s' failed", vector->name);
       feenox_runtime_error();
     }
   }
   
-  return gsl_vector_get(feenox_value_ptr(this), i);
+  return gsl_vector_get(feenox_value_ptr(vector), i);
 }
 
-double feenox_vector_get_initial_static(vector_t *this, const size_t i) {
+double feenox_vector_get_initial_static(vector_t *vector, const size_t i) {
   
-  if (this->initialized == 0) {
-    if (feenox_vector_init(this, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
-      feenox_push_error_message("initialization of vector '%s' failed", this->name);
+  if (vector->initialized == 0) {
+    if (feenox_vector_init(vector, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
+      feenox_push_error_message("initialization of vector '%s' failed", vector->name);
       feenox_runtime_error();
     }
   }
   
-  return gsl_vector_get(this->initial_static, i);
+  return gsl_vector_get(vector->initial_static, i);
 }
 
-double feenox_vector_get_initial_transient(vector_t *this, const size_t i) {
+double feenox_vector_get_initial_transient(vector_t *vector, const size_t i) {
   
-  if (this->initialized == 0) {
-    if (feenox_vector_init(this, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
-      feenox_push_error_message("initialization of vector '%s' failed", this->name);
+  if (vector->initialized == 0) {
+    if (feenox_vector_init(vector, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
+      feenox_push_error_message("initialization of vector '%s' failed", vector->name);
       feenox_runtime_error();
     }
   }
   
-  return gsl_vector_get(this->initial_transient, i);
+  return gsl_vector_get(vector->initial_transient, i);
 }
 
-int feenox_vector_set(vector_t *this, const size_t i, double value) {
+int feenox_vector_set(vector_t *vector, const size_t i, double value) {
   
-  if (this->initialized == 0) {
-    if (feenox_vector_init(this, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
-      feenox_push_error_message("initialization of vector '%s' failed", this->name);
+  if (vector->initialized == 0) {
+    if (feenox_vector_init(vector, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
+      feenox_push_error_message("initialization of vector '%s' failed", vector->name);
       return FEENOX_ERROR;
     }
   }
   
-  gsl_vector_set(feenox_value_ptr(this), i, value);
+  gsl_vector_set(feenox_value_ptr(vector), i, value);
   
   return FEENOX_OK;
 }
 
-int feenox_vector_add(vector_t *this, const size_t i, double value) {
+int feenox_vector_add(vector_t *vector, const size_t i, double value) {
   
-  if (this->initialized == 0) {
-    if (feenox_vector_init(this, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
-      feenox_push_error_message("initialization of vector '%s' failed", this->name);
+  if (vector->initialized == 0) {
+    if (feenox_vector_init(vector, FEENOX_VECTOR_INITIAL) != FEENOX_OK) {
+      feenox_push_error_message("initialization of vector '%s' failed", vector->name);
       return FEENOX_ERROR;
     }
   }
   
-  gsl_vector_set(feenox_value_ptr(this), i, gsl_vector_get(feenox_value_ptr(this), i) + value);
+  gsl_vector_set(feenox_value_ptr(vector), i, gsl_vector_get(feenox_value_ptr(vector), i) + value);
   
   return FEENOX_OK;
 }
 
-int feenox_vector_set_size(vector_t *this, size_t size) {
-  if (this->initialized) {
-    feenox_push_error_message("cannot set vector '%s' size, it is already initialized", this->name);
+int feenox_vector_set_size(vector_t *vector, size_t size) {
+  if (vector->initialized) {
+    feenox_push_error_message("cannot set vector '%s' size, it is already initialized", vector->name);
     return FEENOX_ERROR;
   }
   
-  this->size = size;
+  vector->size = size;
   
   return FEENOX_OK;
 }
 
-size_t feenox_vector_get_size(vector_t *this) {
-  return this->size;
+size_t feenox_vector_get_size(vector_t *vector) {
+  return vector->size;
 }
 
 
 // no_initial = 0 means allocate and initialize initial static and initial transient
 // no_initial = 1 means do not allocate initial
-int feenox_vector_init(vector_t *this, int no_initial) {
+int feenox_vector_init(vector_t *vector, int no_initial) {
 
   int size;
   int i;
   expr_t *data;
 
-  if (this->initialized) {
+  if (vector->initialized) {
     return FEENOX_OK;
   }
 
-  if ((size = this->size) == 0 && (size = (int)(round(feenox_expression_eval(&this->size_expr)))) == 0) {
-    feenox_push_error_message("vector '%s' has zero size at initialization", this->name);
+  if ((size = vector->size) == 0 && (size = (int)(round(feenox_expression_eval(&vector->size_expr)))) == 0) {
+    feenox_push_error_message("vector '%s' has zero size at initialization", vector->name);
     return FEENOX_ERROR;
   } else if (size < 0) {
-    feenox_push_error_message("vector '%s' has negative size %d at initialization", this->name, size);
+    feenox_push_error_message("vector '%s' has negative size %d at initialization", vector->name, size);
     return FEENOX_ERROR;
   }
   
-  this->size = size;
-  feenox_value_ptr(this) = gsl_vector_calloc(size);
+  vector->size = size;
+  feenox_value_ptr(vector) = gsl_vector_calloc(size);
   if (no_initial == 0) {
-    this->initial_static = gsl_vector_calloc(size);
-    this->initial_transient = gsl_vector_calloc(size);
+    vector->initial_static = gsl_vector_calloc(size);
+    vector->initial_transient = gsl_vector_calloc(size);
   }  
 
-  if (this->datas != NULL) {
+  if (vector->datas != NULL) {
     i = 0;
-    LL_FOREACH(this->datas, data) {
-      gsl_vector_set(feenox_value_ptr(this), i++, feenox_expression_eval(data));
+    LL_FOREACH(vector->datas, data) {
+      gsl_vector_set(feenox_value_ptr(vector), i++, feenox_expression_eval(data));
     }
   }
 
@@ -172,7 +172,7 @@ int feenox_vector_init(vector_t *this, int no_initial) {
     feenox_realloc_vector_ptr(this, this->function->data_value, 0);
   }
 */  
-  this->initialized = 1;
+  vector->initialized = 1;
   
   return FEENOX_OK;
 

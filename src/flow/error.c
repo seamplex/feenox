@@ -28,7 +28,9 @@
 #include <unistd.h>
 #include <sys/types.h>
 
+#ifdef HAVE_GSL
 #include <gsl/gsl_errno.h>
+#endif
 
 void feenox_push_error_message(const char *fmt, ...) {
   

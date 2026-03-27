@@ -430,74 +430,74 @@ int feenox_mesh_point_in_tetrahedron(element_t *element, const double *x) {
 }
 
 
-double feenox_mesh_tet_volume(element_t *this) {
+double feenox_mesh_tet_volume(element_t *element) {
 
-  if (this->volume == 0) {
+  if (element->volume == 0) {
     double a[3], b[3], c[3];
     
-    feenox_mesh_subtract(this->node[0]->x, this->node[1]->x, a);
-    feenox_mesh_subtract(this->node[0]->x, this->node[2]->x, b);
-    feenox_mesh_subtract(this->node[0]->x, this->node[3]->x, c);
+    feenox_mesh_subtract(element->node[0]->x, element->node[1]->x, a);
+    feenox_mesh_subtract(element->node[0]->x, element->node[2]->x, b);
+    feenox_mesh_subtract(element->node[0]->x, element->node[3]->x, c);
   
-    this->volume = 1.0/(1.0*2.0*3.0) * fabs(feenox_mesh_cross_dot(c, a, b));
+    element->volume = 1.0/(1.0*2.0*3.0) * fabs(feenox_mesh_cross_dot(c, a, b));
   }  
   
-  return this->volume;
+  return element->volume;
 
 // AFEM.Ch09.pdf
 // 6V = J = x 21 (y 23 z 34 − y34 z 23 ) + x32 (y34 z 12 − y12 z34 ) + x 43 (y12 z23 − y23 z 12),
 }
 
-double feenox_mesh_tet_area(element_t *this) {
+double feenox_mesh_tet_area(element_t *element) {
 
-  if (this->area == 0) {
+  if (element->area == 0) {
     element_t triangle;
     triangle.type = &feenox.mesh.element_types[ELEMENT_TYPE_TRIANGLE3];
     triangle.node = NULL;
     feenox_check_alloc(triangle.node = calloc(3, sizeof(node_t *)));
     
     // first triangle: 0 1 2
-    triangle.node[0] = this->node[0];
-    triangle.node[1] = this->node[1];
-    triangle.node[2] = this->node[2];
+    triangle.node[0] = element->node[0];
+    triangle.node[1] = element->node[1];
+    triangle.node[2] = element->node[2];
     triangle.volume = 0;
-    this->area += triangle.type->volume(&triangle);
+    element->area += triangle.type->volume(&triangle);
     
     // first triangle: 0 1 3
-    triangle.node[0] = this->node[0];
-    triangle.node[1] = this->node[1];
-    triangle.node[2] = this->node[3];
+    triangle.node[0] = element->node[0];
+    triangle.node[1] = element->node[1];
+    triangle.node[2] = element->node[3];
     triangle.volume = 0;
-    this->area += triangle.type->volume(&triangle);
+    element->area += triangle.type->volume(&triangle);
 
     // first triangle: 0 2 3
-    triangle.node[0] = this->node[0];
-    triangle.node[1] = this->node[2];
-    triangle.node[2] = this->node[3];
+    triangle.node[0] = element->node[0];
+    triangle.node[1] = element->node[2];
+    triangle.node[2] = element->node[3];
     triangle.volume = 0;
-    this->area += triangle.type->volume(&triangle);
+    element->area += triangle.type->volume(&triangle);
 
     // first triangle: 1 2 3
-    triangle.node[0] = this->node[1];
-    triangle.node[1] = this->node[2];
-    triangle.node[2] = this->node[3];
+    triangle.node[0] = element->node[1];
+    triangle.node[1] = element->node[2];
+    triangle.node[2] = element->node[3];
     triangle.volume = 0;
-    this->area += triangle.type->volume(&triangle);
+    element->area += triangle.type->volume(&triangle);
     
     feenox_free(triangle.node);
   }  
   
-  return this->area; 
+  return element->area; 
 }
 
-double feenox_mesh_tet_size(element_t *this) {
+double feenox_mesh_tet_size(element_t *element) {
 
-  if (this->size == 0) {
-    this->size = 1.0/4.0 * (feenox_mesh_subtract_module(this->node[0]->x, this->node[1]->x) +
-                            feenox_mesh_subtract_module(this->node[1]->x, this->node[2]->x) +
-                            feenox_mesh_subtract_module(this->node[2]->x, this->node[3]->x) +
-                            feenox_mesh_subtract_module(this->node[3]->x, this->node[0]->x));
+  if (element->size == 0) {
+    element->size = 1.0/4.0 * (feenox_mesh_subtract_module(element->node[0]->x, element->node[1]->x) +
+                            feenox_mesh_subtract_module(element->node[1]->x, element->node[2]->x) +
+                            feenox_mesh_subtract_module(element->node[2]->x, element->node[3]->x) +
+                            feenox_mesh_subtract_module(element->node[3]->x, element->node[0]->x));
   }  
   
-  return this->size;
+  return element->size;
 }
