@@ -329,8 +329,7 @@ of freedom (i.e. the size of the problem matrix) and not the number of
 *elements*, which is irrelevant here and in most problems.
 
 ``` feenox
-PROBLEM mechanical 3D
-READ_MESH cantilever-$1-$2.msh   # in meters
+PROBLEM mechanical 3D MESH cantilever-$1-$2.msh   # in meters
 
 E = 2.1e11         # Young modulus in Pascals
 nu = 0.3           # Poisson's ratio
@@ -338,10 +337,8 @@ nu = 0.3           # Poisson's ratio
 BC left   fixed
 BC right  tz=-1e5  # traction in Pascals, negative z
  
-SOLVE_PROBLEM
-
 # z-displacement (components are u,v,w) at the tip vs. number of nodes
-PRINT nodes %e w(500,0,0) "\# $1 $2"
+PRINT nodes %e w(0.5,0,0) "\# $1 $2"
 ```
 
 ``` terminal
@@ -1090,25 +1087,23 @@ alt="The NAFEMS Geometric-non-linear cantilever beam benchmark problem." />
 cantilever beam benchmark problem.</figcaption>
 </figure>
 
-Consider a cantilevered beam with a square
-$`0.1~\text{m} \times 0.1~\text{m}`$ cross section and axial length
-$`3.2~\text{m}`$ along the $`x`$ axis. The material es linear elastic
-with $`E=2.1 \times 10^{11} \text{Pa}`$ and $`\nu=0`$. The left end at
-plane $`y`$-$`z`$ is fixed. The right end is subject to a total load of
-$`F_x = -3.844 \times 10^6~\text{N}`$ (compressive) and
-$`F_y = -3.844 \times 10^3~\text{N}`$ (downward).
+Consider a cantilevered beam with a
+square $`0.1~\text{m} \times 0.1~\text{m}`$ cross section and axial
+length $`3.2~\text{m}`$ along the $`x`$ axis. The material es linear
+elastic with $`E=2.1 \times 10^{11} \text{Pa}`$ and $`\nu=0`$. The left
+end at plane $`y`$-$`z`$ is fixed. The right end is subject to a total
+load of $`F_x = -3.844 \times 10^6~\text{N}`$ (compressive)
+and $`F_y = -3.844 \times 10^3~\text{N}`$ (downward).
 
 A large-deformation buckling effect is expected due to the massive
-compression of a slender structural geometry and the slight $`0.1\%`$
-loading imperfection in the $`y`$ direction. The reference results are
+compression of a slender structural geometry and the slight $`0.1\%`$
+loading imperfection in the $`y`$ direction. The reference results are
 
 | Scalar quantity                          |       Reference result        |
 |:-----------------------------------------|:-----------------------------:|
 | Maximum vertical displacement at the tip | $`(-2.58 \pm 0.02)~\text{m}`$ |
 | Final vertical displacement at the tip   | $`(-1.36 \pm 0.02)~\text{m}`$ |
 | Final vertical displacement at the tip   | $`(-5.04 \pm 0.04)~\text{m}`$ |
-
-Reference results for the NAFEMS GNL-5 benchmark problem
 
 ------------------------------------------------------------------------
 
@@ -1148,14 +1143,14 @@ converge to other possible solutions.
 
 For that end, we run a quasi-static problem with a non-dimensional
 time $`t`$ from $`t=0`$ up to $`t=1`$ (i.e. `end_time = 1`) and scale
-the loads with the factor $`t`$. We start with $`\Delta t_0 = 0.01`$
-(i.e. `dt_0 = 1e-2` meaning $`1\%`$ of the load) and then allow FeenoX
+the loads with the factor $`t`$. We start with $`\Delta t_0 = 0.01`$
+(i.e. `dt_0 = 1e-2` meaning $`1\%`$ of the load) and then allow FeenoX
 to choose the time (load) step.
 
 In FeenoX, to use a linear-elastic isotropic material model in the
 large-deformation (a.k.a. [Saint Venant-Kirchoff model]) one can either
 
-1.  keep $`E`$ and $`\nu`$ as global variables `E` and `nu` respectively
+1.  keep $`E`$ and $`\nu`$ as global variables `E` and `nu` respectively
     as in the [linear case] above and then
 
     1.  set the special variable `ldef` to non-zero, or

@@ -131,3 +131,6 @@ nafems-gnl-cantilever*.pdf
 nafems-gnl-cantilever*.dat
 
 steel-*.pvsm
+
+tennis*.dat
+tennis-top.svg

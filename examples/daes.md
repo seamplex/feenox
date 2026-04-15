@@ -1141,3 +1141,107 @@ Mapas de estabilidad de cinética puntual con realimentación termohidráulica
 :::
 
 
+# Effect of top spin in a tennis ball
+
+This input file solves for the $x(t)$-$y(t)$ position of a tennis ball
+taking into account vertical, horizontal and rotation force and torque
+balances. Without arguments, it computes the trajectory for a base set
+of parameters. With two arguments, the first one chooses which parameter
+to disturb and the second gives a signed fraction with the disturbance.
+
+So to study how the trajectory changes with an initial spin which is the
+double of the nominal case (positive means top spin), one can do
+
+``` terminal
+$ feenox tennis.fee 10 "(+1)"
+```
+
+
+```feenox
+PHASE_SPACE x vx y vy theta omega Fy Fx tau
+DEFAULT_ARGUMENT_VALUE 1 0   # no extra args means no disturbances
+DEFAULT_ARGUMENT_VALUE 2 0
+
+# solver settings
+end_time = 2    # in seconds (SI)
+dt_0 = 1e-6
+max_dt = 1e-4
+dae_rtol = 1e-6
+
+# parameters (in SI) with room for perturbations
+m = 0.058       *(1+equal($1,1)*($2)) # mass of the ball
+r = 0.5*0.067   *(1+equal($1,2)*($2)) # radius
+g = 9.8         *(1+equal($1,3)*($2)) # gravity
+k = 3e4         *(1+equal($1,4)*($2)) # stiffness of the ball (as in spring)
+alpha = 10      *(1+equal($1,5)*($2)) # damping coef. (prop. to speed)
+mu = 0.5        *(1+equal($1,6)*($2)) # friction coef
+
+rho = 1.2       *(1+equal($1,7)*($2)) # air density [kg/m^3]
+Cd = 0.4        *(1+equal($1,8)*($2)) # drag coefficient
+Cl = 0.25       *(1+equal($1,9)*($2)) # lift coefficient (Magnus)
+
+spin = 200      *(1+equal($1,10)*($2)) # initial top spin in rad/sec
+
+# geometry & misc
+A = pi*r^2      # cross-sectional area
+I = 0.4*m*r^2   # moment of inertia
+v_epsilon = 0.1 # regularization constant (non-dimensional)=
+
+# initial conditions
+y_0 = 1.5
+vy_0 = 0
+Fy_0 = 0
+
+x_0 = 0
+vx_0 = 15
+Fx_0 = 0
+
+theta_0 = 0
+omega_0 = spin
+tau_0 = 0
+
+
+# DAES
+
+# aerodynamic forces
+Fx_drag = -0.5 * rho * Cd * A * sqrt(vx^2 + vy^2) * vx
+Fy_drag = -0.5 * rho * Cd * A * sqrt(vx^2 + vy^2) * vy
+Fx_magnus = -0.5 * rho * Cl * A * omega * r * vy
+Fy_magnus = +0.5 * rho * Cl * A * omega * r * vx
+
+# vertical balance
+0 .= y_dot - vy
+0 .= m*vy_dot + (y<r) * alpha*y_dot + (m*g - Fy) - Fy_drag - Fy_magnus
+Fy = (y<r) * k*(r-y)
+
+# horizontal balance
+0 .= x_dot - vx
+0 .= m*vx_dot - Fx - Fx_drag - Fx_magnus
+Fx = -mu * Fy * tanh((vx - omega*r) / v_epsilon)
+
+# rotational balance
+0 .= theta_dot - omega
+0 .= I*omega_dot - tau
+tau = -Fx * r
+
+PRINT t x y vx omega*r omega Fx Fy Fx_drag  Fy_drag Fx_magnus Fy_magnus
+
+```
+
+
+```terminal
+$ feenox tennis.fee > tennis-base.dat
+$ feenox tennis.fee 10 "(-1)"   > tennis-top-1.dat
+$ feenox tennis.fee 10 "(-0.5)" > tennis-top-0.5.dat
+$ feenox tennis.fee 10 "(+0.5)" > tennis-top+0.5.dat
+$ feenox tennis.fee 10 "(+1)"   > tennis-top+1.0.dat
+$ feenox tennis.fee 7  "(-0.2)" > tennis-rho-0.2.dat
+$ feenox tennis.fee 7  "(+0.2)" > tennis-rho+0.2.dat
+$ gnuplot tennis.gp
+
+```
+
+
+![Effect of top spin in the trajectory of a tennis ball](tennis-top.svg)
+
+
