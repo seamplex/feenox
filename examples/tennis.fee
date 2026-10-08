@@ -46,8 +46,8 @@ tau_0 = 0
 # aerodynamic forces
 Fx_drag = -0.5 * rho * Cd * A * sqrt(vx^2 + vy^2) * vx
 Fy_drag = -0.5 * rho * Cd * A * sqrt(vx^2 + vy^2) * vy
-Fx_magnus = -0.5 * rho * Cl * A * omega * r * vy
-Fy_magnus = +0.5 * rho * Cl * A * omega * r * vx
+Fx_magnus = +0.5 * rho * Cl * A * omega * r * vy
+Fy_magnus = -0.5 * rho * Cl * A * omega * r * vx
 
 # vertical balance
 0 .= y_dot - vy
