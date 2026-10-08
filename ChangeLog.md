@@ -1,11 +1,12 @@
 # Development (current)
 
+ * possibility to compile FeenoX without GNU Scientific Library
  * functions `vecmean`, `vecvariance` and `vecsd`
 
 # v1.2 (Sep 2025)
 
  * VTK/VTU writer now supports sparse or unsorted node tags
- * basic example for a large-deformation mechanical case (NAFEMS GNL-5 benchmar problem)
+ * basic example for a large-deformation mechanical case (NAFEMS GNL-5 benchmark problem)
  * outputs from `WRITE_RESULTS` or `WRITE_MESH` in `vtu` or `vtk` for transient problems create a `.pvd` file
  * instruction `PROBLEM_SOLVE` is not mandatory anymore, now FeenoX can guess where it should be called
  * keyword `READ_DATA` to read variables and vectors from files
