@@ -24,6 +24,7 @@ TESTS_general = \
         tests/algebraic_expr.sh \
         tests/arguments.sh \
         tests/builtin.sh \
+        tests/special-functions-gsl.sh \
         tests/circle.sh \
         tests/cog.sh \
         tests/expressions.sh \
@@ -142,6 +143,11 @@ XFAIL_TESTS = tests/abort.sh \
               tests/xfail-few-properties-ortho-young.sh \
               tests/xfail-few-properties-ortho-poisson.sh \
               tests/xfail-few-properties-ortho-shear.sh
+
+if GSL_AVAILABLE
+else
+XFAIL_TESTS += tests/special-functions-gsl.sh
+endif
 
 # TODO: also split XFAIL_TESTS
 # @$(MAKE) check TESTS="$(thermal_tests)" XFAIL_TESTS="$(thermal_xfail_tests)"
