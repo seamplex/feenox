@@ -72,6 +72,8 @@ no. 95, p. 5846, Mar. 2024, doi: [10.21105/joss.05846](https://doi.org/10.21105/
 
 > ### News
 >
+> * White paper [“Why FeenoX is different”](https://seamplex.com/feenox/doc/whitepaper/)
+>
 > * First non-trivial large-deformation mechanical example: [NAFEMS GNL5 “Large-deformation beam”](https://www.seamplex.com/feenox/examples/mechanical.html#nafems-gnl5-large-deformation-beam)
 >
 > * FeenoX is now in Debian ([Trixie backports](https://packages.debian.org/trixie-backports/feenox), [Forky](https://packages.debian.org/forky/feenox) and [Sid](https://packages.debian.org/sid/feenox)) and [Ubuntu](https://launchpad.net/ubuntu/+source/feenox) (25.04 onward).
