@@ -78,10 +78,11 @@ encouraged to compare the above input syntax with any other FEA solver
 and then consider how to ask ChatGPT & friends for help to create an
 input file from scratch. Good luck detecting hallucinations. Or how to
 write a Graphical User Interface that would need to create something the
-solver can read. Plus, it can be installed with
+solver can read. Plus, it can be simply installed (even in WSL2) by
+doing
 
 ``` terminal
-apt install feenox
+sudo apt install feenox
 ```
 
 ------------------------------------------------------------------------

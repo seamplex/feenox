@@ -419,6 +419,7 @@ AS_IF([test "x${with_gsl}" != "xno"], [
   )
 ])
 
+AM_CONDITIONAL([GSL_AVAILABLE], [test "x${have_gsl}" = "xyes"])
 
 
 # give some information about the compiler in the summary

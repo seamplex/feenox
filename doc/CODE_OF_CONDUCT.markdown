@@ -20,7 +20,7 @@ chaptersDepth: 1
 codeBlockCaptions: false
 cref: false
 crossrefYaml: pandoc-crossref.yaml
-date: 2026-02-19
+date: 2026-10-08
 eqLabels: arabic
 eqnBlockInlineMath: false
 eqnBlockTemplate: |
