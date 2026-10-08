@@ -1185,7 +1185,7 @@ spin = 200      *(1+equal($1,10)*($2)) # initial top spin in rad/sec
 # geometry & misc
 A = pi*r^2      # cross-sectional area
 I = 0.4*m*r^2   # moment of inertia
-v_epsilon = 0.1 # regularization constant (non-dimensional)=
+v_epsilon = 0.1 # regularization constant (non-dimensional)
 
 # initial conditions
 y_0 = 1.5
@@ -1206,8 +1206,8 @@ tau_0 = 0
 # aerodynamic forces
 Fx_drag = -0.5 * rho * Cd * A * sqrt(vx^2 + vy^2) * vx
 Fy_drag = -0.5 * rho * Cd * A * sqrt(vx^2 + vy^2) * vy
-Fx_magnus = -0.5 * rho * Cl * A * omega * r * vy
-Fy_magnus = +0.5 * rho * Cl * A * omega * r * vx
+Fx_magnus = +0.5 * rho * Cl * A * omega * r * vy
+Fy_magnus = -0.5 * rho * Cl * A * omega * r * vx
 
 # vertical balance
 0 .= y_dot - vy

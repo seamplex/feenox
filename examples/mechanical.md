@@ -1002,7 +1002,7 @@ problem.](nafems-gnl-cantilever-problem.svg){width="100%"}
 
 Consider a cantilevered beam with a
 square $0.1~\text{m} \times 0.1~\text{m}$ cross section and axial
-length $3.2~\text{m}$ along the $x$ axis. The material es linear elastic
+length $3.2~\text{m}$ along the $x$ axis. The material is linear elastic
 with $E=2.1 \times 10^{11} \text{Pa}$ and $\nu=0$. The left end at
 plane $y$-$z$ is fixed. The right end is subject to a total load
 of $F_x = -3.844 \times 10^6~\text{N}$ (compressive)
