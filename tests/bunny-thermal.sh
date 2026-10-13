@@ -15,7 +15,9 @@ checkgmsh
 if [ ! -e ${dir}/bunny.msh ]; then
   if [ ! -e ${dir}/Stanford_Bunny.stl ] ; then
    if [ ! -z "$(which wget)" ]; then
-     wget https://upload.wikimedia.org/wikipedia/commons/4/43/Stanford_Bunny.stl -O ${dir}/Stanford_Bunny.stl || exit $?
+#    temporarily disable downloading the STL from wikipedia
+#      wget https://upload.wikimedia.org/wikipedia/commons/4/43/Stanford_Bunny.stl -O ${dir}/Stanford_Bunny.stl || exit $?
+     return 77
    else
      return 77
    fi
