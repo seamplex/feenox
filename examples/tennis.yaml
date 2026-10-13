@@ -1,0 +1,27 @@
+---
+category: daes
+intro: |
+  # Effect of top spin in a tennis ball
+
+  This input file solves for the $x(t)$-$y(t)$ position of a tennis ball taking into account vertical, horizontal and rotation force and torque balances.
+  Without arguments, it computes the trajectory for a base set of parameters.
+  With two arguments, the first one chooses which parameter to disturb and the second gives a signed fraction with the disturbance.
+  
+  So to study how the trajectory changes with an initial spin which is the double of the nominal case (positive means top spin), one can do
+  
+  ```terminal
+  $ feenox tennis.fee 10 "(+1)"
+  ```
+  
+terminal: |
+  $ feenox tennis.fee > tennis-base.dat
+  $ feenox tennis.fee 10 "(-1)"   > tennis-top-1.dat
+  $ feenox tennis.fee 10 "(-0.5)" > tennis-top-0.5.dat
+  $ feenox tennis.fee 10 "(+0.5)" > tennis-top+0.5.dat
+  $ feenox tennis.fee 10 "(+1)"   > tennis-top+1.0.dat
+  $ feenox tennis.fee 7  "(-0.2)" > tennis-rho-0.2.dat
+  $ feenox tennis.fee 7  "(+0.2)" > tennis-rho+0.2.dat
+  $ gnuplot tennis.gp
+figures: |
+  ![Effect of top spin in the trajectory of a tennis ball](tennis-top.svg)
+...

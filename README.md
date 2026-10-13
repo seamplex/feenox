@@ -42,10 +42,10 @@ Note that
 Each of these items has a lot of design and usage implications, thoroughly discussed in the [Software Design Specification](https://www.seamplex.com/feenox/doc/sds.html), ranging from integrating FeenoX as a back end for different front ends with a reasonably low effort (e.g. [SunCAE](https://www.seamplex.com/suncae)), down to suitability for interaction with Large Language Models.
 As a reference, the reader is encouraged to compare the above input syntax with any other FEA solver and then consider how to ask ChatGPT & friends for help to create an input file from scratch. Good luck detecting hallucinations.
 Or how to write a Graphical User Interface that would need to create something the solver can read.
-Plus, it can be installed with
+Plus, it can be simply installed (even in WSL2) by doing
 
 ```terminal
-apt install feenox
+sudo apt install feenox
 ```
 
 ---

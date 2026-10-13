@@ -34,6 +34,15 @@
  #include <sys/resource.h>
 #endif
 
+#ifndef HAVE_GSL
+static double feenox_builtin_missing_gsl(const char *name) {
+  feenox_push_error_message("%s() needs FeenoX to be compiled with GSL support", name);
+  feenox_pop_errors();
+  feenox_polite_exit(FEENOX_ERROR);
+  return 0;
+}
+#endif
+
 
 // plotx reference
 //  1. min
@@ -588,7 +597,11 @@ double feenox_builtin_acos(expr_item_t *f) {
 ///fn+j0+desc Computes the regular cylindrical Bessel function of zeroth order evaluated at the argument\ $x$.
 ///fn+j0+plotx 0 10 0.05
 double feenox_builtin_j0(expr_item_t *f) {
+#ifndef HAVE_GSL
+  return feenox_builtin_missing_gsl("j0");
+#else
   return gsl_sf_bessel_J0(feenox_expression_eval(&f->arg[0]));
+#endif
 }
 
 ///fn+cos+usage cos(x)
@@ -676,6 +689,9 @@ double feenox_builtin_exp(expr_item_t *f) {
 ///fn+expint1+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t} \, dt \right]
 ///fn+expint1+plotx 1e-2 2.0 1e-2
 double feenox_builtin_expint1(expr_item_t *f) {
+#ifndef HAVE_GSL
+  return feenox_builtin_missing_gsl("expint1");
+#else
   double x = feenox_expression_eval(&f->arg[0]);
 
   if (x == 0) {
@@ -684,6 +700,7 @@ double feenox_builtin_expint1(expr_item_t *f) {
   }
 
   return gsl_sf_expint_E1(x);
+#endif
 }
 
 ///fn+expint2+desc Computes the second exponential integral function of the argument\ $x$.
@@ -691,7 +708,11 @@ double feenox_builtin_expint1(expr_item_t *f) {
 ///fn+expint2+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^2} \, dt \right]
 ///fn+expint2+plotx 0.0 2.0 1e-2
 double feenox_builtin_expint2(expr_item_t *f) {
+#ifndef HAVE_GSL
+  return feenox_builtin_missing_gsl("expint2");
+#else
   return gsl_sf_expint_E2(feenox_expression_eval(&f->arg[0]));
+#endif
 }
 
 ///fn+expint3+desc Computes the third exponential integral function of the argument\ $x$.
@@ -699,7 +720,11 @@ double feenox_builtin_expint2(expr_item_t *f) {
 ///fn+expint3+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^3} \, dt \right]
 ///fn+expint3+plotx 0.0 2.0 1e-2
 double feenox_builtin_expint3(expr_item_t *f) {
+#ifndef HAVE_GSL
+  return feenox_builtin_missing_gsl("expint3");
+#else
   return gsl_sf_expint_En(3, feenox_expression_eval(&f->arg[0]));
+#endif
 }
 
 ///fn+expintn+desc Computes the $n$-th exponential integral function of the argument\ $x$.
@@ -707,6 +732,9 @@ double feenox_builtin_expint3(expr_item_t *f) {
 ///fn+expintn+usage expintn(n,x)
 ///fn+expintn+math \text{Re} \left[ \int_1^{\infty}\! \frac{\exp(-xt)}{t^n} \, dt \right]
 double feenox_builtin_expintn(expr_item_t *f) {
+#ifndef HAVE_GSL
+  return feenox_builtin_missing_gsl("expintn");
+#else
   int n;
   n = ((int)(round(feenox_expression_eval(&f->arg[0]))));
   double x = feenox_expression_eval(&f->arg[1]);
@@ -717,6 +745,7 @@ double feenox_builtin_expintn(expr_item_t *f) {
   }
 
   return gsl_sf_expint_En(n, x);
+#endif
 }
 
 ///fn+log+desc Computes the natural logarithm of the argument\ $x$. If\ $x$ is zero or negative,
