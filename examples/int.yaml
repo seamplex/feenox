@@ -1,0 +1,14 @@
+---
+category: basic
+intro: |
+  # Equality in the Cauchy-Schwarz inequality
+
+  For two functions $f$ and $g$, the Cauchy-Schwarz inequality states
+  that $(\int fg)^2 \leq \int f^2 \int g^2$. This input evaluates both
+  sides on $[0,1]$ for $f(x)=x$ and $g(x)=-x$. Since the functions are
+  proportional, equality holds and both sides are $1/9$.
+terminal: |
+  $ feenox int.fee
+  0.111111  0.111111
+  $
+...

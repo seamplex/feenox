@@ -1,0 +1,23 @@
+# based on https://github.com/seamplex/feenox/discussions/19
+# originally by ibartol
+
+# Define the nodes and variables
+VECTOR x1[2] DATA 0 1
+VECTOR x2[2] DATA 1 0
+VECTOR x3[2] DATA 1/sqrt(2) 1/sqrt(2)
+
+h1(xi) = xi*(xi-1)/2
+h2(xi) = xi*(xi+1)/2
+h3(xi) = (1+xi)*(1-xi)
+
+# Shape function derivatives
+VAR xi'
+h1'(xi) = derivative(h1(xi'), xi', xi)
+h2'(xi) = derivative(h2(xi'), xi', xi)
+h3'(xi) = derivative(h3(xi'), xi', xi)
+
+# Derivative of x & y with respect to xi
+dx_dxi(xi) = h1'(xi)*x1[1] + h2'(xi)*x2[1] + h3'(xi)*x3[1]
+dy_dxi(xi) = h1'(xi)*x1[2] + h2'(xi)*x2[2] + h3'(xi)*x3[2]
+
+PRINT integral(sqrt(dx_dxi(xi)^2+dy_dxi(xi)^2),xi,-1,1)

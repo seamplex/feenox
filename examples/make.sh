@@ -13,7 +13,10 @@ done
 
 for i in hello          \
          pi             \
+         2d-interpolation \
+         int            \
          inflation      \
+         investor       \
          lorenz         \
          logistic       \
          double         \
@@ -30,6 +33,8 @@ for i in hello          \
          fibo_vector    \
          fibo_iterative \
          derivative     \
+         single-arc-anal \
+         urna           \
          cantilever     \
          fork           \
          iaea-2dpwr     \

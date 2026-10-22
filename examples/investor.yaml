@@ -1,0 +1,15 @@
+---
+category: basic
+intro: |
+  # Discrete compounding and continuous growth
+
+  This input uses the explicit Euler method to solve $dc/dt=rc$ from
+  $t=0$ to $1$, starting with $c(0)=1$ and a growth rate $r=0.1$. It
+  compares the numerical value with the exact solution $e^{rt}$ at each
+  step. The final line shows the small error from using a finite time
+  step of $10^{-4}$; `tail` keeps the output to that final comparison.
+terminal: |
+  $ feenox investor.fee | tail -n 1
+  1.1051703655  1.1051709181  -0.0000005526
+  $
+...

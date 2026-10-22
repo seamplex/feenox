@@ -1,0 +1,8 @@
+dt = 1e-4
+end_time = 1
+
+c_0 = 1
+r = 0.1
+c = c*(1+dt*r)
+
+PRINT %.10f c exp(r) c-exp(r)

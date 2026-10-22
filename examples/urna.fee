@@ -1,0 +1,22 @@
+static_steps = 250
+
+IF step_static=1
+ red = 1
+endif
+
+IF step_static=2
+ black = 1
+ENDIF
+
+IF step_static>2
+  r = random(0,step_static-1)
+  red_plus = (r<red)
+  red = red + red_plus
+  black = black + 1 - red_plus
+ENDIF
+
+# PRINT red black
+
+IF done
+  PRINT red/static_steps #black/static_steps (red+black)/static_steps
+ENDIF

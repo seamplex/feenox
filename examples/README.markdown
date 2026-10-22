@@ -85,13 +85,18 @@ propose benchmark problems to add to the suite.
 - Basic mathematics
   - [Hello World (and Universe)!]
   - [Ten ways of computing *π*]
+  - [Interpolating a two-dimensional function]
+  - [Equality in the Cauchy-Schwarz inequality]
   - [Financial decisions under inflation]
+  - [Discrete compounding and continuous growth]
   - [The logistic map]
   - [The Fibonacci sequence]
     - [Using the closed-form formula as a function]
     - [Using a vector]
     - [Solving an iterative problem]
   - [Computing the derivative of a function as a Unix filter]
+  - [Length of a quadratic arc]
+  - [A stochastic urn model]
   - [On the evaluation of thermal expansion coefficients]
   - [Buffon’s needle]
 - Ordinary Differential Equations & Differential-Algebraic Equations
@@ -151,13 +156,18 @@ propose benchmark problems to add to the suite.
 
   [Hello World (and Universe)!]: https://seamplex.com/feenox/examples/basic.html#hello-world-and-universe
   [Ten ways of computing *π*]: https://seamplex.com/feenox/examples/basic.html#ten-ways-of-computing-pi
+  [Interpolating a two-dimensional function]: https://seamplex.com/feenox/examples/basic.html#interpolating-a-two-dimensional-function
+  [Equality in the Cauchy-Schwarz inequality]: https://seamplex.com/feenox/examples/basic.html#equality-in-the-cauchy-schwarz-inequality
   [Financial decisions under inflation]: https://seamplex.com/feenox/examples/basic.html#financial-decisions-under-inflation
+  [Discrete compounding and continuous growth]: https://seamplex.com/feenox/examples/basic.html#discrete-compounding-and-continuous-growth
   [The logistic map]: https://seamplex.com/feenox/examples/basic.html#the-logistic-map
   [The Fibonacci sequence]: https://seamplex.com/feenox/examples/basic.html#the-fibonacci-sequence
   [Using the closed-form formula as a function]: https://seamplex.com/feenox/examples/basic.html#using-the-closed-form-formula-as-a-function
   [Using a vector]: https://seamplex.com/feenox/examples/basic.html#using-a-vector
   [Solving an iterative problem]: https://seamplex.com/feenox/examples/basic.html#solving-an-iterative-problem
   [Computing the derivative of a function as a Unix filter]: https://seamplex.com/feenox/examples/basic.html#computing-the-derivative-of-a-function-as-a-unix-filter
+  [Length of a quadratic arc]: https://seamplex.com/feenox/examples/basic.html#length-of-a-quadratic-arc
+  [A stochastic urn model]: https://seamplex.com/feenox/examples/basic.html#a-stochastic-urn-model
   [On the evaluation of thermal expansion coefficients]: https://seamplex.com/feenox/examples/basic.html#on-the-evaluation-of-thermal-expansion-coefficients
   [Buffon’s needle]: https://seamplex.com/feenox/examples/basic.html#buffons-needle
   [Lorenz’ attractor—the one with the butterfly]: https://seamplex.com/feenox/examples/daes.html#lorenz-attractorthe-one-with-the-butterfly

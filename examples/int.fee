@@ -1,0 +1,7 @@
+f(x) = x
+g(x) = -x
+
+L = integral(f(x)*g(x),x,0,1)^2
+R = integral(f(x)^2,x,0,1)*integral(g(x)^2,x,0,1)
+
+PRINT L R

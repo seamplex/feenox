@@ -1,8 +1,14 @@
 - Basic mathematics
   - [Hello World (and Universe)!](https://seamplex.com/feenox/examples/basic.html#hello-world-and-universe)
   - [Ten ways of computing *π*](https://seamplex.com/feenox/examples/basic.html#ten-ways-of-computing-pi)
+  - [Interpolating a two-dimensional
+  function](https://seamplex.com/feenox/examples/basic.html#interpolating-a-two-dimensional-function)
+  - [Equality in the Cauchy-Schwarz
+  inequality](https://seamplex.com/feenox/examples/basic.html#equality-in-the-cauchy-schwarz-inequality)
   - [Financial decisions under
   inflation](https://seamplex.com/feenox/examples/basic.html#financial-decisions-under-inflation)
+  - [Discrete compounding and continuous
+  growth](https://seamplex.com/feenox/examples/basic.html#discrete-compounding-and-continuous-growth)
   - [The logistic map](https://seamplex.com/feenox/examples/basic.html#the-logistic-map)
   - [The Fibonacci sequence](https://seamplex.com/feenox/examples/basic.html#the-fibonacci-sequence)
     - [Using the closed-form formula as a
@@ -11,6 +17,8 @@
     - [Solving an iterative problem](https://seamplex.com/feenox/examples/basic.html#solving-an-iterative-problem)
   - [Computing the derivative of a function as a Unix
   filter](https://seamplex.com/feenox/examples/basic.html#computing-the-derivative-of-a-function-as-a-unix-filter)
+  - [Length of a quadratic arc](https://seamplex.com/feenox/examples/basic.html#length-of-a-quadratic-arc)
+  - [A stochastic urn model](https://seamplex.com/feenox/examples/basic.html#a-stochastic-urn-model)
   - [On the evaluation of thermal expansion
   coefficients](https://seamplex.com/feenox/examples/basic.html#on-the-evaluation-of-thermal-expansion-coefficients)
   - [Buffon’s needle](https://seamplex.com/feenox/examples/basic.html#buffons-needle)

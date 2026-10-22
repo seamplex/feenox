@@ -1,0 +1,5 @@
+FUNCTION f(x,y) FILE hyperbolic-paraboloid.dat INTERPOLATION nearest
+FUNCTION g(x,y) FILE hyperbolic-paraboloid.dat INTERPOLATION shepard
+FUNCTION h(x,y) FILE hyperbolic-paraboloid.dat INTERPOLATION rectangular
+
+PRINT_FUNCTION f g h MIN -1 -1 MAX 3 2 NSTEPS 40 30

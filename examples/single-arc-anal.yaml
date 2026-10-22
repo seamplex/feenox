@@ -1,0 +1,19 @@
+---
+category: basic
+intro: |
+  # Length of a quadratic arc
+
+  A three-node quadratic interpolation approximates a quarter-circle using
+  its two endpoints and the midpoint on the circle. The input defines the
+  quadratic shape functions, differentiates the mapped coordinates with
+  respect to the reference coordinate, and integrates the resulting speed
+  to obtain the arc length.
+
+  The computed length is about $1.56242$, compared with the exact
+  quarter-circle length $\pi/2 \approx 1.57080$. The difference is the
+  geometric approximation error of this quadratic curve.
+terminal: |
+  $ feenox single-arc-anal.fee
+  1.56242
+  $
+...

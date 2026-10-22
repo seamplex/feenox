@@ -125,6 +125,64 @@ $
 
 
 
+# Interpolating a two-dimensional function
+
+Compare nearest-neighbor, Shepard, and rectangular interpolation using
+the same nine samples of the function $f(x,y)=xy$. The input samples
+form a rectangular grid with nonuniform spacing, so this illustrates how
+the interpolation method affects values between data points.
+
+The FeenoX input evaluates each interpolation over a regular output
+grid. Redirect that table to a file and use the accompanying Gnuplot
+script to plot the three results:
+
+
+```feenox
+FUNCTION f(x,y) FILE hyperbolic-paraboloid.dat INTERPOLATION nearest
+FUNCTION g(x,y) FILE hyperbolic-paraboloid.dat INTERPOLATION shepard
+FUNCTION h(x,y) FILE hyperbolic-paraboloid.dat INTERPOLATION rectangular
+
+PRINT_FUNCTION f g h MIN -1 -1 MAX 3 2 NSTEPS 40 30
+```
+
+
+```terminal
+$ feenox 2d-interpolation.fee > 2d-interpolation.dat
+$ gnuplot 2d-interpolation.gp
+$
+
+```
+
+
+
+# Equality in the Cauchy-Schwarz inequality
+
+For two functions $f$ and $g$, the Cauchy-Schwarz inequality states that
+$(\int fg)^2 \leq \int f^2 \int g^2$. This input evaluates both sides on
+$[0,1]$ for $f(x)=x$ and $g(x)=-x$. Since the functions are
+proportional, equality holds and both sides are $1/9$.
+
+
+```feenox
+f(x) = x
+g(x) = -x
+
+L = integral(f(x)*g(x),x,0,1)^2
+R = integral(f(x)^2,x,0,1)*integral(g(x)^2,x,0,1)
+
+PRINT L R
+```
+
+
+```terminal
+$ feenox int.fee
+0.111111  0.111111
+$
+
+```
+
+
+
 # Financial decisions under inflation
 
 You live in a country with a high inflation rate. A retailer offers you
@@ -170,6 +228,36 @@ with  3 payments and 30% off with r = 0.10317 you pay 0.637
 with 12 payments no discount with r = 0.0831703 you pay 0.669
 with  3 payments and 30% off with r = 0.0831703 you pay 0.648
 $ 
+
+```
+
+
+
+# Discrete compounding and continuous growth
+
+This input uses the explicit Euler method to solve $dc/dt=rc$ from $t=0$
+to $1$, starting with $c(0)=1$ and a growth rate $r=0.1$. It compares
+the numerical value with the exact solution $e^{rt}$ at each step. The
+final line shows the small error from using a finite time step of
+$10^{-4}$; `tail` keeps the output to that final comparison.
+
+
+```feenox
+dt = 1e-4
+end_time = 1
+
+c_0 = 1
+r = 0.1
+c = c*(1+dt*r)
+
+PRINT %.10f c exp(r) c-exp(r)
+```
+
+
+```terminal
+$ feenox investor.fee | tail -n 1
+1.1051703655  1.1051709181  -0.0000005526
+$
 
 ```
 
@@ -434,6 +522,101 @@ $
 
 
 ![Numerical derivative as a Unix filter and actual analytical result](derivative.svg)
+
+
+# Length of a quadratic arc
+
+A three-node quadratic interpolation approximates a quarter-circle using
+its two endpoints and the midpoint on the circle. The input defines the
+quadratic shape functions, differentiates the mapped coordinates with
+respect to the reference coordinate, and integrates the resulting speed
+to obtain the arc length.
+
+The computed length is about $1.56242$, compared with the exact
+quarter-circle length $\pi/2 \approx 1.57080$. The difference is the
+geometric approximation error of this quadratic curve.
+
+
+```feenox
+# based on https://github.com/seamplex/feenox/discussions/19
+# originally by ibartol
+
+# Define the nodes and variables
+VECTOR x1[2] DATA 0 1
+VECTOR x2[2] DATA 1 0
+VECTOR x3[2] DATA 1/sqrt(2) 1/sqrt(2)
+
+h1(xi) = xi*(xi-1)/2
+h2(xi) = xi*(xi+1)/2
+h3(xi) = (1+xi)*(1-xi)
+
+# Shape function derivatives
+VAR xi'
+h1'(xi) = derivative(h1(xi'), xi', xi)
+h2'(xi) = derivative(h2(xi'), xi', xi)
+h3'(xi) = derivative(h3(xi'), xi', xi)
+
+# Derivative of x & y with respect to xi
+dx_dxi(xi) = h1'(xi)*x1[1] + h2'(xi)*x2[1] + h3'(xi)*x3[1]
+dy_dxi(xi) = h1'(xi)*x1[2] + h2'(xi)*x2[2] + h3'(xi)*x3[2]
+
+PRINT integral(sqrt(dx_dxi(xi)^2+dy_dxi(xi)^2),xi,-1,1)
+```
+
+
+```terminal
+$ feenox single-arc-anal.fee
+1.56242
+$
+
+```
+
+
+
+# A stochastic urn model
+
+Start with one red and one black ball. At each draw, return the chosen
+ball to the urn and add another ball of the same color. The input runs
+250 iteration steps and prints the final fraction of red balls. Because
+the draws are random, the result varies between runs; the example
+illustrates how a simple stochastic process can be expressed with
+FeenoX's iteration and random-number features.
+
+
+```feenox
+static_steps = 250
+
+IF step_static=1
+ red = 1
+endif
+
+IF step_static=2
+ black = 1
+ENDIF
+
+IF step_static>2
+  r = random(0,step_static-1)
+  red_plus = (r<red)
+  red = red + red_plus
+  black = black + 1 - red_plus
+ENDIF
+
+# PRINT red black
+
+IF done
+  PRINT red/static_steps #black/static_steps (red+black)/static_steps
+ENDIF
+```
+
+
+```terminal
+$ feenox urna.fee
+0.316
+$
+(Example output from one run; the value varies.)
+
+```
+
 
 
 # On the evaluation of thermal expansion coefficients

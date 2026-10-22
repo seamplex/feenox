@@ -1,0 +1,17 @@
+---
+category: basic
+intro: |
+  # A stochastic urn model
+
+  Start with one red and one black ball. At each draw, return the chosen
+  ball to the urn and add another ball of the same color. The input runs
+  250 iteration steps and prints the final fraction of red balls. Because
+  the draws are random, the result varies between runs; the example
+  illustrates how a simple stochastic process can be expressed with
+  FeenoX's iteration and random-number features.
+terminal: |
+  $ feenox urna.fee
+  0.316
+  $
+  (Example output from one run; the value varies.)
+...

@@ -1,0 +1,18 @@
+---
+category: basic
+intro: |
+  # Interpolating a two-dimensional function
+
+  Compare nearest-neighbor, Shepard, and rectangular interpolation using
+  the same nine samples of the function $f(x,y)=xy$. The input samples form
+  a rectangular grid with nonuniform spacing, so this illustrates how the
+  interpolation method affects values between data points.
+
+  The FeenoX input evaluates each interpolation over a regular output grid.
+  Redirect that table to a file and use the accompanying Gnuplot script to
+  plot the three results:
+terminal: |
+  $ feenox 2d-interpolation.fee > 2d-interpolation.dat
+  $ gnuplot 2d-interpolation.gp
+  $
+...
