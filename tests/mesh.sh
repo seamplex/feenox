@@ -29,6 +29,12 @@ exitifwrong $?
 answer1 read_mesh2d.fee 41bin.msh "12 22 14"
 exitifwrong $?
 
+answer1 read_mesh2d.fee 42.msh "12 22 14"
+exitifwrong $?
+
+answer1 read_mesh2d.fee 42bin.msh "12 22 14"
+exitifwrong $?
+
 answer1 read_mesh2d.fee .vtk "12 22 14"
 exitifwrong $?
 
