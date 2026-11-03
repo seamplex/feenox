@@ -2205,7 +2205,7 @@ int feenox_parse_read_mesh(void) {
 ///kw_pde+READ_MESH+detail Either a file identifier (defined previously with a `FILE` keyword) or a file path should be given.
 ///kw_pde+READ_MESH+detail The format is read from the extension, which should be either
 ///kw_pde+READ_MESH+detail @
-///kw_pde+READ_MESH+detail  * `.msh`, `.msh2` or `.msh4` [Gmsh ASCII format](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format), versions 2.2, 4.0 or 4.1
+///kw_pde+READ_MESH+detail  * `.msh`, `.msh2` or `.msh4` [Gmsh ASCII format](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format), versions 2.2, 4.0, 4.1 or 4.2
 ///kw_pde+READ_MESH+detail  * `.vtk` [ASCII legacy VTK](https://lorensen.github.io/VTKExamples/site/VTKFileFormats/)
 ///kw_pde+READ_MESH+detail  * `.frd` [CalculiX’s FRD ASCII output](https://web.mit.edu/calculix_v2.7/CalculiX/cgx_2.7/doc/cgx/node4.html)
 ///kw_pde+READ_MESH+detail @

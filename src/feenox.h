@@ -1312,6 +1312,11 @@ struct mesh_t {
   
 
   int sparse;            // flag that indicates if the nodes are sparse
+  
+  // gmsh-specific msh file format version, needed to read transient data back
+  unsigned int gmsh_version_maj;
+  unsigned int gmsh_version_min;
+  
   size_t *tag2index;     // array to map tags to indexes (we need a -1)
   // pointer to tag_min entries before so we can use the tag as an offset
   size_t *tag2index_from_tag_min; 

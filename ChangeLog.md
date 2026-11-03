@@ -1,5 +1,7 @@
 # Development (current)
 
+ * support for Gmsh format version 4.2
+ * more robust feenox2ccx converter
  * possibility to compile FeenoX without GNU Scientific Library
  * whitepaper [“Why FeenoX is different”](https://seamplex.com/feenox/doc/whitepaper/)
  * small fix when writing to VTU/VTK from `.msh` version 2.2

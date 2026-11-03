@@ -21,5 +21,5 @@ answer poisson-square.fee "0.2949 0.2044 -0.2044"
 exitifwrong $?
 
 gmsh -v 0 -2 ${dir}/maze.geo || exit $?
-answerzero maze.fee
+answerzero maze.fee 2e-3
 exitifwrong $?

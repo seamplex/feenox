@@ -65,10 +65,16 @@ int feenox_mesh_read_gmsh(mesh_t *mesh) {
       } else if (strcmp("4.1", buffer) == 0) {
         version_maj = 4;
         version_min = 1;       
+      } else if (strcmp("4.2", buffer) == 0) {
+        version_maj = 4;
+        version_min = 2;       
       } else {
-        feenox_push_error_message("mesh '%s' has an incompatible version '%s', only versions 2.2, 4.0 and 4.1 are supported", mesh->file->path, buffer);
+        feenox_push_error_message("mesh '%s' has an incompatible version '%s', only versions 2.2, 4.0, 4.1 and 4.2 are supported", mesh->file->path, buffer);
         return FEENOX_ERROR;
       }
+      
+      mesh->gmsh_version_maj = version_maj;
+      mesh->gmsh_version_min = version_min;
   
       // file-type (ASCII int; 0 for ASCII mode, 1 for binary mode)
       if (fscanf(fp, "%d", &binary) == 0) {
@@ -76,7 +82,7 @@ int feenox_mesh_read_gmsh(mesh_t *mesh) {
       }
       
       if (binary && (version_maj == 2 || version_min == 0))  {
-        feenox_push_error_message("binary gmsh reader works only for version 4.1");
+        feenox_push_error_message("binary gmsh reader works only for versions 4.1 and 4.2");
         return FEENOX_ERROR;
       }
   
@@ -254,6 +260,19 @@ int feenox_mesh_read_gmsh(mesh_t *mesh) {
             feenox_check_alloc(geometrical_entity->bounding = calloc(geometrical_entity->num_bounding, sizeof(int)));
             feenox_call(feenox_gmsh_read_data_int(mesh, geometrical_entity->num_bounding, geometrical_entity->bounding, binary));
           }
+          
+          // since version 4.2 curves, surfaces and volumes end with a list of
+          // embedded entities given as (dim,tag) pairs, we read them and ignore them
+          if (version_maj == 4 && version_min >= 2) {
+            size_t num_embedded = 0;
+            feenox_call(feenox_gmsh_read_data_size_t(mesh, 1, &num_embedded, binary));
+            if (num_embedded != 0) {
+              int *embedded = NULL;
+              feenox_check_alloc(embedded = calloc(2*num_embedded, sizeof(int)));
+              feenox_call(feenox_gmsh_read_data_int(mesh, 2*num_embedded, embedded, binary));
+              feenox_free(embedded);
+            }
+          }
         }
         
         // add the entity to the hashed map of its dimensions
@@ -353,6 +372,19 @@ int feenox_mesh_read_gmsh(mesh_t *mesh) {
           if (geometrical_entity->num_bounding != 0) {
             feenox_check_alloc(geometrical_entity->bounding = calloc(geometrical_entity->num_bounding, sizeof(int)));
             feenox_call(feenox_gmsh_read_data_int(mesh, geometrical_entity->num_bounding, geometrical_entity->bounding, binary));
+          }
+          
+          // since version 4.2 curves, surfaces and volumes end with a list of
+          // embedded entities given as (dim,tag) pairs, we read them and ignore them
+          if (version_maj == 4 && version_min >= 2) {
+            size_t num_embedded = 0;
+            feenox_call(feenox_gmsh_read_data_size_t(mesh, 1, &num_embedded, binary));
+            if (num_embedded != 0) {
+              int *embedded = NULL;
+              feenox_check_alloc(embedded = calloc(2*num_embedded, sizeof(int)));
+              feenox_call(feenox_gmsh_read_data_int(mesh, 2*num_embedded, embedded, binary));
+              feenox_free(embedded);
+            }
           }
         }
         
@@ -944,18 +976,60 @@ int feenox_mesh_read_gmsh(mesh_t *mesh) {
 
       feenox_mesh_gmsh_readnewline();
       
-      int node = 0;
-      double value = 0;
-      for (size_t j = 0; j < num_nodes; j++) {
-        feenox_call(feenox_gmsh_read_data_int(mesh, 1, &node, binary));
-        for (unsigned int g = 0; g < dofs; g++) {
-          feenox_call(feenox_gmsh_read_data_double(mesh, 1, &value, binary));
-          if ((node_index = (mesh->sparse==0) ? node-1 : mesh->tag2index_from_tag_min[node]) == SIZE_MAX) {
-            feenox_push_error_message("node %d does not exist", node);
-            return FEENOX_ERROR;
+      if (version_maj == 4 && version_min >= 2) {
+        
+        // since version 4.2 the records come in blocks, with all the node tags
+        // first (as size_t) and all their values next
+        size_t header[4] = {0,0,0,0};  // numBlocks numNodes minNodeTag maxNodeTag
+        feenox_call(feenox_gmsh_read_data_size_t(mesh, 4, header, binary));
+        size_t num_blocks = header[0];
+        if (header[1] != num_nodes) {
+          feenox_push_error_message("field '%s' has %d nodes in the integer tags but %ld in the block header", string_tag, num_nodes, header[1]);
+          return FEENOX_ERROR;
+        }
+        
+        for (size_t l = 0; l < num_blocks; l++) {
+          size_t nodes_in_block = 0;
+          feenox_call(feenox_gmsh_read_data_size_t(mesh, 1, &nodes_in_block, binary));
+          
+          size_t *node_tags = NULL;
+          feenox_check_alloc(node_tags = calloc(nodes_in_block, sizeof(size_t)));
+          feenox_call(feenox_gmsh_read_data_size_t(mesh, nodes_in_block, node_tags, binary));
+          
+          double *values = NULL;
+          feenox_check_alloc(values = calloc(nodes_in_block * dofs, sizeof(double)));
+          feenox_call(feenox_gmsh_read_data_double(mesh, nodes_in_block * dofs, values, binary));
+          
+          for (size_t j = 0; j < nodes_in_block; j++) {
+            if ((node_index = (mesh->sparse==0) ? node_tags[j]-1 : mesh->tag2index_from_tag_min[node_tags[j]]) == SIZE_MAX) {
+              feenox_push_error_message("node %ld does not exist", node_tags[j]);
+              return FEENOX_ERROR;
+            }
+            for (unsigned int g = 0; g < dofs; g++) {
+              feenox_vector_set(functions[g]->vector_value, node_index, values[j*dofs + g]);
+            }
           }
-          feenox_vector_set(functions[g]->vector_value, node_index, value);
-        }  
+          
+          feenox_free(node_tags);
+          feenox_free(values);
+        }
+        
+      } else {
+      
+        int node = 0;
+        double value = 0;
+        for (size_t j = 0; j < num_nodes; j++) {
+          feenox_call(feenox_gmsh_read_data_int(mesh, 1, &node, binary));
+          for (unsigned int g = 0; g < dofs; g++) {
+            feenox_call(feenox_gmsh_read_data_double(mesh, 1, &value, binary));
+            if ((node_index = (mesh->sparse==0) ? node-1 : mesh->tag2index_from_tag_min[node]) == SIZE_MAX) {
+              feenox_push_error_message("node %d does not exist", node);
+              return FEENOX_ERROR;
+            }
+            feenox_vector_set(functions[g]->vector_value, node_index, value);
+          }  
+        }
+        
       }
 
       // the newline
@@ -1258,20 +1332,60 @@ int feenox_mesh_update_function_gmsh(function_t *function, double t, double dt) 
       
       feenox_check_alloc(new_data = calloc(nodes, sizeof(double)));
       
-      // the format says the node tag is now an int
-      double value = 0;
-      int node = 0;
-      int node_index = 0;
-      for (int j = 0; j < nodes; j++) {
-        if (fscanf(mesh->file->pointer, "%d %lf", &node, &value) == 0) {
-          feenox_push_error_message("error reading file");
+      if (mesh->gmsh_version_maj == 4 && mesh->gmsh_version_min >= 2) {
+        
+        // since version 4.2 the records come in blocks, with all the node tags
+        // first (as size_t) and all their values next
+        size_t header[4] = {0,0,0,0};  // numBlocks numNodes minNodeTag maxNodeTag
+        feenox_call(feenox_gmsh_read_data_size_t(mesh, 4, header, 0));
+        if (header[1] != nodes) {
+          feenox_push_error_message("expected %d nodes in block header, not %ld", nodes, header[1]);
           return FEENOX_ERROR;
         }
-        if ((node_index = (mesh->sparse==0) ? node-1 : mesh->tag2index_from_tag_min[node]) == SIZE_MAX) {
-          feenox_push_error_message("node %d does not exist", node);
-          return FEENOX_ERROR;
+        
+        for (size_t l = 0; l < header[0]; l++) {
+          size_t nodes_in_block = 0;
+          feenox_call(feenox_gmsh_read_data_size_t(mesh, 1, &nodes_in_block, 0));
+          
+          size_t *node_tags = NULL;
+          feenox_check_alloc(node_tags = calloc(nodes_in_block, sizeof(size_t)));
+          feenox_call(feenox_gmsh_read_data_size_t(mesh, nodes_in_block, node_tags, 0));
+          
+          double *values = NULL;
+          feenox_check_alloc(values = calloc(nodes_in_block, sizeof(double)));
+          feenox_call(feenox_gmsh_read_data_double(mesh, nodes_in_block, values, 0));
+          
+          for (size_t j = 0; j < nodes_in_block; j++) {
+            size_t node_index = 0;
+            if ((node_index = (mesh->sparse==0) ? node_tags[j]-1 : mesh->tag2index_from_tag_min[node_tags[j]]) == SIZE_MAX) {
+              feenox_push_error_message("node %ld does not exist", node_tags[j]);
+              return FEENOX_ERROR;
+            }
+            new_data[node_index] = values[j];
+          }
+          
+          feenox_free(node_tags);
+          feenox_free(values);
         }
-        new_data[node_index] = value;
+        
+      } else {
+      
+        // the format says the node tag is now an int
+        double value = 0;
+        int node = 0;
+        int node_index = 0;
+        for (int j = 0; j < nodes; j++) {
+          if (fscanf(mesh->file->pointer, "%d %lf", &node, &value) == 0) {
+            feenox_push_error_message("error reading file");
+            return FEENOX_ERROR;
+          }
+          if ((node_index = (mesh->sparse==0) ? node-1 : mesh->tag2index_from_tag_min[node]) == SIZE_MAX) {
+            feenox_push_error_message("node %d does not exist", node);
+            return FEENOX_ERROR;
+          }
+          new_data[node_index] = value;
+        }
+        
       }
       
       // done!
