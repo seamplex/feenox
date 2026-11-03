@@ -28,6 +28,8 @@ We can convert it to the non-human-friendly `.inp` format with `fee2ccx` (we hav
 ```terminal
 gmsh  -3 tensile-test.geo
 fee2ccx tensile-test.fee > tensile-test.inp
+# or
+fee2ccx -o tensile-test.inp tensile-test.fee
 ```
 
 and then solve it with
@@ -42,7 +44,9 @@ In particular, `fee2ccx`
  * evaluates the material properties and creates a `*MATERIAL` section (note that non-uniform material properties are not easily handled in CalculiX, help is welcome here)
  * evaluates the Dirichlet boundary conditions in the `.fee` and creates a `*BOUNDARY` section (node by node)
  * evaluates the Neumann boundary conditions and volumetric sources in the `.fee` and creates a `*CLOAD` section (node by node)
+ * converts a homogeneous linear-isotropic material to a CalculiX `*ELASTIC` card
 
+Run `fee2ccx --help` for command-line options. The converter validates the input model and rejects unsupported cases rather than silently writing a different model.
 
 ## Example: NAFEMS LE10 Benchmark problem
 
@@ -61,13 +65,16 @@ In particular, `fee2ccx`
 
 ## Limitations
 
- * Linear isotropic elasticity (orthotropic TO-DO)
- * Single-material only (TO-DOs)
- * Steady state (TO-DOs)
+ * Homogeneous isotropic linear elasticity only; material values are sampled once during conversion
+ * Single-step, small-strain static problems only; transient, multi-step quasi-static, and geometrically/materially nonlinear analyses are rejected
+ * Serial execution only
+ * 3D supported elements are limited to those present in the FeenoX-to-CalculiX element map
+ * 2D triangle3/triangle6 and quadrangle4/quadrangle8 elements are supported for plane stress, plane strain, and axisymmetric formulations; quadrangle9 is rejected because there is no equivalent mapped element in this converter
+ * Boundary and body loads are exported as the assembled nodal equivalent force vector (`*CLOAD`). This is suitable for the supported static linear case but does not preserve the original surface/body load definition.
+ * Thermal expansion, multiple materials, and spatially varying material properties are unsupported and rejected. Time-dependent function/property material definitions are rejected; scalar material variables are exported at their value during conversion.
 
 ## TODOs
 
- * command-line options to include or not the original input
  * orthotropic materials (might need some re-thinking on FeenoX's side)
  * multi-volume material properties
  * non-uniform material properties
