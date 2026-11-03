@@ -123,7 +123,7 @@ save it alongside `bunny.geo`. The following command generates the mesh
 used by all three inputs:
 
 ``` terminal
-$ gmsh -3 bunny.geo -clscale 0.5 -setnumber Mesh.MshFileVersion 4.1 -o bunny.msh
+$ gmsh -3 bunny.geo -clscale 0.5 -o bunny.msh
 ```
 
 The mesh uses first-order tetrahedra. The size factor refines the

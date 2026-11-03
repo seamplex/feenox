@@ -589,7 +589,7 @@ Run the commands from the `examples` directory with Gmsh and a FeenoX
 binary built with PETSc. Generate the shared mesh once:
 
 ``` terminal
-$ gmsh -v 0 -3 cube-hex.geo -setnumber Mesh.MshFileVersion 4.1 -o cube-hex.msh
+$ gmsh -v 0 -3 cube-hex.geo -o cube-hex.msh
 ```
 
 The default geometry creates an $8 \times 8 \times 8$ grid of
