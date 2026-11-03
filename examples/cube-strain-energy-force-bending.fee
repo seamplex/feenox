@@ -1,0 +1,12 @@
+PROBLEM mechanical 3D
+READ_MESH cube-hex.msh
+
+E = 69e3
+nu = 0.28
+
+BC left   fixed
+BC right  Fz=1000
+
+SOLVE_PROBLEM
+
+PRINT nodes strain_energy

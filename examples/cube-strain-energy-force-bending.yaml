@@ -1,0 +1,16 @@
+---
+category: mechanical
+intro: |
+  ## Transverse force
+
+  The same total force is now applied in the $z$ direction with
+  `Fz=1000`. This produces bending and shear rather than axial tension.
+  The resulting energy is about $49.5013$, larger than in the axial case
+  because the cube is more compliant under this transverse load. The
+  corresponding average displacement of the loaded face is about
+  $0.0990025$ in the $z$ direction.
+terminal: |
+  $ feenox cube-strain-energy-force-bending.fee
+  4913  49.5013
+  $
+...

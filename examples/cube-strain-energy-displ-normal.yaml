@@ -1,0 +1,23 @@
+---
+category: mechanical
+intro: |
+  ## Prescribed axial displacement
+
+  Instead of applying a force, prescribe $u=0.0141186$ uniformly on
+  `right`. Only the $x$ displacement is prescribed there: the $y$ and
+  $z$ components remain unconstrained. Do not interpret this as fixing
+  the whole face.
+
+  This displacement is close to the average displacement in the axial
+  force case, so the energies are close but not identical. A uniform
+  face displacement and a distributed force are different boundary
+  conditions; the chosen displacement is not an exact calibration.
+
+  Under displacement control, the energy also equals half the prescribed
+  displacement times the total reaction on that face. The reaction here
+  is approximately $1000.34$, giving $U \approx 7.06168$.
+terminal: |
+  $ feenox cube-strain-energy-displ-normal.fee
+  4913  7.06168
+  $
+...

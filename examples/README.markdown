@@ -134,6 +134,10 @@ propose benchmark problems to add to the suite.
     - [Thermal problem]
     - [Mechanical problem]
   - [Orthotropic free expansion of a cube]
+  - [Strain energy of a cube under force and displacement control]
+    - [Axial force]
+    - [Transverse force]
+    - [Prescribed axial displacement]
   - [Thermo-elastic expansion of finite cylinders]
   - [Temperature-dependent material properties]
   - [Two cubes compressing each other]
@@ -141,6 +145,10 @@ propose benchmark problems to add to the suite.
   - [NAFEMS GNL5 “Large-deformation beam”]
 - Mechanical modal analysis
   - [Optimizing the length of a tuning fork]
+  - [Bunny modes with three support conditions]
+    - [Fixed base]
+    - [Free-free vibration]
+    - [Radial and tangential base constraints]
   - [Five natural modes of a cantilevered wire]
 - Neutron diffusion
   - [IAEA 2D PWR Benchmark]
@@ -200,12 +208,20 @@ propose benchmark problems to add to the suite.
   [Thermal problem]: https://seamplex.com/feenox/examples/mechanical.html#thermal-problem
   [Mechanical problem]: https://seamplex.com/feenox/examples/mechanical.html#mechanical-problem
   [Orthotropic free expansion of a cube]: https://seamplex.com/feenox/examples/mechanical.html#orthotropic-free-expansion-of-a-cube
+  [Strain energy of a cube under force and displacement control]: https://seamplex.com/feenox/examples/mechanical.html#strain-energy-of-a-cube-under-force-and-displacement-control
+  [Axial force]: https://seamplex.com/feenox/examples/mechanical.html#axial-force
+  [Transverse force]: https://seamplex.com/feenox/examples/mechanical.html#transverse-force
+  [Prescribed axial displacement]: https://seamplex.com/feenox/examples/mechanical.html#prescribed-axial-displacement
   [Thermo-elastic expansion of finite cylinders]: https://seamplex.com/feenox/examples/mechanical.html#thermo-elastic-expansion-of-finite-cylinders
   [Temperature-dependent material properties]: https://seamplex.com/feenox/examples/mechanical.html#temperature-dependent-material-properties
   [Two cubes compressing each other]: https://seamplex.com/feenox/examples/mechanical.html#two-cubes-compressing-each-other
   [Steel/aluminum paradox]: https://seamplex.com/feenox/examples/mechanical.html#steelaluminum-paradox
   [NAFEMS GNL5 “Large-deformation beam”]: https://seamplex.com/feenox/examples/mechanical.html#nafems-gnl5-large-deformation-beam
   [Optimizing the length of a tuning fork]: https://seamplex.com/feenox/examples/modal.html#optimizing-the-length-of-a-tuning-fork
+  [Bunny modes with three support conditions]: https://seamplex.com/feenox/examples/modal.html#bunny-modes-with-three-support-conditions
+  [Fixed base]: https://seamplex.com/feenox/examples/modal.html#fixed-base
+  [Free-free vibration]: https://seamplex.com/feenox/examples/modal.html#free-free-vibration
+  [Radial and tangential base constraints]: https://seamplex.com/feenox/examples/modal.html#radial-and-tangential-base-constraints
   [Five natural modes of a cantilevered wire]: https://seamplex.com/feenox/examples/modal.html#five-natural-modes-of-a-cantilevered-wire
   [IAEA 2D PWR Benchmark]: https://seamplex.com/feenox/examples/neutron_diffusion.html#iaea-2d-pwr-benchmark
   [IAEA 3D PWR Benchmark]: https://seamplex.com/feenox/examples/neutron_diffusion.html#iaea-3d-pwr-benchmark

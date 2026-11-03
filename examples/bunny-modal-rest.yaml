@@ -1,0 +1,18 @@
+---
+category: modal
+intro: |
+  ## Radial and tangential base constraints
+
+  The `tangential` condition prevents displacement normal to `base`.
+  The `radial` condition constrains displacement to the radial direction
+  relative to the surface's center of gravity. Together, they allow
+  in-plane radial motion on a planar base instead of clamping every
+  displacement component.
+
+  These are homogeneous kinematic constraints, not a unilateral contact
+  or friction model. Compare their mode shapes with the fixed and
+  unsupported cases to see the effect of changing the support model.
+terminal: |
+  $ feenox bunny-modal-rest.fee
+  $ paraview bunny-modal-rest.vtu
+...

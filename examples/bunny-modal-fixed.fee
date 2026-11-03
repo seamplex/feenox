@@ -1,0 +1,10 @@
+PROBLEM modal MODES 4 MESH bunny.msh
+
+E = 1
+rho = 1
+nu = 0.3
+
+BC base fixed
+
+SOLVE_PROBLEM
+WRITE_RESULTS FORMAT vtu

@@ -49,9 +49,15 @@ for i in hello          \
          parallelepiped-mechanical  \
          barra3d                    \
          temp-cylinder-tran         \
+         bunny-modal-fixed          \
+         bunny-modal-free           \
+         bunny-modal-rest           \
          wire                       \
          asme-expansion             \
          cube-orthotropic-expansion \
+         cube-strain-energy-force-normal \
+         cube-strain-energy-force-bending \
+         cube-strain-energy-displ-normal \
          veeder                     \
          mechanical-square-temperature \
          two-cubes-thermal    \

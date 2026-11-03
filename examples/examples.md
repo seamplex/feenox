@@ -69,6 +69,11 @@
     - [Mechanical problem](https://seamplex.com/feenox/examples/mechanical.html#mechanical-problem)
   - [Orthotropic free expansion of a
   cube](https://seamplex.com/feenox/examples/mechanical.html#orthotropic-free-expansion-of-a-cube)
+  - [Strain energy of a cube under force and displacement
+  control](https://seamplex.com/feenox/examples/mechanical.html#strain-energy-of-a-cube-under-force-and-displacement-control)
+    - [Axial force](https://seamplex.com/feenox/examples/mechanical.html#axial-force)
+    - [Transverse force](https://seamplex.com/feenox/examples/mechanical.html#transverse-force)
+    - [Prescribed axial displacement](https://seamplex.com/feenox/examples/mechanical.html#prescribed-axial-displacement)
   - [Thermo-elastic expansion of finite
   cylinders](https://seamplex.com/feenox/examples/mechanical.html#thermo-elastic-expansion-of-finite-cylinders)
   - [Temperature-dependent material
@@ -80,6 +85,12 @@
 - Mechanical modal analysis
   - [Optimizing the length of a tuning
   fork](https://seamplex.com/feenox/examples/modal.html#optimizing-the-length-of-a-tuning-fork)
+  - [Bunny modes with three support
+  conditions](https://seamplex.com/feenox/examples/modal.html#bunny-modes-with-three-support-conditions)
+    - [Fixed base](https://seamplex.com/feenox/examples/modal.html#fixed-base)
+    - [Free-free vibration](https://seamplex.com/feenox/examples/modal.html#free-free-vibration)
+    - [Radial and tangential base
+    constraints](https://seamplex.com/feenox/examples/modal.html#radial-and-tangential-base-constraints)
   - [Five natural modes of a cantilevered
   wire](https://seamplex.com/feenox/examples/modal.html#five-natural-modes-of-a-cantilevered-wire)
 - Neutron diffusion

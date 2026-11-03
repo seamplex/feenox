@@ -577,6 +577,142 @@ $
 > have expected after seeing the plots from the previous section. 
 
 
+# Strain energy of a cube under force and displacement control
+
+These three linear-elastic problems use the same unit cube, Young's
+modulus $E=69000$, and Poisson's ratio $\nu=0.28$. The face at $x=0$
+(`left`) is fixed in all cases. On the opposite face (`right`), compare
+an axial force, a transverse force, and a prescribed axial displacement.
+All other faces are traction-free.
+
+Run the commands from the `examples` directory with Gmsh and a FeenoX
+binary built with PETSc. Generate the shared mesh once:
+
+``` terminal
+$ gmsh -v 0 -3 cube-hex.geo -setnumber Mesh.MshFileVersion 4.1 -o cube-hex.msh
+```
+
+The default geometry creates an $8 \times 8 \times 8$ grid of
+second-order, 27-node hexahedra with 4913 nodes. Each input prints the
+number of mesh nodes and the total stored strain energy:
+
+$$U = \frac{1}{2}\mathbf{u}^{T}K\mathbf{u}.$$
+
+Use consistent units throughout: for example, geometry in millimeters,
+$E$ in $\mathrm{N/mm^2}$, forces in newtons, and displacements in
+millimeters give energy in $\mathrm{N\,mm}$. These inputs do not write
+field files; add `WRITE_RESULTS FORMAT vtu` after the solve if needed.
+
+## Axial force
+
+`Fx=1000` specifies the total force on `right`, not a force at each
+node. FeenoX distributes it over the face. For a linearly applied load,
+the strain energy equals half the final force times the average
+displacement in the loading direction. Here the average axial
+displacement is approximately $0.0141142$, giving $U \approx 7.05711$.
+
+
+```feenox
+PROBLEM mechanical 3D
+READ_MESH cube-hex.msh
+
+E = 69e3
+nu = 0.28
+
+BC left   fixed
+BC right  Fx=1000
+
+SOLVE_PROBLEM
+
+PRINT nodes strain_energy
+```
+
+
+```terminal
+$ feenox cube-strain-energy-force-normal.fee
+4913  7.05711
+$
+
+```
+
+
+
+## Transverse force
+
+The same total force is now applied in the $z$ direction with `Fz=1000`.
+This produces bending and shear rather than axial tension. The resulting
+energy is about $49.5013$, larger than in the axial case because the
+cube is more compliant under this transverse load. The corresponding
+average displacement of the loaded face is about $0.0990025$ in the $z$
+direction.
+
+
+```feenox
+PROBLEM mechanical 3D
+READ_MESH cube-hex.msh
+
+E = 69e3
+nu = 0.28
+
+BC left   fixed
+BC right  Fz=1000
+
+SOLVE_PROBLEM
+
+PRINT nodes strain_energy
+```
+
+
+```terminal
+$ feenox cube-strain-energy-force-bending.fee
+4913  49.5013
+$
+
+```
+
+
+
+## Prescribed axial displacement
+
+Instead of applying a force, prescribe $u=0.0141186$ uniformly on
+`right`. Only the $x$ displacement is prescribed there: the $y$ and $z$
+components remain unconstrained. Do not interpret this as fixing the
+whole face.
+
+This displacement is close to the average displacement in the axial
+force case, so the energies are close but not identical. A uniform face
+displacement and a distributed force are different boundary conditions;
+the chosen displacement is not an exact calibration.
+
+Under displacement control, the energy also equals half the prescribed
+displacement times the total reaction on that face. The reaction here is
+approximately $1000.34$, giving $U \approx 7.06168$.
+
+
+```feenox
+PROBLEM mechanical 3D
+READ_MESH cube-hex.msh
+
+E = 69e3
+nu = 0.28
+
+BC left   fixed
+BC right  u=0.0141186
+
+SOLVE_PROBLEM
+PRINT nodes strain_energy
+```
+
+
+```terminal
+$ feenox cube-strain-energy-displ-normal.fee
+4913  7.06168
+$
+
+```
+
+
+
 # Thermo-elastic expansion of finite cylinders
 
 Let us solve the following problem introduced by J. Veeder in his

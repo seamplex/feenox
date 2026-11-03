@@ -106,6 +106,138 @@ $
 ![Estimated length\ $\ell_1$ needed to get 440\ Hz for different mesh refinement levels\ $n$](fork.svg){#fig:fork}
 
 
+# Bunny modes with three support conditions
+
+Compare the first four elastic vibration modes of the Stanford Bunny
+with a fixed base, no supports, and a base constrained with radial and
+tangential conditions. All three inputs use the same mesh and material
+parameters, so the support conditions are the only difference.
+
+This example requires Gmsh and a FeenoX binary linked against PETSc and
+SLEPc. Check `feenox --versions` before running the modal problems.
+
+Run the commands from the `examples` directory. Obtain
+`Stanford_Bunny.stl` from the [Wikimedia Commons file
+page](https://commons.wikimedia.org/wiki/File:Stanford_Bunny.stl) and
+save it alongside `bunny.geo`. The following command generates the mesh
+used by all three inputs:
+
+``` terminal
+$ gmsh -3 bunny.geo -clscale 0.5 -setnumber Mesh.MshFileVersion 4.1 -o bunny.msh
+```
+
+The mesh uses first-order tetrahedra. The size factor refines the
+surface mesh relative to the settings in `bunny.geo`; Gmsh may report
+warnings about the quality of the input STL. Check that meshing
+completes without errors and creates volume elements before solving.
+Inspect the physical surface `base` in Gmsh to see where the supports
+are applied. The separate surface named `rest` is not used by these
+input files: `bunny-modal-rest.fee` also applies its conditions to
+`base`.
+
+With $E=1$, $\rho=1$, and $\nu=0.3$, these inputs are intended for
+comparing mode shapes, not predicting the frequencies of a particular
+physical object. Use consistent geometry and material units for
+dimensional results. Mode amplitudes are arbitrary, not displacements
+under an applied load.
+
+Each input writes its own VTU file with vector fields `mode1` through
+`mode4`. Open the three files in ParaView and apply **Warp By Vector**,
+selecting the same mode number and a suitable scale factor for each
+case. The inputs have no `PRINT` instruction, so successful solves
+produce result files rather than a frequency table on standard output.
+
+## Fixed base
+
+The `fixed` condition sets all three displacement components to zero on
+`base`. This is the clamped reference case.
+
+
+```feenox
+PROBLEM modal MODES 4 MESH bunny.msh
+
+E = 1
+rho = 1
+nu = 0.3
+
+BC base fixed
+
+SOLVE_PROBLEM
+WRITE_RESULTS FORMAT vtu
+```
+
+
+```terminal
+$ feenox bunny-modal-fixed.fee
+$ paraview bunny-modal-fixed.vtu
+
+```
+
+
+
+## Free-free vibration
+
+Omitting boundary conditions leaves the bunny unsupported. A free
+three-dimensional body has six rigid-body modes with zero frequency.
+FeenoX deflates these rigid-body motions, so `MODES 4` requests four
+elastic modes rather than four rigid translations or rotations.
+
+
+```feenox
+PROBLEM modal MODES 4 MESH bunny.msh
+
+E = 1
+rho = 1
+nu = 0.3
+
+SOLVE_PROBLEM
+WRITE_RESULTS FORMAT vtu
+```
+
+
+```terminal
+$ feenox bunny-modal-free.fee
+$ paraview bunny-modal-free.vtu
+
+```
+
+
+
+## Radial and tangential base constraints
+
+The `tangential` condition prevents displacement normal to `base`. The
+`radial` condition constrains displacement to the radial direction
+relative to the surface's center of gravity. Together, they allow
+in-plane radial motion on a planar base instead of clamping every
+displacement component.
+
+These are homogeneous kinematic constraints, not a unilateral contact or
+friction model. Compare their mode shapes with the fixed and unsupported
+cases to see the effect of changing the support model.
+
+
+```feenox
+PROBLEM modal MODES 4 MESH bunny.msh
+
+E = 1
+rho = 1
+nu = 0.3
+
+BC base radial tangential
+
+SOLVE_PROBLEM
+WRITE_RESULTS FORMAT vtu
+```
+
+
+```terminal
+$ feenox bunny-modal-rest.fee
+$ paraview bunny-modal-rest.vtu
+
+```
+
+
+
 # Five natural modes of a cantilevered wire
 
 Back in [College](https://www.ib.edu.ar/), we had this subject

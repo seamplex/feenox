@@ -1,0 +1,13 @@
+---
+category: modal
+intro: |
+  ## Free-free vibration
+
+  Omitting boundary conditions leaves the bunny unsupported. A free
+  three-dimensional body has six rigid-body modes with zero frequency.
+  FeenoX deflates these rigid-body motions, so `MODES 4` requests four
+  elastic modes rather than four rigid translations or rotations.
+terminal: |
+  $ feenox bunny-modal-free.fee
+  $ paraview bunny-modal-free.vtu
+...

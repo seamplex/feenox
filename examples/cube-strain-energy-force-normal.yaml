@@ -1,0 +1,43 @@
+---
+category: mechanical
+intro: |
+  # Strain energy of a cube under force and displacement control
+
+  These three linear-elastic problems use the same unit cube, Young's
+  modulus $E=69000$, and Poisson's ratio $\nu=0.28$. The face at $x=0$
+  (`left`) is fixed in all cases. On the opposite face (`right`), compare
+  an axial force, a transverse force, and a prescribed axial displacement.
+  All other faces are traction-free.
+
+  Run the commands from the `examples` directory with Gmsh and a FeenoX
+  binary built with PETSc. Generate the shared mesh once:
+
+  ```terminal
+  $ gmsh -v 0 -3 cube-hex.geo -setnumber Mesh.MshFileVersion 4.1 -o cube-hex.msh
+  ```
+
+  The default geometry creates an $8 \times 8 \times 8$ grid of
+  second-order, 27-node hexahedra with 4913 nodes. Each input prints the
+  number of mesh nodes and the total stored strain energy:
+
+  $$
+  U = \frac{1}{2}\mathbf{u}^{T}K\mathbf{u}.
+  $$
+
+  Use consistent units throughout: for example, geometry in millimeters,
+  $E$ in $\mathrm{N/mm^2}$, forces in newtons, and displacements in
+  millimeters give energy in $\mathrm{N\,mm}$. These inputs do not write
+  field files; add `WRITE_RESULTS FORMAT vtu` after the solve if needed.
+
+  ## Axial force
+
+  `Fx=1000` specifies the total force on `right`, not a force at each
+  node. FeenoX distributes it over the face. For a linearly applied load,
+  the strain energy equals half the final force times the average
+  displacement in the loading direction. Here the average axial
+  displacement is approximately $0.0141142$, giving $U \approx 7.05711$.
+terminal: |
+  $ feenox cube-strain-energy-force-normal.fee
+  4913  7.05711
+  $
+...
