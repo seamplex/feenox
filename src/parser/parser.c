@@ -3385,10 +3385,14 @@ int feenox_parse_problem(void) {
     // if we still do not have a dimension, use 3d
     if (feenox.pde.dim == 0) {
       feenox.pde.dim = 3;
+      feenox.pde.dim_by_default = 1;
     }
   
     feenox_call(feenox_problem_parse_time_init());
     feenox_call(feenox.pde.parse_problem(NULL));
+    if (mesh != NULL && mesh->dim == 0) {
+      mesh->dim = feenox.pde.dim;
+    }
     if (feenox.pde.solution == NULL) {
       feenox_call(feenox_problem_define_solutions());
     }

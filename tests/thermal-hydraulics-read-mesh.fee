@@ -1,0 +1,14 @@
+# Same pipe as relap7-pipe.fee, with a separate READ_MESH instruction.
+PROBLEM thermal_hydraulics
+READ_MESH relap7-pipe.msh
+
+MATERIAL pipe A=8.78882e-5 D_h=0.01179
+
+BC inlet  rho=753.632 v=4.43
+BC outlet p=15.51e6
+
+SOLVE_PROBLEM
+
+mdot_ref = 753.632*4.43*8.78882e-5
+dp_ref = 16967.2
+PRINT abs(mdot(1)/mdot_ref-1)+abs((p(0)-p(2))/dp_ref-1)

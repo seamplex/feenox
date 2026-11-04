@@ -1803,6 +1803,7 @@ struct feenox_t {
     
 
     unsigned int dim;              // spatial dimension of the problem (currently, equal to the topological dimension)
+    int dim_by_default;            // true if dim was not given explicitly and the default was used
     unsigned int dofs;             // DoFs per node/cell
     size_t width;                  // number of expected non-zeros per row
     size_t spatial_unknowns;       // number of spatial unknowns (nodes in fem, cells in fvm)
