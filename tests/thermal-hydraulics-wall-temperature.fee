@@ -1,0 +1,18 @@
+# Prescribed coefficient: verify every control volume against its energy balance.
+DEFAULT_ARGUMENT_VALUE 1 565
+DEFAULT_ARGUMENT_VALUE 2 10000
+DEFAULT_ARGUMENT_VALUE 3 1
+PROBLEM thermal_hydraulics MESH relap7-pipe.msh
+wall_temperature = $1+if(end_time>0,5*(min(t/0.1,1)-1),0)
+coefficient = $2
+perimeter = $3*4*8.78882e-5/0.01179
+MATERIAL pipe A=8.78882e-5 D_h=0.01179 f=0.02 T_wall=wall_temperature h_wall=coefficient P_h=perimeter
+BC inlet rho=753.632 v=4.43
+BC outlet p=15.51e6
+SOLVE_PROBLEM
+
+# Full control volumes at x=0.4,0.8,1.2,1.6; half at x=2.
+wall_heat = coefficient*perimeter*(0.4*((wall_temperature-T(0.4))+(wall_temperature-T(0.8))+(wall_temperature-T(1.2))+(wall_temperature-T(1.6)))+0.2*(wall_temperature-T(2)))
+IF end_time=0|done
+  PRINT abs(mdot(2)*(h(2)-h(0))-wall_heat)/(1+abs(wall_heat))
+ENDIF

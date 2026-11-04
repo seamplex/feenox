@@ -77,6 +77,8 @@ int feenox_problem_parse_time_init_thermal_hydraulics(void) {
   thermal_hydraulics.fluid.h = thermal_hydraulics_if97_h;
   thermal_hydraulics.fluid.cp = thermal_hydraulics_if97_cp;
   thermal_hydraulics.fluid.mu = thermal_hydraulics_iapws_mu;
+  thermal_hydraulics.fluid.k = thermal_hydraulics_if97_k;
+  thermal_hydraulics.fluid.beta = thermal_hydraulics_if97_beta;
   thermal_hydraulics.fluid.T_from_p_rho = thermal_hydraulics_if97_T_from_p_rho;
   thermal_hydraulics.fluid.psat = thermal_hydraulics_if97_psat;
   thermal_hydraulics.fluid.T_min = 273.15;
@@ -127,6 +129,28 @@ int feenox_problem_init_runtime_thermal_hydraulics(void) {
 ///pr_thermal_hydraulics+q+description Volumetric power\ $q'''$ (in W/m^3) deposited into the fluid.
 ///pr_thermal_hydraulics+q+description Default is zero.
   feenox_call(feenox_distribution_init(&thermal_hydraulics.q, "q"));
+///pr_thermal_hydraulics+P_h+description Heated perimeter (in m). Default is $4A/D_h$.
+///pr_thermal_hydraulics+P_h+description For a circular pipe this is $\pi D$. Set zero for an insulated pipe.
+  feenox_call(feenox_distribution_init(&thermal_hydraulics.P_h, "P_h"));
+///pr_thermal_hydraulics+T_wall+description Specified pipe wall temperature (in K).
+///pr_thermal_hydraulics+T_wall+description Adds $h_{wall} P_h (T_{wall}-T)$ per unit length to the energy equation.
+///pr_thermal_hydraulics+T_wall+description By default, the coefficient follows the TRACE single-phase tube model:
+///pr_thermal_hydraulics+T_wall+description the maximum of laminar (Nu=4.36), corrected Gnielinski, and natural convection.
+///pr_thermal_hydraulics+T_wall+description Water conductivity uses IAPWS-2011 with its industrial critical enhancement.
+///pr_thermal_hydraulics+T_wall+description Wall boiling and wall thermal inertia are not modeled.
+///pr_thermal_hydraulics+T_wall+description Mutually exclusive with `q_wall` on a given pipe; either can be combined with volumetric `q`.
+///pr_thermal_hydraulics+T_wall+description Wall properties are evaluated at element centers before each solve (including time-dependent inputs).
+///pr_thermal_hydraulics+T_wall+description Each endpoint control volume receives half the element's wall heat, evaluated at that node's fluid state.
+///pr_thermal_hydraulics+T_wall+description Inlet `T` or `rho` specifies the entering stream state; the heated inlet control volume can have a different temperature.
+  feenox_call(feenox_distribution_init(&thermal_hydraulics.T_wall, "T_wall"));
+///pr_thermal_hydraulics+q_wall+description Specified wall heat flux (in W/m^2), positive into the fluid.
+///pr_thermal_hydraulics+q_wall+description Adds $q_{wall}P_h$ per unit length. Negative values cool the fluid.
+///pr_thermal_hydraulics+q_wall+description Mutually exclusive with `T_wall` on a given pipe. Default is an adiabatic wall.
+  feenox_call(feenox_distribution_init(&thermal_hydraulics.q_wall, "q_wall"));
+///pr_thermal_hydraulics+h_wall+description Optional prescribed wall heat transfer coefficient (in W/m^2/K).
+///pr_thermal_hydraulics+h_wall+description Requires `T_wall` on the same pipe and overrides the TRACE correlation.
+///pr_thermal_hydraulics+h_wall+description Zero disables wall heat exchange; negative values are invalid.
+  feenox_call(feenox_distribution_init(&thermal_hydraulics.h_wall, "h_wall"));
   
   if (thermal_hydraulics.A.defined == 0 && thermal_hydraulics.D.defined == 0) {
     feenox_push_error_message("either the flow area 'A' or the diameter 'D' have to be given");

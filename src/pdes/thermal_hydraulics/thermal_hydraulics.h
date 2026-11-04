@@ -45,6 +45,8 @@ struct th_fluid_t {
   double (*h)(double p, double T);
   double (*cp)(double p, double T);
   double (*mu)(double rho, double T);
+  double (*k)(double p, double T);
+  double (*beta)(double p, double T);
   double (*T_from_p_rho)(double p, double rho);
   double (*psat)(double T);      // NULL if not applicable
   double T_min;                  // validity range (only used for warnings)
@@ -65,6 +67,11 @@ struct th_pipe_t {
   double f;                  // fixed darcy friction factor (if f_given)
   int f_given;
   double q;                  // volumetric power (W/m^3)
+  double P_h;                // heated perimeter (m)
+  double T_wall;
+  double q_wall;             // inward wall heat flux (W/m^2)
+  double h_wall;             // prescribed heat transfer coefficient (W/m^2/K)
+  int has_T_wall, has_q_wall, has_h_wall;
 };
 
 // a node is a control volume holding the scalar unknowns
@@ -93,6 +100,10 @@ struct thermal_hydraulics_t {
   distribution_t roughness;
   distribution_t f;
   distribution_t q;
+  distribution_t P_h;
+  distribution_t T_wall;
+  distribution_t q_wall;
+  distribution_t h_wall;
   
   // gravity
   var_t *g[3];
@@ -141,6 +152,8 @@ extern double thermal_hydraulics_if97_h(double p, double T);
 extern double thermal_hydraulics_if97_cp(double p, double T);
 extern double thermal_hydraulics_if97_T_from_p_rho(double p, double rho);
 extern double thermal_hydraulics_iapws_mu(double rho, double T);
+extern double thermal_hydraulics_if97_k(double p, double T);
+extern double thermal_hydraulics_if97_beta(double p, double T);
 extern double thermal_hydraulics_if97_psat(double T);
 
 // friction.c

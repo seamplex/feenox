@@ -1,0 +1,12 @@
+# Different wall models in different groups must not conflict.
+# P_h is defined only for the insulated branches, and defaults on the main pipe.
+PROBLEM thermal_hydraulics DIM 2 MESH thermal-hydraulics-tee.msh
+MATERIAL branch D=0.02 q_wall=0 P_h=0
+MATERIAL main D=0.03 T_wall=340 h_wall=10000
+BC in1 mdot=1 T=300
+BC in2 mdot=2 T=350
+BC out p=1e6
+SOLVE_PROBLEM
+
+wall_heat = 10000*pi*0.03*(0.125*(340-T(1,0.5))+0.25*sum(340-T(1+0.25*i,0.5),i,1,7)+0.125*(340-T(3,0.5)))
+PRINT abs(3*h(3,0.5)-h(0,0)-2*h(0,1)-wall_heat)/(1+abs(wall_heat))

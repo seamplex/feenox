@@ -1,0 +1,10 @@
+DEFAULT_ARGUMENT_VALUE 1 10000
+PROBLEM thermal_hydraulics MESH relap7-pipe.msh
+flux = $1
+MATERIAL pipe A=8.78882e-5 D_h=0.01179 f=0.02 q_wall=flux
+BC inlet p=15.51e6
+BC outlet rho=753.632 v=4.43
+SOLVE_PROBLEM
+
+expected_heat = flux*(4*8.78882e-5/0.01179)*1.8
+PRINT abs(mdot(1)+753.632*4.43*8.78882e-5)+abs(-mdot(1)*(h(0)-h(2))-expected_heat)/(1+abs(expected_heat))

@@ -1,7 +1,8 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox's routines for thermal-hydraulics: water properties
  *  IAPWS-IF97 region 1 (compressed liquid), region 4 saturation pressure
- *  and IAPWS 2008 viscosity (without critical enhancement)
+ *  IAPWS 2008 viscosity (without critical enhancement), and
+ *  IAPWS 2011 thermal conductivity (industrial critical enhancement)
  *
  *  The equations and numerical coefficients are taken from the following
  *  documents of the International Association for the Properties of Water
@@ -19,8 +20,11 @@
  *       https://www.iapws.org/technical-guidance/release/viscosity
  *   [4] M. L. Huber et al., New International Formulation for the Viscosity
  *       of H2O, J. Phys. Chem. Ref. Data 38, 101 (2009).
+ *   [5] IAPWS R15-11, Release on the IAPWS Formulation 2011 for the Thermal
+ *       Conductivity of Ordinary Water Substance, IAPWS (2011).
+ *       https://iapws.org/technical-guidance/release/ThCond
  *
- *  All coefficients were checked one by one against the tables in [1] and [3].
+ *  All coefficients were checked against the tables in [1], [3], and [5].
  *
  *  Copyright (C) 2026 Jeremy Theler
  *
@@ -72,13 +76,13 @@ static const double if97_r1_n[34] = {
   -0.93537087292458e-25 };
 
 // derivatives of the dimensionless Gibbs free energy gamma(pi,tau) of region 1
-static void if97_r1_gamma(double p, double T, double *gamma_pi, double *gamma_tau, double *gamma_tautau, double *gamma_pitau) {
+static void if97_r1_gamma(double p, double T, double *gamma_pi, double *gamma_tau, double *gamma_tautau, double *gamma_pitau, double *gamma_pipi) {
   double pi = p/IF97_PSTAR1;
   double tau = IF97_TSTAR1/T;
   double a = 7.1 - pi;
   double b = tau - 1.222;
   
-  double g_pi = 0, g_tau = 0, g_tautau = 0, g_pitau = 0;
+  double g_pi = 0, g_tau = 0, g_tautau = 0, g_pitau = 0, g_pipi = 0;
   for (int i = 0; i < 34; i++) {
     int Ii = if97_r1_I[i];
     int Ji = if97_r1_J[i];
@@ -93,33 +97,37 @@ static void if97_r1_gamma(double p, double T, double *gamma_pi, double *gamma_ta
     g_tau    +=  n * aI * Ji * bJ1;
     g_tautau +=  n * aI * Ji * (Ji-1) * bJ2;
     g_pitau  += -n * Ii * aI1 * Ji * bJ1;
+    if (Ii > 1) {
+      g_pipi += n * Ii * (Ii-1) * gsl_pow_int(a, Ii-2) * bJ;
+    }
   }
   
   if (gamma_pi != NULL)     *gamma_pi = g_pi;
   if (gamma_tau != NULL)    *gamma_tau = g_tau;
   if (gamma_tautau != NULL) *gamma_tautau = g_tautau;
   if (gamma_pitau != NULL)  *gamma_pitau = g_pitau;
+  if (gamma_pipi != NULL)   *gamma_pipi = g_pipi;
   
   return;
 }
 
 double thermal_hydraulics_if97_rho(double p, double T) {
   double g_pi = 0;
-  if97_r1_gamma(p, T, &g_pi, NULL, NULL, NULL);
+  if97_r1_gamma(p, T, &g_pi, NULL, NULL, NULL, NULL);
   double pi = p/IF97_PSTAR1;
   return p / (IF97_R * T * pi * g_pi);
 }
 
 double thermal_hydraulics_if97_h(double p, double T) {
   double g_tau = 0;
-  if97_r1_gamma(p, T, NULL, &g_tau, NULL, NULL);
+  if97_r1_gamma(p, T, NULL, &g_tau, NULL, NULL, NULL);
   double tau = IF97_TSTAR1/T;
   return IF97_R * T * tau * g_tau;
 }
 
 double thermal_hydraulics_if97_cp(double p, double T) {
   double g_tautau = 0;
-  if97_r1_gamma(p, T, NULL, NULL, &g_tautau, NULL);
+  if97_r1_gamma(p, T, NULL, NULL, &g_tautau, NULL, NULL);
   double tau = IF97_TSTAR1/T;
   return -IF97_R * tau*tau * g_tautau;
 }
@@ -127,13 +135,72 @@ double thermal_hydraulics_if97_cp(double p, double T) {
 // derivative of the density with respect to temperature at constant pressure
 static double if97_drhodT(double p, double T) {
   double g_pi = 0, g_pitau = 0;
-  if97_r1_gamma(p, T, &g_pi, NULL, NULL, &g_pitau);
+  if97_r1_gamma(p, T, &g_pi, NULL, NULL, &g_pitau, NULL);
   double pi = p/IF97_PSTAR1;
   double tau = IF97_TSTAR1/T;
   // v = R T pi g_pi / p => dv/dT = R pi / p (g_pi - tau g_pitau)
   double v = IF97_R * T * pi * g_pi / p;
   double dvdT = IF97_R * pi / p * (g_pi - tau*g_pitau);
   return -dvdT/(v*v);
+}
+
+double thermal_hydraulics_if97_beta(double p, double T) {
+  return -if97_drhodT(p, T)/thermal_hydraulics_if97_rho(p, T);
+}
+
+// IAPWS-2011 [5], eqs. (15)-(26), including the industrial critical enhancement.
+double thermal_hydraulics_if97_k(double p, double T) {
+  // [5] tables 1 and 2.
+  static const double L0[5] = {2.443221e-3, 1.323095e-2, 6.770357e-3, -3.454586e-3, 4.096266e-4};
+  static const double L1[5][6] = {
+    {1.60397357, -0.646013523, 0.111443906, 0.102997357, -0.0504123634, 0.00609859258},
+    {2.33771842, -2.78843778, 1.53616167, -0.463045512, 0.0832827019, -0.00719201245},
+    {2.19650529, -4.54580785, 3.55777244, -1.40944978, 0.275418278, -0.0205938816},
+    {-1.21051378, 1.60812989, -0.621178141, 0.0716373224, 0, 0},
+    {-2.7203370, 4.57586331, -3.18369245, 1.1168348, -0.19268305, 0.012913842}
+  };
+  // [5] table 6, indexed by density interval j, then power i.
+  static const double A[5][6] = {
+    {6.53786807199516, -5.61149954923348, 3.39624167361325, -2.27492629730878, 10.2631854662709, 1.97815050331519},
+    {6.52717759281799, -6.30816983387575, 8.08379285492595, -9.82240510197603, 12.1358413791395, -5.54349664571295},
+    {5.35500529896124, -3.96415689925446, 8.91990208918795, -12.0338729505790, 9.19494865194302, -2.16866274479712},
+    {1.55225959906681, 0.464621290821181, 8.93237374861479, -11.0321960061126, 6.16780999933360, -0.965458722086812},
+    {1.11999926419994, 0.595748562571649, 9.88952565078920, -10.3255051147040, 4.66861294457414, -0.503243546373828}
+  };
+  double g_pi, g_tautau, g_pitau, g_pipi;
+  if97_r1_gamma(p, T, &g_pi, NULL, &g_tautau, &g_pitau, &g_pipi);
+  double tau = IF97_TSTAR1/T;
+  double rho = IF97_PSTAR1/(IF97_R*T*g_pi);
+  double cp = -IF97_R*tau*tau*g_tautau;
+  double cv = cp + IF97_R*gsl_pow_2(g_pi-tau*g_pitau)/g_pipi;
+  double drhodp = -g_pipi*rho/(g_pi*IF97_PSTAR1);
+  double Tr = T/647.096;
+  double rhor = rho/322.0;
+  double sum0 = 0, sum1 = 0;
+  for (int i = 0; i < 5; i++) {
+    sum0 += L0[i]/gsl_pow_int(Tr, i);
+    for (int j = 0; j < 6; j++) {
+      sum1 += L1[i][j]*gsl_pow_int(1/Tr-1, i)*gsl_pow_int(rhor-1, j);
+    }
+  }
+  double lambda = sqrt(Tr)/sum0 * exp(rhor*sum1);
+  int j = (rhor <= 0.310559006) ? 0 : (rhor <= 0.776397516) ? 1 :
+          (rhor <= 1.242236025) ? 2 : (rhor <= 1.863354037) ? 3 : 4;
+  double sumA = 0;
+  for (int i = 0; i < 6; i++) {
+    sumA += A[j][i]*gsl_pow_int(rhor, i);
+  }
+  double zeta = drhodp*22.064e6/322.0;
+  double delta_chi = GSL_MAX(0, rhor*(zeta-1.5/(Tr*sumA)));
+  double y = 0.13/0.40 * pow(delta_chi/0.06, 0.630/1.239);
+  if (y >= 1.2e-7) {
+    double cvcp = cv/cp;
+    double Z = 2/(M_PI*y) * ((1-cvcp)*atan(y) + cvcp*y +
+                            expm1(-1/(1/y+y*y/(3*rhor*rhor))));
+    double mur = thermal_hydraulics_iapws_mu(rho, T)/1e-6;
+    lambda += 177.8514*rhor*(cp/461.51805)*Tr/mur*Z;
+  }
+  return 1e-3*lambda;
 }
 
 // inverse function T(p,rho) for region 1 using newton-raphson
