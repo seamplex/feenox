@@ -36,6 +36,7 @@
 typedef struct th_fluid_t th_fluid_t;
 typedef struct th_pipe_t th_pipe_t;
 typedef struct th_node_t th_node_t;
+typedef struct th_heat_structure_t th_heat_structure_t;
 typedef struct thermal_hydraulics_t thermal_hydraulics_t;
 
 // equation of state and transport properties of the working fluid
@@ -56,6 +57,7 @@ struct th_fluid_t {
 // a pipe segment is a 1D element (a "junction" or "flow path" in RELAP's jargon)
 struct th_pipe_t {
   element_t *element;
+  th_heat_structure_t *heat_structure;
   size_t a;                  // index of the start node
   size_t b;                  // index of the end node
   
@@ -90,8 +92,32 @@ struct th_node_t {
   double p_bc, T_bc, rho_bc, v_bc, mdot_bc;
 };
 
+struct th_heat_structure_t {
+  char *group_name;
+  char *material_name[3];
+  physical_group_t *group;
+  expr_t *power_expr;
+  expr_t *properties[3][3];   // k, rho, cp
+  double k[3], rho[3], cp[3];
+  double power, length;
+  int axial_conduction;
+  size_t nr;
+  size_t offset;
+  double *radius;
+  int *layer;
+  double *node_length;
+  var_t *heat, *energy;
+  function_t *center_function, *fuel_surface_function, *clad_surface_function;
+  size_t fuel_surface;
+  UT_hash_handle hh;
+};
+
 struct thermal_hydraulics_t {
   th_fluid_t fluid;
+  th_heat_structure_t *heat_structures;
+  size_t n_solid_unknowns;
+  var_t *hs_heat, *hs_energy;
+  function_t *fuel_center_function, *fuel_surface_function, *clad_surface_function;
   
   // properties
   distribution_t A;

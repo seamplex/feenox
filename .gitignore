@@ -119,4 +119,6 @@ poisson-square.vtu
 hex8-ldef.txt
 beam-orthotropic-*.vtu
 relap7-pipe.msh
+relap7-core-channel.msh
 thermal-hydraulics-tee.msh
+thermal-hydraulics-structures.msh

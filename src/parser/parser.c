@@ -397,6 +397,10 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_linearize_stress());
       return FEENOX_OK;      
 
+    } else if (strcasecmp(token, "HEAT_STRUCTURE") == 0) {
+      feenox_call(feenox_parse_heat_structure());
+      return FEENOX_OK;
+
 // this should come last because there is no actual keyword apart from the equal sign
 // so if we came down here, then that means that any line containing a '=' that has
 // not been already processed must be one of these

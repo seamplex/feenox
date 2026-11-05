@@ -1,0 +1,15 @@
+DEFAULT_ARGUMENT_VALUE 1 NO_AXIAL_CONDUCTION
+DEFAULT_ARGUMENT_VALUE 2 0
+DEFAULT_ARGUMENT_VALUE 3 40
+DEFAULT_ARGUMENT_VALUE 4 0
+INCLUDE relap7-core-channel.fee
+
+IF end_time=0|done
+  linear_power = 77337.69407/3.865
+  fuel_drop = linear_power/(4*pi*2.5)
+  gap_clad_drop = linear_power/(2*pi)*(log(0.004196/0.004096)/0.6+log(0.004748/0.004196)/21.5)
+  wall_drop = linear_power/(5.33e4*2*pi*0.004748)
+  inlet_heat = 5.33e4*2*pi*0.004748*(3.865/80)*(T_clad_surface(0,0,0)-T(0,0,0))
+  coolant_heat = mdot(0,0,3.865)*(h(0,0,3.865)-h(0,0,0))+inlet_heat
+  PRINT abs(hs_heat/77337.69407-1)+abs(coolant_heat/77337.69407-1)+abs((T_fuel_center(0,0,1.9325)-T_fuel_surface(0,0,1.9325))/fuel_drop-1)+abs((T_fuel_surface(0,0,1.9325)-T_clad_surface(0,0,1.9325))/gap_clad_drop-1)+abs((T_clad_surface(0,0,1.9325)-T(0,0,1.9325))/wall_drop-1)
+ENDIF

@@ -1,0 +1,27 @@
+# RELAP-7 Example 5. Argument 1 is AXIAL_CONDUCTION or NO_AXIAL_CONDUCTION.
+# Argument 2 is the end time; zero requests only the steady state.
+DEFAULT_ARGUMENT_VALUE 1 AXIAL_CONDUCTION
+DEFAULT_ARGUMENT_VALUE 2 0
+DEFAULT_ARGUMENT_VALUE 3 10
+DEFAULT_ARGUMENT_VALUE 4 1
+PROBLEM thermal_hydraulics DIM 3 MESH relap7-core-channel.msh
+end_time = $2
+dt = 0.1
+
+HEAT_STRUCTURE PIPE channel FUEL fuel GAP gap CLAD clad $1
+MATERIAL fuel k=2.5 rho_s=1.032e4 cp=300
+MATERIAL gap k=0.6 rho_s=1 cp=1
+MATERIAL clad k=21.5 rho_s=6.55e3 cp=350
+MATERIAL channel {
+  A=8.79375e-5 D_h=0.01179 f=0.01 h_wall=5.33e4
+  fuel_radius=0.004096 gap_width=0.0001 clad_width=0.000552
+  fuel_cells=$3 gap_cells=1 clad_cells=2 hs_power=77337.69407
+}
+BC inlet rho=753.68 v=4.43
+BC outlet p=155e5
+
+SOLVE_PROBLEM
+
+IF (end_time=0|done)&$4
+  PRINTF "%g %g %g %g %g" T(0,0,3.865) T_fuel_center(0,0,3.865) T_fuel_surface(0,0,3.865) T_clad_surface(0,0,3.865) mdot(0,0,3.865)
+ENDIF

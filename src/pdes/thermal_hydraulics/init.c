@@ -62,6 +62,15 @@ int feenox_problem_parse_time_init_thermal_hydraulics(void) {
   feenox_call(feenox_problem_define_solution_function("v", &thermal_hydraulics.v_function, FEENOX_SOLUTION_NOT_GRADIENT));
 ///re_thermal_hydraulics+mdot+description The mass flow field\ $\dot{m}(x)$ in kg/s along the direction of the pipe elements, averaged at the nodes.
   feenox_call(feenox_problem_define_solution_function("mdot", &thermal_hydraulics.mdot_function, FEENOX_SOLUTION_NOT_GRADIENT));
+///pr_thermal_hydraulics+T_0+description Initial fluid temperature as a function of the spatial coordinates.
+///pr_thermal_hydraulics+T_0+description For transients, any prescribed initial field skips the t=0 steady solve. Unspecified fluid fields use the boundary-based initial guess.
+///pr_thermal_hydraulics+p_0+description Initial pressure (Pa), as a function of the spatial coordinates.
+///pr_thermal_hydraulics+v_0+description Initial signed pipe velocity (m/s), evaluated at element centers. Mutually exclusive with `mdot_0`.
+///pr_thermal_hydraulics+mdot_0+description Initial signed mass flow (kg/s), evaluated at element centers.
+///pr_thermal_hydraulics+T_solid_0+description Initial solid temperature (K), with radius as the first argument followed by the spatial coordinates.
+///pr_thermal_hydraulics+T_solid_0+description This function initializes every heat structure on its own radial grid.
+///pr_thermal_hydraulics+T_solid_0+description If absent with prescribed fluid initial conditions, the solid starts at the local initial fluid temperature.
+///pr_thermal_hydraulics+T_solid_0+description Without any initial fields, a coupled steady state initializes the transient. Time integration uses backward Euler.
 
 ///va_thermal_hydraulics+g_x+detail The $x$ component of the gravity acceleration vector in m/s^2. Default is zero.
   feenox_check_alloc(thermal_hydraulics.g[0] = feenox_get_or_define_variable_get_ptr("g_x"));
@@ -131,6 +140,8 @@ int feenox_problem_init_runtime_thermal_hydraulics(void) {
   feenox_call(feenox_distribution_init(&thermal_hydraulics.q, "q"));
 ///pr_thermal_hydraulics+P_h+description Heated perimeter (in m). Default is $4A/D_h$.
 ///pr_thermal_hydraulics+P_h+description For a circular pipe this is $\pi D$. Set zero for an insulated pipe.
+///pr_thermal_hydraulics+P_h+description For a heat structure, the default is the outer cladding circumference and an explicit value must be positive.
+///pr_thermal_hydraulics+P_h+description The default applies separately to each material where `P_h` is absent; an explicit zero is preserved.
   feenox_call(feenox_distribution_init(&thermal_hydraulics.P_h, "P_h"));
 ///pr_thermal_hydraulics+T_wall+description Specified pipe wall temperature (in K).
 ///pr_thermal_hydraulics+T_wall+description Adds $h_{wall} P_h (T_{wall}-T)$ per unit length to the energy equation.
@@ -148,8 +159,9 @@ int feenox_problem_init_runtime_thermal_hydraulics(void) {
 ///pr_thermal_hydraulics+q_wall+description Mutually exclusive with `T_wall` on a given pipe. Default is an adiabatic wall.
   feenox_call(feenox_distribution_init(&thermal_hydraulics.q_wall, "q_wall"));
 ///pr_thermal_hydraulics+h_wall+description Optional prescribed wall heat transfer coefficient (in W/m^2/K).
-///pr_thermal_hydraulics+h_wall+description Requires `T_wall` on the same pipe and overrides the TRACE correlation.
-///pr_thermal_hydraulics+h_wall+description Zero disables wall heat exchange; negative values are invalid.
+///pr_thermal_hydraulics+h_wall+description Requires `T_wall` or a `HEAT_STRUCTURE` on the same pipe. For a heat structure it must be positive.
+///pr_thermal_hydraulics+h_wall+description Heat structures currently require a prescribed coefficient rather than automatic TRACE convection.
+///pr_thermal_hydraulics+h_wall+description Zero disables prescribed-temperature wall heat exchange; heat structures require a positive value. Negative values are invalid.
   feenox_call(feenox_distribution_init(&thermal_hydraulics.h_wall, "h_wall"));
   
   if (thermal_hydraulics.A.defined == 0 && thermal_hydraulics.D.defined == 0) {

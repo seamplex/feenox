@@ -1,0 +1,42 @@
+# Three independent solids meeting at shared coolant nodes, with different
+# radial grids, radii, materials, and powers. No solid-to-solid connection.
+DEFAULT_ARGUMENT_VALUE 1 AXIAL_CONDUCTION
+DEFAULT_ARGUMENT_VALUE 2 0
+DEFAULT_ARGUMENT_VALUE 3 1
+PROBLEM thermal_hydraulics MESH thermal-hydraulics-structures.msh
+HEAT_STRUCTURE PIPE first $1 FUEL fuel GAP gap CLAD clad
+HEAT_STRUCTURE CLAD clad GAP gap FUEL other PIPE second $1
+HEAT_STRUCTURE $1 GAP gap PIPE third CLAD clad FUEL fuel
+end_time = $2
+dt = 0.1
+MATERIAL fuel k=2.5 rho_s=10320 cp=300
+MATERIAL other k=5 rho_s=8000 cp=400
+MATERIAL gap k=0.6 rho_s=1 cp=1
+MATERIAL clad k=21.5 rho_s=6550 cp=350
+MATERIAL first {
+  A=1e-4 D_h=0.01 f=0.01 h_wall=5000
+  fuel_radius=0.004 gap_width=0.0001 clad_width=0.0005
+  fuel_cells=40 gap_cells=1 clad_cells=2 hs_power=1000
+}
+MATERIAL second {
+  A=1e-4 D_h=0.01 f=0.01 h_wall=10000
+  fuel_radius=0.003 gap_width=0.0002 clad_width=0.0003
+  fuel_cells=30 gap_cells=2 clad_cells=3 hs_power=2000
+}
+MATERIAL third {
+  A=1e-4 D_h=0.01 f=0.01 h_wall=15000
+  fuel_radius=0.002 gap_width=0.0001 clad_width=0.0004
+  fuel_cells=20 gap_cells=1 clad_cells=4 hs_power=3000
+}
+BC inlet mdot=0.1 T=300
+BC outlet p=1e6
+SOLVE_PROBLEM
+IF (end_time=0|done)&$3
+  power_error = abs(hs_heat_first/1000-1)+abs(hs_heat_second/2000-1)+abs(hs_heat_third/3000-1)
+  sum_error = abs(hs_heat/6000-1)+abs(hs_energy/(hs_energy_first+hs_energy_second+hs_energy_third)-1)
+  radial_error = abs((T_fuel_center_first(0.5)-T_fuel_surface_first(0.5))/(1000/(4*pi*2.5))-1)+abs((T_fuel_center_second(1.5)-T_fuel_surface_second(1.5))/(2000/(4*pi*5))-1)+abs((T_fuel_center_third(2.5)-T_fuel_surface_third(2.5))/(3000/(4*pi*2.5))-1)
+  # Independent convection drops at the shared node must not be overwritten.
+  shared_error = abs((T_clad_surface_first(1)-T(1))/(1000/(5000*2*pi*0.0046))-1)+abs((T_clad_surface_second(1)-T(1))/(2000/(10000*2*pi*0.0035))-1)
+  alias_error = abs(T_fuel_center(0.5)-T_fuel_center_first(0.5))+abs(T_fuel_surface(0.5)-T_fuel_surface_first(0.5))+abs(T_clad_surface(0.5)-T_clad_surface_first(0.5))
+  PRINT power_error+sum_error+radial_error+shared_error+alias_error
+ENDIF

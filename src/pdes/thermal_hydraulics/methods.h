@@ -23,6 +23,7 @@
 #define THERMAL_HYDRAULICS_METHODS_H
 
 // thermal_hydraulics/parser.c
+extern int feenox_parse_heat_structure(void);
 extern int feenox_problem_parse_problem_thermal_hydraulics(const char *token);
 extern int feenox_problem_parse_write_post_thermal_hydraulics(mesh_write_t *mesh_write, const char *token);
 

@@ -28,7 +28,9 @@
   - each line element is a flow path with mass flow mdot (positive from node a to node b)
  
  Global vector layout:
-   [ p_0 T_0 p_1 T_1 ... p_{N-1} T_{N-1} mdot_0 mdot_1 ... mdot_{K-1} ]
+   [ p_0 T_0 ... p_{N-1} T_{N-1} mdot_0 ... mdot_{K-1} solid blocks ... ]
+   Each heat structure has its own block of N radial temperature columns,
+   starting at hs->offset, with hs->nr fuel-gap-clad temperatures per column.
  
  Residuals:
    row 2j:   mass balance at node j (or p_j - p_bc if node j has a pressure BC)
@@ -39,6 +41,7 @@
 #define TH_P(j)    (2*(j))
 #define TH_T(j)    (2*(j)+1)
 #define TH_MDOT(k) (2*thermal_hydraulics.n_nodes + (k))
+#define TH_SOLID(hs,j,i) ((hs)->offset + (j)*(hs)->nr + (i))
 
 #ifdef HAVE_PETSC
 static int thermal_hydraulics_update_properties(void);
@@ -49,13 +52,27 @@ static int thermal_hydraulics_store_old(void);
 static PetscErrorCode thermal_hydraulics_residual(SNES snes, Vec X, Vec R, void *ctx);
 static int thermal_hydraulics_property_defined(distribution_t *property, int group);
 static double thermal_hydraulics_wall_coefficient(th_pipe_t *pipe, double p, double T, double mdot);
+static int thermal_hydraulics_init_heat_structure(th_heat_structure_t *hs);
+static int thermal_hydraulics_update_heat_structure(th_heat_structure_t *hs);
+static int thermal_hydraulics_set_initial_conditions(void);
+static expr_t *thermal_hydraulics_material_expression(material_t *material, const char *name);
+static double thermal_hydraulics_radial_weight(th_heat_structure_t *hs, size_t i, int side);
+static int thermal_hydraulics_solid_residual(th_heat_structure_t *hs, const PetscScalar *x, PetscScalar *r);
 #endif
 
 int feenox_problem_solve_thermal_hydraulics(void) {
 
 #ifdef HAVE_PETSC
   
-  size_t size = 2*thermal_hydraulics.n_nodes + thermal_hydraulics.n_pipes;
+  for (th_heat_structure_t *hs = thermal_hydraulics.heat_structures; hs != NULL; hs = hs->hh.next) {
+    if (hs->nr == 0) {
+      hs->offset = 2*thermal_hydraulics.n_nodes + thermal_hydraulics.n_pipes + thermal_hydraulics.n_solid_unknowns;
+      feenox_call(thermal_hydraulics_init_heat_structure(hs));
+      thermal_hydraulics.n_solid_unknowns += thermal_hydraulics.n_nodes*hs->nr;
+    }
+  }
+  size_t size = 2*thermal_hydraulics.n_nodes + thermal_hydraulics.n_pipes +
+                thermal_hydraulics.n_solid_unknowns;
   if (thermal_hydraulics.x == NULL) {
     petsc_call(VecCreateSeq(PETSC_COMM_SELF, size, &thermal_hydraulics.x));
     petsc_call(PetscObjectSetName((PetscObject)thermal_hydraulics.x, "x_th"));
@@ -66,9 +83,19 @@ int feenox_problem_solve_thermal_hydraulics(void) {
   thermal_hydraulics.transient = (feenox_special_var_value(in_static) == 0 && feenox_special_var_value(end_time) > 0);
   thermal_hydraulics.dt = feenox_special_var_value(dt);
   feenox_call(thermal_hydraulics_update_properties());
+  for (th_heat_structure_t *hs = thermal_hydraulics.heat_structures; hs != NULL; hs = hs->hh.next) {
+    feenox_call(thermal_hydraulics_update_heat_structure(hs));
+  }
+  int initial = feenox_special_var_value(end_time) > 0 &&
+                (feenox_get_function_ptr("p_0") != NULL || feenox_get_function_ptr("T_0") != NULL ||
+                 feenox_get_function_ptr("mdot_0") != NULL || feenox_get_function_ptr("v_0") != NULL ||
+                 feenox_get_function_ptr("T_solid_0") != NULL);
   
   if (thermal_hydraulics.snes == NULL) {
     feenox_call(thermal_hydraulics_initial_guess());
+    if (initial) {
+      feenox_call(thermal_hydraulics_set_initial_conditions());
+    }
     feenox_call(thermal_hydraulics_create_jacobian());
     feenox_call(thermal_hydraulics_setup_snes());
   }
@@ -78,7 +105,11 @@ int feenox_problem_solve_thermal_hydraulics(void) {
     return FEENOX_ERROR;
   }
   
-  if (feenox.pde.do_not_solve == 0) {
+  if (thermal_hydraulics.transient && (!isfinite(thermal_hydraulics.dt) || thermal_hydraulics.dt <= 0)) {
+    feenox_push_error_message("thermal_hydraulics transient steps need a positive finite dt");
+    return FEENOX_ERROR;
+  }
+  if (feenox.pde.do_not_solve == 0 && !(initial && feenox_special_var_value(in_static))) {
     petsc_call(SNESSolve(thermal_hydraulics.snes, NULL, thermal_hydraulics.x));
     SNESConvergedReason reason;
     petsc_call(SNESGetConvergedReason(thermal_hydraulics.snes, &reason));
@@ -95,6 +126,34 @@ int feenox_problem_solve_thermal_hydraulics(void) {
   // feenox_problem_phi_to_solution() can fill the solution functions
   const PetscScalar *x = NULL;
   petsc_call(VecGetArrayRead(thermal_hydraulics.x, &x));
+  double total_heat = 0, total_energy = 0;
+  for (th_heat_structure_t *hs = thermal_hydraulics.heat_structures; hs != NULL; hs = hs->hh.next) {
+    double heat = 0, energy = 0;
+    for (size_t k = 0; k < thermal_hydraulics.n_pipes; k++) {
+      th_pipe_t *pipe = &thermal_hydraulics.pipes[k];
+      if (pipe->element->physical_group != hs->group) continue;
+      heat += pipe->h_wall*pipe->P_h*pipe->L/2*
+              (x[TH_SOLID(hs,pipe->a,hs->nr-1)]-x[TH_T(pipe->a)]+
+               x[TH_SOLID(hs,pipe->b,hs->nr-1)]-x[TH_T(pipe->b)]);
+    }
+    for (size_t j = 0; j < thermal_hydraulics.n_nodes; j++) {
+      for (size_t i = 0; i+1 < hs->nr; i++) {
+        int l = hs->layer[i];
+        for (int side = 0; side < 2; side++) {
+          energy += hs->rho[l]*hs->cp[l]*hs->node_length[j]*
+                    thermal_hydraulics_radial_weight(hs, i, side)*x[TH_SOLID(hs,j,i+side)];
+        }
+      }
+    }
+    feenox_var_value(hs->heat) = heat;
+    feenox_var_value(hs->energy) = energy;
+    total_heat += heat;
+    total_energy += energy;
+  }
+  if (thermal_hydraulics.heat_structures != NULL) {
+    feenox_var_value(thermal_hydraulics.hs_heat) = total_heat;
+    feenox_var_value(thermal_hydraulics.hs_energy) = total_energy;
+  }
   for (size_t j = 0; j < thermal_hydraulics.n_nodes; j++) {
     node_t *node = &feenox.pde.mesh->node[j];
     petsc_call(VecSetValue(feenox.pde.phi, node->index_dof[0], x[TH_P(j)], INSERT_VALUES));
@@ -138,6 +197,20 @@ int feenox_problem_solve_post_thermal_hydraulics(void) {
     feenox_vector_set(thermal_hydraulics.h_function->vector_value, j, thermal_hydraulics.fluid.h(p, T));
     feenox_vector_set(thermal_hydraulics.v_function->vector_value, j, v);
     feenox_vector_set(thermal_hydraulics.mdot_function->vector_value, j, mdot);
+    for (th_heat_structure_t *hs = thermal_hydraulics.heat_structures; hs != NULL; hs = hs->hh.next) {
+      int active = hs->node_length[j] > 0;
+      double center = active ? x[TH_SOLID(hs,j,0)] : NAN;
+      double fuel_surface = active ? x[TH_SOLID(hs,j,hs->fuel_surface)] : NAN;
+      double clad_surface = active ? x[TH_SOLID(hs,j,hs->nr-1)] : NAN;
+      feenox_vector_set(hs->center_function->vector_value, j, center);
+      feenox_vector_set(hs->fuel_surface_function->vector_value, j, fuel_surface);
+      feenox_vector_set(hs->clad_surface_function->vector_value, j, clad_surface);
+      if (hs == thermal_hydraulics.heat_structures) {
+        feenox_vector_set(thermal_hydraulics.fuel_center_function->vector_value, j, center);
+        feenox_vector_set(thermal_hydraulics.fuel_surface_function->vector_value, j, fuel_surface);
+        feenox_vector_set(thermal_hydraulics.clad_surface_function->vector_value, j, clad_surface);
+      }
+    }
     
     if (warned == 0) {
       if (T < thermal_hydraulics.fluid.T_min || T > thermal_hydraulics.fluid.T_max) {
@@ -157,6 +230,190 @@ int feenox_problem_solve_post_thermal_hydraulics(void) {
 }
 
 #ifdef HAVE_PETSC
+
+static expr_t *thermal_hydraulics_material_expression(material_t *material, const char *name) {
+  property_data_t *data = NULL;
+  HASH_FIND_STR(material->property_datums, name, data);
+  if (data == NULL) {
+    feenox_push_error_message("material '%s' needs heat-structure property '%s'", material->name, name);
+    return NULL;
+  }
+  return &data->expr;
+}
+
+static int thermal_hydraulics_init_heat_structure(th_heat_structure_t *hs) {
+  HASH_FIND_STR(feenox.pde.mesh->physical_groups, hs->group_name, hs->group);
+  if (hs->group == NULL || hs->group->dimension != 1 || hs->group->material == NULL) {
+    feenox_push_error_message("HEAT_STRUCTURE needs a physical line group '%s' with a channel material", hs->group_name);
+    return FEENOX_ERROR;
+  }
+  material_t *channel = hs->group->material;
+  const char *geometry[] = {"fuel_radius", "gap_width", "clad_width", "fuel_cells", "gap_cells", "clad_cells"};
+  double value[6];
+  for (int i = 0; i < 6; i++) {
+    expr_t *expr = thermal_hydraulics_material_expression(channel, geometry[i]);
+    if (expr == NULL) {
+      return FEENOX_ERROR;
+    }
+    if (feenox_expression_depends_on_space(expr) || feenox_depends_on_time(expr->variables)) {
+      feenox_push_error_message("heat-structure geometry '%s' must not depend on space or time", geometry[i]);
+      return FEENOX_ERROR;
+    }
+    value[i] = feenox_expression_eval(expr);
+    if (!isfinite(value[i]) || value[i] <= 0 || (i >= 3 && (value[i] != floor(value[i]) || value[i] > 10000))) {
+      feenox_push_error_message("heat-structure '%s' must be positive; radial cell counts must be integers <= 10000", geometry[i]);
+      return FEENOX_ERROR;
+    }
+  }
+  hs->nr = 1+(size_t)value[3]+(size_t)value[4]+(size_t)value[5];
+  hs->fuel_surface = (size_t)value[3];
+  feenox_check_alloc(hs->radius = calloc(hs->nr, sizeof(double)));
+  feenox_check_alloc(hs->layer = calloc(hs->nr-1, sizeof(int)));
+  feenox_check_alloc(hs->node_length = calloc(thermal_hydraulics.n_nodes, sizeof(double)));
+  size_t n = 0;
+  double radius = 0;
+  const char *properties[] = {"k", "rho_s", "cp"};
+  for (int l = 0; l < 3; l++) {
+    material_t *material = feenox_get_material_ptr(hs->material_name[l]);
+    if (material == NULL) {
+      feenox_push_error_message("unknown heat-structure material '%s'", hs->material_name[l]);
+      return FEENOX_ERROR;
+    }
+    for (int m = 0; m < 3; m++) {
+      if ((hs->properties[l][m] = thermal_hydraulics_material_expression(material, properties[m])) == NULL) {
+        return FEENOX_ERROR;
+      }
+      if (hs->properties[l][m]->variables != NULL || hs->properties[l][m]->functions != NULL) {
+        feenox_push_error_message("heat-structure material '%s' property '%s' must be constant", material->name, properties[m]);
+        return FEENOX_ERROR;
+      }
+    }
+    size_t cells = (size_t)value[l+3];
+    for (size_t i = 0; i < cells; i++) {
+      hs->layer[n] = l;
+      hs->radius[++n] = radius+value[l]*(i+1)/cells;
+    }
+    radius += value[l];
+  }
+  for (size_t k = 0; k < thermal_hydraulics.n_pipes; k++) {
+    th_pipe_t *pipe = &thermal_hydraulics.pipes[k];
+    if (pipe->element->physical_group == hs->group) {
+      pipe->heat_structure = hs;
+      hs->length += pipe->L;
+      hs->node_length[pipe->a] += pipe->L/2;
+      hs->node_length[pipe->b] += pipe->L/2;
+    }
+  }
+  if (hs->length <= 0) {
+    feenox_push_error_message("HEAT_STRUCTURE group '%s' has no pipe elements", hs->group_name);
+    return FEENOX_ERROR;
+  }
+  if ((hs->power_expr = thermal_hydraulics_material_expression(channel, "hs_power")) == NULL) {
+    return FEENOX_ERROR;
+  }
+  if (feenox_expression_depends_on_space(hs->power_expr)) {
+    feenox_push_error_message("hs_power is total channel power and must not depend on space");
+    return FEENOX_ERROR;
+  }
+  feenox_call(feenox_problem_fill_aux_solution(hs->center_function));
+  feenox_call(feenox_problem_fill_aux_solution(hs->fuel_surface_function));
+  feenox_call(feenox_problem_fill_aux_solution(hs->clad_surface_function));
+  if (hs == thermal_hydraulics.heat_structures) {
+    feenox_call(feenox_problem_fill_aux_solution(thermal_hydraulics.fuel_center_function));
+    feenox_call(feenox_problem_fill_aux_solution(thermal_hydraulics.fuel_surface_function));
+    feenox_call(feenox_problem_fill_aux_solution(thermal_hydraulics.clad_surface_function));
+  }
+  return FEENOX_OK;
+}
+
+static int thermal_hydraulics_update_heat_structure(th_heat_structure_t *hs) {
+  hs->power = feenox_expression_eval(hs->power_expr);
+  if (!isfinite(hs->power) || hs->power < 0) {
+    feenox_push_error_message("hs_power for heat structure '%s' must be finite and non-negative", hs->group_name);
+    return FEENOX_ERROR;
+  }
+  for (int l = 0; l < 3; l++) {
+    hs->k[l] = feenox_expression_eval(hs->properties[l][0]);
+    hs->rho[l] = feenox_expression_eval(hs->properties[l][1]);
+    hs->cp[l] = feenox_expression_eval(hs->properties[l][2]);
+    if (!isfinite(hs->k[l]) || hs->k[l] <= 0 || !isfinite(hs->rho[l]) || hs->rho[l] <= 0 ||
+        !isfinite(hs->cp[l]) || hs->cp[l] <= 0) {
+      feenox_push_error_message("heat-structure material '%s' needs positive finite k, rho_s, and cp", hs->material_name[l]);
+      return FEENOX_ERROR;
+    }
+  }
+  return FEENOX_OK;
+}
+
+// Axisymmetric linear-element lumped area: integral of 2*pi*r*N_side dr.
+static double thermal_hydraulics_radial_weight(th_heat_structure_t *hs, size_t i, int side) {
+  double a = hs->radius[i];
+  double dr = hs->radius[i+1]-a;
+  return 2*M_PI*dr*(a/2+dr*(side == 0 ? 1.0/6 : 1.0/3));
+}
+
+static int thermal_hydraulics_set_initial_conditions(void) {
+  const char *names[] = {"p_0", "T_0", "mdot_0", "v_0", "T_solid_0"};
+  function_t *f[5];
+  for (int i = 0; i < 5; i++) {
+    f[i] = feenox_get_function_ptr(names[i]);
+    int dim = feenox.pde.dim+(i == 4);
+    if (f[i] != NULL && f[i]->n_arguments != dim) {
+      feenox_push_error_message("initial condition '%s' needs %d arguments", names[i], dim);
+      return FEENOX_ERROR;
+    }
+  }
+  if (f[2] != NULL && f[3] != NULL) {
+    feenox_push_error_message("give either mdot_0 or v_0, not both");
+    return FEENOX_ERROR;
+  }
+  if (f[4] != NULL && thermal_hydraulics.heat_structures == NULL) {
+    feenox_push_error_message("T_solid_0 requires a HEAT_STRUCTURE");
+    return FEENOX_ERROR;
+  }
+  PetscScalar *x = NULL;
+  petsc_call(VecGetArray(thermal_hydraulics.x, &x));
+  for (size_t j = 0; j < thermal_hydraulics.n_nodes; j++) {
+    double *xx = feenox.pde.mesh->node[j].x;
+    if (f[0] != NULL) x[TH_P(j)] = feenox_function_eval(f[0], xx);
+    if (f[1] != NULL) x[TH_T(j)] = feenox_function_eval(f[1], xx);
+    if (!isfinite(x[TH_P(j)]) || x[TH_P(j)] <= 0 || !isfinite(x[TH_T(j)]) ||
+        x[TH_T(j)] < thermal_hydraulics.fluid.T_min || x[TH_T(j)] > thermal_hydraulics.fluid.T_max) {
+      petsc_call(VecRestoreArray(thermal_hydraulics.x, &x));
+      feenox_push_error_message("invalid initial fluid pressure or temperature at node %ld", feenox.pde.mesh->node[j].tag);
+      return FEENOX_ERROR;
+    }
+    for (th_heat_structure_t *hs = thermal_hydraulics.heat_structures; hs != NULL; hs = hs->hh.next) {
+      for (size_t i = 0; i < hs->nr; i++) {
+        double args[4] = {hs->radius[i], xx[0], xx[1], xx[2]};
+        x[TH_SOLID(hs,j,i)] = f[4] != NULL ? feenox_function_eval(f[4], args) : x[TH_T(j)];
+        if (!isfinite(x[TH_SOLID(hs,j,i)]) || x[TH_SOLID(hs,j,i)] <= 0) {
+          petsc_call(VecRestoreArray(thermal_hydraulics.x, &x));
+          feenox_push_error_message("invalid initial solid temperature in '%s' at node %ld", hs->group_name, feenox.pde.mesh->node[j].tag);
+          return FEENOX_ERROR;
+        }
+      }
+    }
+  }
+  for (size_t k = 0; k < thermal_hydraulics.n_pipes; k++) {
+    th_pipe_t *pipe = &thermal_hydraulics.pipes[k];
+    double xx[3];
+    for (int d = 0; d < 3; d++) xx[d] = 0.5*(pipe->element->node[0]->x[d]+pipe->element->node[1]->x[d]);
+    if (f[2] != NULL) x[TH_MDOT(k)] = feenox_function_eval(f[2], xx);
+    if (f[3] != NULL) {
+      double p = 0.5*(x[TH_P(pipe->a)]+x[TH_P(pipe->b)]);
+      double T = 0.5*(x[TH_T(pipe->a)]+x[TH_T(pipe->b)]);
+      x[TH_MDOT(k)] = thermal_hydraulics.fluid.rho(p, T)*pipe->A*feenox_function_eval(f[3], xx);
+    }
+    if (!isfinite(x[TH_MDOT(k)])) {
+      petsc_call(VecRestoreArray(thermal_hydraulics.x, &x));
+      feenox_push_error_message("invalid initial pipe flow at element %ld", pipe->element->tag);
+      return FEENOX_ERROR;
+    }
+  }
+  petsc_call(VecRestoreArray(thermal_hydraulics.x, &x));
+  return FEENOX_OK;
+}
 
 static int thermal_hydraulics_property_defined(distribution_t *property, int group) {
   return property->defined && (property->full || (group >= 0 && property->defined_per_group[group]));
@@ -204,22 +461,26 @@ static int thermal_hydraulics_update_properties(void) {
     th_pipe_t *pipe = &thermal_hydraulics.pipes[k];
     element_t *e = pipe->element;
     material_t *material = feenox_fem_get_material(e);
-    // TODO: see if we can get rid of this group-id-based logic
     int group = -1;
-    int index = 0;
-    for (physical_group_t *pg = feenox.pde.mesh->physical_groups; pg != NULL; pg = pg->hh.next) {
-      if (pg == e->physical_group) {
-        group = index;
+    int i = 0;
+    physical_group_t *physical_group = NULL;
+    for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
+      if (physical_group == e->physical_group) {
+        group = i;
         break;
       }
-      index++;
-    }
-    double x[3];
-    for (int d = 0; d < 3; d++) {
-      x[d] = 0.5*(e->node[0]->x[d] + e->node[1]->x[d]);
+      i++;
     }
     
+    double x[3] = {
+      0.5*(e->node[0]->x[0] + e->node[1]->x[0]),
+      0.5*(e->node[0]->x[1] + e->node[1]->x[1]),
+      0.5*(e->node[0]->x[2] + e->node[1]->x[2])
+    };
+
+    // diameter
     double D = (thermal_hydraulics.D.defined) ? thermal_hydraulics.D.eval(&thermal_hydraulics.D, x, material) : 0;
+    // area
     pipe->A = (thermal_hydraulics.A.defined) ? thermal_hydraulics.A.eval(&thermal_hydraulics.A, x, material) : 0;
     if (pipe->A <= 0 && D > 0) {
       pipe->A = M_PI*D*D/4.0;
@@ -229,6 +490,7 @@ static int thermal_hydraulics_update_properties(void) {
       return FEENOX_ERROR;
     }
     
+    // hydraulic diameter
     pipe->D_h = (thermal_hydraulics.D_h.defined) ? thermal_hydraulics.D_h.eval(&thermal_hydraulics.D_h, x, material) : 0;
     if (pipe->D_h <= 0) {
       pipe->D_h = (D > 0) ? D : sqrt(4*pipe->A/M_PI);
@@ -240,22 +502,34 @@ static int thermal_hydraulics_update_properties(void) {
     pipe->q = (thermal_hydraulics.q.defined) ? thermal_hydraulics.q.eval(&thermal_hydraulics.q, x, material) : 0;
     pipe->P_h = thermal_hydraulics_property_defined(&thermal_hydraulics.P_h, group) ?
                 thermal_hydraulics.P_h.eval(&thermal_hydraulics.P_h, x, material) : 4*pipe->A/pipe->D_h;
+    th_heat_structure_t *hs = pipe->heat_structure;
+    if (hs != NULL && !thermal_hydraulics_property_defined(&thermal_hydraulics.P_h, group)) {
+      pipe->P_h = 2*M_PI*hs->radius[hs->nr-1];
+    }
     pipe->has_T_wall = thermal_hydraulics_property_defined(&thermal_hydraulics.T_wall, group);
     pipe->has_q_wall = thermal_hydraulics_property_defined(&thermal_hydraulics.q_wall, group);
     pipe->has_h_wall = thermal_hydraulics_property_defined(&thermal_hydraulics.h_wall, group);
     
-    // TODO: can we check fort this at parse time?
+    // TODO: can we check for this at parse time?
     if (pipe->has_T_wall && pipe->has_q_wall) {
       feenox_push_error_message("element %ld has both 'T_wall' and 'q_wall'; specify only one wall heating model", e->tag);
       return FEENOX_ERROR;
     }
-    if (pipe->has_h_wall && !pipe->has_T_wall) {
+    if (hs != NULL && (pipe->has_T_wall || pipe->has_q_wall)) {
+      feenox_push_error_message("HEAT_STRUCTURE pipe cannot also have T_wall or q_wall");
+      return FEENOX_ERROR;
+    }
+    if (pipe->has_h_wall && !pipe->has_T_wall && hs == NULL) {
       feenox_push_error_message("element %ld has 'h_wall' without 'T_wall'", e->tag);
       return FEENOX_ERROR;
     }
     pipe->T_wall = pipe->has_T_wall ? thermal_hydraulics.T_wall.eval(&thermal_hydraulics.T_wall, x, material) : 0;
     pipe->q_wall = pipe->has_q_wall ? thermal_hydraulics.q_wall.eval(&thermal_hydraulics.q_wall, x, material) : 0;
     pipe->h_wall = pipe->has_h_wall ? thermal_hydraulics.h_wall.eval(&thermal_hydraulics.h_wall, x, material) : 0;
+    if (hs != NULL && (!pipe->has_h_wall || pipe->h_wall <= 0 || pipe->P_h <= 0)) {
+      feenox_push_error_message("HEAT_STRUCTURE pipe needs positive h_wall and P_h");
+      return FEENOX_ERROR;
+    }
     if (!isfinite(pipe->P_h) || pipe->P_h < 0 ||
         !isfinite(pipe->q_wall) || !isfinite(pipe->h_wall) || pipe->h_wall < 0) {
       feenox_push_error_message("element %ld needs finite wall properties with P_h >= 0 and h_wall >= 0", e->tag);
@@ -439,6 +713,11 @@ static int thermal_hydraulics_initial_guess(void) {
     double *xx = feenox.pde.mesh->node[j].x;
     x[TH_P(j)] = (p_guess_function != NULL) ? feenox_function_eval(p_guess_function, xx) : p_guess;
     x[TH_T(j)] = (T_guess_function != NULL) ? feenox_function_eval(T_guess_function, xx) : T_guess;
+    for (th_heat_structure_t *hs = thermal_hydraulics.heat_structures; hs != NULL; hs = hs->hh.next) {
+      for (size_t i = 0; i < hs->nr; i++) {
+        x[TH_SOLID(hs,j,i)] = x[TH_T(j)];
+      }
+    }
   }
   for (size_t k = 0; k < thermal_hydraulics.n_pipes; k++) {
     x[TH_MDOT(k)] = mdot_sign*mdot_guess;
@@ -453,13 +732,19 @@ static int thermal_hydraulics_initial_guess(void) {
 static int thermal_hydraulics_create_jacobian(void) {
 
   size_t N = thermal_hydraulics.n_nodes;
-  PetscInt size = 2*N + thermal_hydraulics.n_pipes;
+  PetscInt size = 2*N + thermal_hydraulics.n_pipes + thermal_hydraulics.n_solid_unknowns;
   
   PetscInt *nnz = NULL;
   feenox_check_alloc(nnz = calloc(size, sizeof(PetscInt)));
   for (size_t j = 0; j < N; j++) {
     // own p & T plus mdot and p & T of the neighbor for each pipe
     nnz[TH_P(j)] = nnz[TH_T(j)] = 2 + 3*thermal_hydraulics.nodes[j].n_pipes;
+    for (th_heat_structure_t *hs = thermal_hydraulics.heat_structures; hs != NULL; hs = hs->hh.next) {
+      nnz[TH_T(j)]++;
+      for (size_t i = 0; i < hs->nr; i++) {
+        nnz[TH_SOLID(hs,j,i)] = 4+thermal_hydraulics.nodes[j].n_pipes;
+      }
+    }
   }
   for (size_t k = 0; k < thermal_hydraulics.n_pipes; k++) {
     nnz[TH_MDOT(k)] = 5;
@@ -492,6 +777,25 @@ static int thermal_hydraulics_create_jacobian(void) {
     PetscInt cols[5] = {TH_P(pipe->a), TH_T(pipe->a), TH_P(pipe->b), TH_T(pipe->b), TH_MDOT(k)};
     PetscScalar zeros[5] = {0, 0, 0, 0, 0};
     petsc_call(MatSetValues(thermal_hydraulics.J, 1, &row, 5, cols, zeros, INSERT_VALUES));
+  }
+  for (th_heat_structure_t *hs = thermal_hydraulics.heat_structures; hs != NULL; hs = hs->hh.next) {
+    size_t nr = hs->nr;
+    for (size_t j = 0; j < N; j++) {
+      petsc_call(MatSetValue(thermal_hydraulics.J, TH_T(j), TH_SOLID(hs,j,nr-1), 0, INSERT_VALUES));
+      for (size_t i = 0; i < nr; i++) {
+        PetscInt row = TH_SOLID(hs,j,i);
+        petsc_call(MatSetValue(thermal_hydraulics.J, row, row, 0, INSERT_VALUES));
+        petsc_call(MatSetValue(thermal_hydraulics.J, row, TH_T(j), 0, INSERT_VALUES));
+        if (i > 0) petsc_call(MatSetValue(thermal_hydraulics.J, row, TH_SOLID(hs,j,i-1), 0, INSERT_VALUES));
+        if (i+1 < nr) petsc_call(MatSetValue(thermal_hydraulics.J, row, TH_SOLID(hs,j,i+1), 0, INSERT_VALUES));
+        th_node_t *node = &thermal_hydraulics.nodes[j];
+        for (size_t l = 0; l < node->n_pipes; l++) {
+          th_pipe_t *pipe = &thermal_hydraulics.pipes[node->pipe[l]];
+          size_t other = pipe->a == j ? pipe->b : pipe->a;
+          petsc_call(MatSetValue(thermal_hydraulics.J, row, TH_SOLID(hs,other,i), 0, INSERT_VALUES));
+        }
+      }
+    }
   }
   petsc_call(MatAssemblyBegin(thermal_hydraulics.J, MAT_FINAL_ASSEMBLY));
   petsc_call(MatAssemblyEnd(thermal_hydraulics.J, MAT_FINAL_ASSEMBLY));
@@ -569,6 +873,57 @@ static int thermal_hydraulics_store_old(void) {
   return FEENOX_OK;
 }
 
+static int thermal_hydraulics_solid_residual(th_heat_structure_t *hs, const PetscScalar *x, PetscScalar *r) {
+  double scale = thermal_hydraulics.mdot_ref*thermal_hydraulics.h_ref;
+  double q = hs->power/(hs->length*M_PI*gsl_pow_2(hs->radius[hs->fuel_surface]));
+  const PetscScalar *old = NULL;
+  if (thermal_hydraulics.transient) {
+    petsc_call(VecGetArrayRead(thermal_hydraulics.x_old, &old));
+  }
+  for (size_t j = 0; j < thermal_hydraulics.n_nodes; j++) {
+    double L = hs->node_length[j];
+    for (size_t i = 0; i < hs->nr; i++) {
+      r[TH_SOLID(hs,j,i)] = L > 0 ? 0 : (x[TH_SOLID(hs,j,i)]-x[TH_T(j)])/1000;
+    }
+    if (L == 0) continue;
+    for (size_t i = 0; i+1 < hs->nr; i++) {
+      int l = hs->layer[i];
+      double dr = hs->radius[i+1]-hs->radius[i];
+      double conductance = M_PI*hs->k[l]*(hs->radius[i]+hs->radius[i+1])/dr;
+      double heat = conductance*L*(x[TH_SOLID(hs,j,i+1)]-x[TH_SOLID(hs,j,i)]);
+      r[TH_SOLID(hs,j,i)] += heat/scale;
+      r[TH_SOLID(hs,j,i+1)] -= heat/scale;
+      for (int side = 0; side < 2; side++) {
+        size_t row = TH_SOLID(hs,j,i+side);
+        double V = thermal_hydraulics_radial_weight(hs, i, side)*L;
+        if (l == 0) r[row] += q*V/scale;
+        if (old != NULL) {
+          r[row] -= hs->rho[l]*hs->cp[l]*V*(x[row]-old[row])/(thermal_hydraulics.dt*scale);
+        }
+      }
+    }
+  }
+  if (hs->axial_conduction) {
+    for (size_t k = 0; k < thermal_hydraulics.n_pipes; k++) {
+      th_pipe_t *pipe = &thermal_hydraulics.pipes[k];
+      if (pipe->element->physical_group != hs->group) continue;
+      for (size_t i = 0; i+1 < hs->nr; i++) {
+        for (int side = 0; side < 2; side++) {
+          double conductance = hs->k[hs->layer[i]]*thermal_hydraulics_radial_weight(hs, i, side)/pipe->L;
+          size_t a = TH_SOLID(hs,pipe->a,i+side), b = TH_SOLID(hs,pipe->b,i+side);
+          double heat = conductance*(x[b]-x[a]);
+          r[a] += heat/scale;
+          r[b] -= heat/scale;
+        }
+      }
+    }
+  }
+  if (old != NULL) {
+    petsc_call(VecRestoreArrayRead(thermal_hydraulics.x_old, &old));
+  }
+  return FEENOX_OK;
+}
+
 static PetscErrorCode thermal_hydraulics_residual(SNES snes, Vec X, Vec R, void *ctx) {
   
   const PetscScalar *x = NULL;
@@ -581,6 +936,9 @@ static PetscErrorCode thermal_hydraulics_residual(SNES snes, Vec X, Vec R, void 
   double *h = thermal_hydraulics.h;
   int transient = thermal_hydraulics.transient;
   double dt = thermal_hydraulics.dt;
+  for (th_heat_structure_t *hs = thermal_hydraulics.heat_structures; hs != NULL; hs = hs->hh.next) {
+    petsc_call(thermal_hydraulics_solid_residual(hs, x, r));
+  }
   
   for (size_t j = 0; j < thermal_hydraulics.n_nodes; j++) {
     rho[j] = fluid->rho(x[TH_P(j)], x[TH_T(j)]);
@@ -607,7 +965,12 @@ static PetscErrorCode thermal_hydraulics_residual(SNES snes, Vec X, Vec R, void 
       energy += TH_EPSILON_MDOT * (h[other] - h[j]);
       if (pipe->P_h > 0) {
         double q_wall = pipe->q_wall;
-        if (pipe->has_T_wall) {
+        th_heat_structure_t *hs = pipe->heat_structure;
+        if (hs != NULL) {
+          q_wall = pipe->h_wall*(x[TH_SOLID(hs,j,hs->nr-1)]-x[TH_T(j)]);
+          double heat = 0.5*pipe->P_h*pipe->L*q_wall;
+          r[TH_SOLID(hs,j,hs->nr-1)] -= heat/(thermal_hydraulics.mdot_ref*thermal_hydraulics.h_ref);
+        } else if (pipe->has_T_wall) {
           double h_wall = thermal_hydraulics_wall_coefficient(pipe, p, x[TH_T(j)], x[TH_MDOT(k)]);
           if (!isfinite(h_wall) || h_wall < 0) {
             petsc_call(VecRestoreArray(R, &r));

@@ -37,6 +37,8 @@ answerzero thermal-hydraulics-wall-transient.fee 1e-7
 exitifwrong $?
 answerzero thermal-hydraulics-wall-groups.fee 1e-7
 exitifwrong $?
+answerzero thermal-hydraulics-wall-distributions.fee 1e-7
+exitifwrong $?
 for flux in 10000 -10000; do
   answerzero1 thermal-hydraulics-wall-reverse.fee ${flux} 1e-7
   exitifwrong $?
