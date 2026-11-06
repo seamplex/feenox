@@ -135,6 +135,15 @@ int feenox_problem_init_runtime_thermal_hydraulics(void) {
 ///pr_thermal_hydraulics+f+description If not given, it is computed with Churchill's correlation as a function of the
 ///pr_thermal_hydraulics+f+description Reynolds number and the relative roughness\ $\varepsilon/D_h$.
   feenox_call(feenox_distribution_init(&thermal_hydraulics.f, "f"));
+///pr_thermal_hydraulics+K+description Non-negative local loss coefficient on a MATERIAL attached to a physical point shared by at least two pipes. Default is zero.
+///pr_thermal_hydraulics+K+description `K_<pipe_group>` overrides `K` for each port belonging to that physical line group. Coefficients follow the actual flow direction, independently of element orientation.
+///pr_thermal_hydraulics+K+description Each port contributes a loss `K_port*mdot*abs(mdot)/(2*rho*A_loss^2)`. These losses add across a two-pipe connection; `K=1` applies one coefficient to each port, not one coefficient to the whole connection.
+///pr_thermal_hydraulics+A_ref+description Optional positive reference area in m^2 on a physical-point MATERIAL. If absent, local losses use the respective pipe area.
+///pr_thermal_hydraulics+A_ref+description A point material containing `K`, `K_<pipe_group>`, or `A_ref` enables the low-Mach junction model. Use `K=0` for an ideal area transition. Unconfigured shared nodes retain the original common-static-pressure model.
+///pr_thermal_hydraulics+A_ref+description Junction pressure is a reference static pressure: the common total pressure is `p+M^2/(2*rho*A_j^2)`, with `M=sum(abs(mdot_port))/2` and `A_j=A_ref`, or the smallest attached pipe area if absent.
+///pr_thermal_hydraulics+A_ref+description Pipe-port pressures subtract the port velocity head and add an incoming or subtract an outgoing local loss. Static pressures on either side need not equal the point pressure.
+///pr_thermal_hydraulics+A_ref+description The junction energy balance includes signed port kinetic-energy fluxes and backward-Euler kinetic-energy storage in its adjacent half elements. The point uses the existing fluid volumes; no extra junction volume, pump, or compressible entropy/Riemann junction model is added.
+///pr_thermal_hydraulics+A_ref+description Point properties are evaluated at the point coordinates before each solve and can depend on time. Do not prescribe p, v, or mdot at an internal junction point. Overlapping configured point groups are rejected.
 ///pr_thermal_hydraulics+q+description Volumetric power\ $q'''$ (in W/m^3) deposited into the fluid.
 ///pr_thermal_hydraulics+q+description Default is zero.
   feenox_call(feenox_distribution_init(&thermal_hydraulics.q, "q"));

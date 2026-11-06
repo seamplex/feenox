@@ -74,6 +74,8 @@ struct th_pipe_t {
   double q_wall;             // inward wall heat flux (W/m^2)
   double h_wall;             // prescribed heat transfer coefficient (W/m^2/K)
   int has_T_wall, has_q_wall, has_h_wall;
+  double K[2];               // point-material loss coefficients at a and b
+  double loss_area[2];
 };
 
 // a node is a control volume holding the scalar unknowns
@@ -81,6 +83,9 @@ struct th_node_t {
   double V;                  // volume (half of the adjacent pipes)
   double Q;                  // heat (W) deposited into the control volume
   double A;                  // area of the first adjacent pipe (used in velocity BCs)
+  physical_group_t *junction_group;
+  double junction_area;      // area defining the junction reference pressure
+  double kinetic_energy_old;
   
   // adjacency (CSR-like, indexes into the pipe array)
   size_t n_pipes;

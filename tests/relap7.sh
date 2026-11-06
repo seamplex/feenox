@@ -22,6 +22,55 @@ exitifwrong $?
 answer1 relap7-heated-pipe.fee 10 "559.801 563.061 25373.5 0.293423"
 exitifwrong $?
 
+gmsh -v 0 -1 ${dir}/relap7-two-pipes.geo || exit $?
+gmsh -v 0 -1 -setnumber ReverseFlow 1 ${dir}/relap7-two-pipes.geo -o ${dir}/relap7-two-pipes-reverse.msh || exit $?
+gmsh -v 0 -1 -setnumber Orientation 1 ${dir}/relap7-two-pipes.geo -o ${dir}/relap7-two-pipes-oriented.msh || exit $?
+checkjunction() {
+  echo "Checking two-pipe balance: $*"
+  answer=$(${feenox} ${dir}/relap7-two-pipes-verify.fee "$@") || exit $?
+  result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})" 1e-7) || exit $?
+  if [ "${result}" != 1 ]; then
+    echo "expected zero balance error, got ${answer}"
+    exit 1
+  fi
+}
+for mesh in relap7-two-pipes.msh relap7-two-pipes-reverse.msh relap7-two-pipes-oriented.msh; do
+  checkjunction "${mesh}"
+  checkjunction "${mesh}" "K=0 A_ref=1" 0 0 0 0 1
+  checkjunction "${mesh}" "A_ref=1" 0 0 0 0 1
+  checkjunction "${mesh}" "K_pipe1=1 A_ref=1" 0 0 1 0 1
+  checkjunction "${mesh}" "K=1" 0 0 1 1 0
+  checkjunction "${mesh}" "K=9 K_pipe1=0 K_pipe2=2 A_ref=0.5" 0 0 0 2 0.5
+done
+for loss in 0 1; do
+  answerzero1 thermal-hydraulics-junction-equal.fee ${loss} 1e-5
+  exitifwrong $?
+done
+checkjunction relap7-two-pipes.msh "K=if(t<0.2,0,1) A_ref=if(t<0.2,2,1)" 10
+answerzero relap7-two-pipes-startup-verify.fee 1e-6
+exitifwrong $?
+gmsh -v 0 -1 ${dir}/thermal-hydraulics-tee.geo || exit $?
+answerzero thermal-hydraulics-junction-tee.fee 1e-6
+exitifwrong $?
+for properties in "K=-1" "A_ref=0" "A_ref=-1" "K_pipe1=-1" "K_missing=1"; do
+  echo "Rejecting invalid junction properties: ${properties}"
+  if ${feenox} ${dir}/thermal-hydraulics-junction-invalid.fee connection "${properties}"; then
+    echo "expected an error"
+    exit 1
+  fi
+done
+for target in pipe1 inlet; do
+  echo "Rejecting junction properties on ${target}"
+  if ${feenox} ${dir}/thermal-hydraulics-junction-invalid.fee "${target}" "K=1"; then
+    echo "expected an error"
+    exit 1
+  fi
+done
+if ${feenox} ${dir}/thermal-hydraulics-junction-invalid.fee connection "K=1" "BC connection p=1e5"; then
+  echo "expected an error for a pressure BC at an internal junction"
+  exit 1
+fi
+
 gmsh -v 0 -1 ${dir}/relap7-core-channel.geo || exit $?
 for declaration in "HEAT_STRUCTURE" "HEAT_STRUCTURE PIPE channel" "HEAT_STRUCTURE FUEL fuel" "HEAT_STRUCTURE PIPE channel FUEL fuel extra" "HEAT_STRUCTURE PIPE channel FUEL" "HEAT_STRUCTURE PIPE channel FUEL fuel GAP" "HEAT_STRUCTURE PIPE channel FUEL fuel CLAD" "HEAT_STRUCTURE PIPE channel FUEL fuel PIPE other" "HEAT_STRUCTURE PIPE channel FUEL fuel FUEL other" "HEAT_STRUCTURE PIPE channel FUEL fuel GAP gap GAP other" "HEAT_STRUCTURE PIPE channel FUEL fuel CLAD clad CLAD other"; do
   echo "Rejecting invalid heat-structure declaration: ${declaration}"
@@ -75,6 +124,8 @@ fi
 ${feenox} --check ${dir}/relap7-core-parser.fee "PROBLEM thermal_hydraulics" "HEAT_STRUCTURE PIPE channel FUEL fuel" "HEAT_STRUCTURE FUEL fuel PIPE other" || exit $?
 ${feenox} --check ${dir}/relap7-core-parser.fee "PROBLEM thermal_hydraulics" "HEAT_STRUCTURE PIPE channel FUEL fuel GAP gap CLAD clad" "WRITE_RESULTS FORMAT vtu all" || exit $?
 gmsh -v 0 -1 ${dir}/thermal-hydraulics-structures.geo || exit $?
+answerzero thermal-hydraulics-junction-series.fee 1e-5
+exitifwrong $?
 for axial in 0 1; do
   if [ ${axial} = 0 ]; then
     conduction=NO_AXIAL_CONDUCTION

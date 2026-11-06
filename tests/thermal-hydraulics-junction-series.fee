@@ -1,0 +1,11 @@
+# Two separate point materials, including a pipe with losses at both ends.
+PROBLEM thermal_hydraulics MESH thermal-hydraulics-structures.msh
+MATERIAL first A=2 D_h=1 f=1
+MATERIAL second A=2 D_h=1 f=1
+MATERIAL third A=2 D_h=1 f=1
+MATERIAL connection1 K=0.5
+MATERIAL connection2 K=2
+BC inlet rho=995 v=1
+BC outlet p=95000
+SOLVE_PROBLEM
+PRINT abs(mdot(1.5)/1990-1)+abs((p(0)-p(3))/(497.5*(3+2*0.5+2*2))-1)+abs(h(3)-h(0))/1000

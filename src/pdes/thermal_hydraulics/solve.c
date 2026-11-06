@@ -45,6 +45,9 @@
 
 #ifdef HAVE_PETSC
 static int thermal_hydraulics_update_properties(void);
+static int thermal_hydraulics_update_junctions(void);
+static double thermal_hydraulics_port_pressure(th_pipe_t *pipe, int side, const PetscScalar *x);
+static double thermal_hydraulics_junction_kinetic_energy(size_t j, const PetscScalar *x, double rho);
 static int thermal_hydraulics_initial_guess(void);
 static int thermal_hydraulics_create_jacobian(void);
 static int thermal_hydraulics_setup_snes(void);
@@ -419,6 +422,125 @@ static int thermal_hydraulics_property_defined(distribution_t *property, int gro
   return property->defined && (property->full || (group >= 0 && property->defined_per_group[group]));
 }
 
+static int thermal_hydraulics_update_junctions(void) {
+  mesh_t *mesh = feenox.pde.mesh;
+  for (size_t j = 0; j < thermal_hydraulics.n_nodes; j++) {
+    thermal_hydraulics.nodes[j].junction_group = NULL;
+  }
+  for (size_t k = 0; k < thermal_hydraulics.n_pipes; k++) {
+    for (int side = 0; side < 2; side++) {
+      thermal_hydraulics.pipes[k].K[side] = 0;
+      thermal_hydraulics.pipes[k].loss_area[side] = thermal_hydraulics.pipes[k].A;
+    }
+  }
+  for (physical_group_t *group = mesh->physical_groups; group != NULL; group = group->hh.next) {
+    material_t *material = group->material;
+    if (material == NULL) continue;
+    int configured = 0;
+    for (property_data_t *data = material->property_datums; data != NULL; data = data->hh.next) {
+      const char *name = data->property->name;
+      configured |= strcmp(name, "K") == 0 || strcmp(name, "A_ref") == 0 || strncmp(name, "K_", 2) == 0;
+    }
+    if (!configured) continue;
+    if (group->dimension != 0 || group->n_elements == 0) {
+      feenox_push_error_message("junction material '%s' needs a non-empty physical point group, not '%s'", material->name, group->name);
+      return FEENOX_ERROR;
+    }
+    for (size_t e = 0; e < group->n_elements; e++) {
+      element_t *element = &mesh->element[group->element[e]];
+      size_t j = element->node[0]->index_mesh;
+      th_node_t *node = &thermal_hydraulics.nodes[j];
+      if (node->n_pipes < 2) {
+        feenox_push_error_message("junction point '%s' at node %ld needs at least two attached pipes", group->name, mesh->node[j].tag);
+        return FEENOX_ERROR;
+      }
+      if (node->junction_group != NULL) {
+        if (node->junction_group == group) continue;
+        feenox_push_error_message("node %ld has overlapping junction point groups '%s' and '%s'", mesh->node[j].tag, node->junction_group->name, group->name);
+        return FEENOX_ERROR;
+      }
+      node->junction_group = group;
+      for (int d = 0; d < 3; d++) {
+        feenox_var_value(feenox.mesh.vars.arr_x[d]) = mesh->node[j].x[d];
+      }
+      property_data_t *data = NULL;
+      HASH_FIND_STR(material->property_datums, "K", data);
+      double K = data != NULL ? feenox_expression_eval(&data->expr) : 0;
+      HASH_FIND_STR(material->property_datums, "A_ref", data);
+      int has_area = data != NULL;
+      double A_ref = has_area ? feenox_expression_eval(&data->expr) : 0;
+      if (!isfinite(K) || K < 0 || (has_area && (!isfinite(A_ref) || A_ref <= 0))) {
+        feenox_push_error_message("junction '%s' needs finite K >= 0 and, if specified, finite A_ref > 0", group->name);
+        return FEENOX_ERROR;
+      }
+      node->junction_area = thermal_hydraulics.pipes[node->pipe[0]].A;
+      for (size_t i = 0; i < node->n_pipes; i++) {
+        th_pipe_t *pipe = &thermal_hydraulics.pipes[node->pipe[i]];
+        int side = pipe->a == j ? 0 : 1;
+        pipe->K[side] = K;
+        pipe->loss_area[side] = has_area ? A_ref : pipe->A;
+        node->junction_area = GSL_MIN(node->junction_area, pipe->A);
+      }
+      if (has_area) node->junction_area = A_ref;
+      for (data = material->property_datums; data != NULL; data = data->hh.next) {
+        const char *name = data->property->name;
+        if (strncmp(name, "K_", 2) != 0) continue;
+        double value = feenox_expression_eval(&data->expr);
+        if (!isfinite(value) || value < 0) {
+          feenox_push_error_message("junction '%s' needs finite %s >= 0", group->name, name);
+          return FEENOX_ERROR;
+        }
+        int matched = 0;
+        for (size_t i = 0; i < node->n_pipes; i++) {
+          th_pipe_t *pipe = &thermal_hydraulics.pipes[node->pipe[i]];
+          physical_group_t *pipe_group = pipe->element->physical_group;
+          if (pipe_group != NULL && strcmp(name+2, pipe_group->name) == 0) {
+            pipe->K[pipe->a == j ? 0 : 1] = value;
+            matched = 1;
+          }
+        }
+        if (!matched) {
+          feenox_push_error_message("junction '%s' property '%s' does not match an attached pipe group", group->name, name);
+          return FEENOX_ERROR;
+        }
+      }
+    }
+  }
+  return FEENOX_OK;
+}
+
+// Low-Mach port pressure: common reference head, reversible area change,
+// and a dissipative loss whose direction follows the actual flow.
+// Unlike RELAP-7 Theory Manual rev. 3, section 9.6, this does not solve
+// a compressible entropy-based junction Riemann problem.
+static double thermal_hydraulics_port_pressure(th_pipe_t *pipe, int side, const PetscScalar *x) {
+  size_t j = side == 0 ? pipe->a : pipe->b;
+  th_node_t *node = &thermal_hydraulics.nodes[j];
+  if (node->junction_group == NULL) return x[TH_P(j)];
+  double throughflow = 0;
+  double mdot = x[TH_MDOT(pipe-thermal_hydraulics.pipes)];
+  for (size_t i = 0; i < node->n_pipes; i++) {
+    throughflow += 0.5*fabs(x[TH_MDOT(node->pipe[i])]);
+  }
+  double rho = thermal_hydraulics.rho[j];
+  double reference_head = gsl_pow_2(throughflow/node->junction_area)/(2*rho);
+  double port_head = gsl_pow_2(mdot/pipe->A)/(2*rho);
+  double loss = pipe->K[side]*mdot*fabs(mdot)/(2*rho*gsl_pow_2(pipe->loss_area[side]));
+  return x[TH_P(j)]+reference_head-port_head+(side == 0 ? -loss : loss);
+}
+
+static double thermal_hydraulics_junction_kinetic_energy(size_t j, const PetscScalar *x, double rho) {
+  th_node_t *node = &thermal_hydraulics.nodes[j];
+  if (node->junction_group == NULL) return 0;
+  double energy = 0;
+  for (size_t i = 0; i < node->n_pipes; i++) {
+    size_t k = node->pipe[i];
+    th_pipe_t *pipe = &thermal_hydraulics.pipes[k];
+    energy += 0.5*pipe->L*pipe->A*gsl_pow_2(x[TH_MDOT(k)]/pipe->A)/(2*rho);
+  }
+  return energy;
+}
+
 // RELAP-7 Theory Manual, INL/EXT-14-31366 rev. 3, eqs. (739)-(750).
 // https://www.osti.gov/servlets/purl/1498781
 static double thermal_hydraulics_wall_coefficient(th_pipe_t *pipe, double p, double T, double mdot) {
@@ -543,6 +665,8 @@ static int thermal_hydraulics_update_properties(void) {
     }
   }
   
+  feenox_call(thermal_hydraulics_update_junctions());
+
   // node volumes, heat and reference areas
   for (size_t j = 0; j < thermal_hydraulics.n_nodes; j++) {
     th_node_t *node = &thermal_hydraulics.nodes[j];
@@ -622,6 +746,10 @@ static int thermal_hydraulics_update_properties(void) {
     }
     if (node->has_T && node->has_rho) {
       feenox_push_error_message("node %ld has both 'T' and 'rho' boundary conditions", mesh->node[j].tag);
+      return FEENOX_ERROR;
+    }
+    if (node->junction_group != NULL && (node->has_p || node->has_v || node->has_mdot)) {
+      feenox_push_error_message("junction point '%s' cannot also have p, v, or mdot boundary conditions", node->junction_group->name);
       return FEENOX_ERROR;
     }
     
@@ -747,7 +875,8 @@ static int thermal_hydraulics_create_jacobian(void) {
     }
   }
   for (size_t k = 0; k < thermal_hydraulics.n_pipes; k++) {
-    nnz[TH_MDOT(k)] = 5;
+    th_pipe_t *pipe = &thermal_hydraulics.pipes[k];
+    nnz[TH_MDOT(k)] = GSL_MIN(size, 5+thermal_hydraulics.nodes[pipe->a].n_pipes+thermal_hydraulics.nodes[pipe->b].n_pipes);
   }
   petsc_call(MatCreateSeqAIJ(PETSC_COMM_SELF, size, size, 0, nnz, &thermal_hydraulics.J));
   petsc_call(PetscObjectSetName((PetscObject)thermal_hydraulics.J, "J_th"));
@@ -777,6 +906,12 @@ static int thermal_hydraulics_create_jacobian(void) {
     PetscInt cols[5] = {TH_P(pipe->a), TH_T(pipe->a), TH_P(pipe->b), TH_T(pipe->b), TH_MDOT(k)};
     PetscScalar zeros[5] = {0, 0, 0, 0, 0};
     petsc_call(MatSetValues(thermal_hydraulics.J, 1, &row, 5, cols, zeros, INSERT_VALUES));
+    for (int side = 0; side < 2; side++) {
+      th_node_t *node = &thermal_hydraulics.nodes[side == 0 ? pipe->a : pipe->b];
+      for (size_t i = 0; i < node->n_pipes; i++) {
+        petsc_call(MatSetValue(thermal_hydraulics.J, row, TH_MDOT(node->pipe[i]), 0, INSERT_VALUES));
+      }
+    }
   }
   for (th_heat_structure_t *hs = thermal_hydraulics.heat_structures; hs != NULL; hs = hs->hh.next) {
     size_t nr = hs->nr;
@@ -864,6 +999,8 @@ static int thermal_hydraulics_store_old(void) {
     double T = x[TH_T(j)];
     thermal_hydraulics.rho_old[j] = thermal_hydraulics.fluid.rho(p, T);
     thermal_hydraulics.rhou_old[j] = thermal_hydraulics.rho_old[j] * thermal_hydraulics.fluid.h(p, T) - p;
+    thermal_hydraulics.nodes[j].kinetic_energy_old =
+        thermal_hydraulics_junction_kinetic_energy(j, x, thermal_hydraulics.rho_old[j]);
   }
   for (size_t k = 0; k < thermal_hydraulics.n_pipes; k++) {
     thermal_hydraulics.mdot_old[k] = x[TH_MDOT(k)];
@@ -963,6 +1100,10 @@ static PetscErrorCode thermal_hydraulics_residual(SNES snes, Vec X, Vec R, void 
         energy += mdot_in * (h[other] - h[j]);
       }
       energy += TH_EPSILON_MDOT * (h[other] - h[j]);
+      if (node->junction_group != NULL) {
+        // Convert the difference in port kinetic-energy flux to enthalpy.
+        energy += mdot_in*gsl_pow_2(x[TH_MDOT(k)]/(rho[j]*pipe->A))/2;
+      }
       if (pipe->P_h > 0) {
         double q_wall = pipe->q_wall;
         th_heat_structure_t *hs = pipe->heat_structure;
@@ -989,6 +1130,9 @@ static PetscErrorCode thermal_hydraulics_residual(SNES snes, Vec X, Vec R, void 
     if (transient) {
       mass_accumulation = node->V * (rho[j] - thermal_hydraulics.rho_old[j]) / dt;
       energy_accumulation = node->V * ((rho[j]*h[j] - p) - thermal_hydraulics.rhou_old[j] - h[j]*(rho[j] - thermal_hydraulics.rho_old[j])) / dt;
+      if (node->junction_group != NULL) {
+        energy_accumulation += (thermal_hydraulics_junction_kinetic_energy(j, x, rho[j])-node->kinetic_energy_old)/dt;
+      }
     }
     
     // the state of the fluid that enters through the boundary (if any)
@@ -1048,7 +1192,9 @@ static PetscErrorCode thermal_hydraulics_residual(SNES snes, Vec X, Vec R, void 
     double acceleration = mdot*mdot/(A*A) * (1.0/rho[b] - 1.0/rho[a]);
     double inertia = (transient) ? pipe->L/A * (mdot - thermal_hydraulics.mdot_old[k]) / dt : 0;
     
-    r[TH_MDOT(k)] = (x[TH_P(a)] - x[TH_P(b)] + gravity - friction - acceleration - inertia) / thermal_hydraulics.p_ref;
+    double p_a = thermal_hydraulics_port_pressure(pipe, 0, x);
+    double p_b = thermal_hydraulics_port_pressure(pipe, 1, x);
+    r[TH_MDOT(k)] = (p_a - p_b + gravity - friction - acceleration - inertia) / thermal_hydraulics.p_ref;
   }
   
   petsc_call(VecRestoreArray(R, &r));

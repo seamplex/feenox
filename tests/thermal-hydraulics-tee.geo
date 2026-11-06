@@ -12,5 +12,6 @@ Transfinite Curve{3} = 9;
 Physical Point("in1") = {1};
 Physical Point("in2") = {2};
 Physical Point("out") = {4};
+Physical Point("connection") = {3};
 Physical Curve("branch") = {1, 2};
 Physical Curve("main") = {3};

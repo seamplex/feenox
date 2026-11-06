@@ -77,6 +77,8 @@ int feenox_parse_heat_structure(void) {
       axial_given = 1;
       continue;
     }
+    
+    // TODO: traditional parsing with split documentation
     int i = 0;
     while (i < 4 && strcasecmp(token, keywords[i]) != 0) i++;
     if (i == 4) {
@@ -131,6 +133,8 @@ int feenox_parse_heat_structure(void) {
     }
     feenox_free(name);
   }
+  
+  // we need one for each, not only one for the first one
   if (thermal_hydraulics.heat_structures == NULL) {
 ///re_thermal_hydraulics+T_fuel_center+description First heat structure's fuel centerline temperature (K), NaN outside its pipe group. Use `T_fuel_center_<pipe_group>` for each structure.
     feenox_call(feenox_problem_define_solution_function("T_fuel_center", &thermal_hydraulics.fuel_center_function, FEENOX_SOLUTION_NOT_GRADIENT));
