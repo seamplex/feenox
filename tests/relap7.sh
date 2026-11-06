@@ -157,6 +157,78 @@ if ${feenox} ${dir}/thermal-hydraulics-junction-invalid.fee connection "K=1" "BC
   exit 1
 fi
 
+# RELAP-7 Example 9: two hydraulically separate sides of a counterflow exchanger.
+gmsh -v 0 -1 ${dir}/relap7-heat-exchanger.geo || exit $?
+gmsh -v 0 -1 -setnumber N 100 ${dir}/relap7-heat-exchanger.geo -o ${dir}/relap7-heat-exchanger-fine.msh || exit $?
+gmsh -v 0 -1 -setnumber Orientation 1 ${dir}/relap7-heat-exchanger.geo -o ${dir}/relap7-heat-exchanger-oriented.msh || exit $?
+gmsh -v 0 -1 -setnumber SecondaryN 9 ${dir}/relap7-heat-exchanger.geo -o ${dir}/relap7-heat-exchanger-mismatch.msh || exit $?
+checkexchanger() {
+  input=$1
+  shift
+  echo "Checking exchanger: ${input} $*"
+  answer=$(${feenox} ${dir}/${input} "$@") || exit $?
+  result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})" 1e-6) || exit $?
+  test "${result}" = 1 || { echo "exchanger balance error: ${answer}"; exit 1; }
+}
+checkexchanger relap7-heat-exchanger-verify.fee
+checkexchanger relap7-heat-exchanger-energy.fee
+checkexchanger relap7-heat-exchanger-energy.fee 10 relap7-heat-exchanger-oriented.msh 0 "(0-1)"
+checkexchanger thermal-hydraulics-exchanger.fee
+checkexchanger thermal-hydraulics-exchanger.fee TUBE "INNER_RADIUS 0.005" 0
+checkexchanger thermal-hydraulics-exchanger-tube-energy.fee
+checkexchanger thermal-hydraulics-exchanger-multiple.fee
+checkexchanger thermal-hydraulics-exchanger-rod.fee
+for structure in exchanger second; do
+  for field in T_wall_primary T_wall_middle T_wall_secondary; do
+    grep -q "Name=\"${field}_${structure}\"" thermal-hydraulics-exchanger.vtu || exit 1
+  done
+done
+rm -f thermal-hydraulics-exchanger.vtu thermal-hydraulics-exchanger-rod.vtu
+checkexchanger thermal-hydraulics-stagnation.fee
+for properties in \
+  "p0=1.005e6" "T0=400" "p0=-1 T0=400" "p0=1.005e6 T0=100" \
+  "p0=1.005e6 T0=400 p=1e6" "p0=1.005e6 T0=400 T=400" \
+  "p0=1.005e6 T0=400 rho=900" "p0=1.005e6 T0=400 v=1" \
+  "p0=1.005e6 T0=400 mdot=0.1"; do
+  if ${feenox} ${dir}/thermal-hydraulics-stagnation.fee "${properties}"; then
+    echo "expected an error for invalid stagnation BC: ${properties}"
+    exit 1
+  fi
+done
+if ${feenox} ${dir}/thermal-hydraulics-stagnation.fee "p0=1.005e6 T0=400" connection; then
+  echo "expected an error for an internal stagnation BC"
+  exit 1
+fi
+for geometry in \
+  "TYPE PLATE THICKNESS 0.01 CELLS 2" \
+  "TYPE TUBE THICKNESS 0.01 CELLS 2" \
+  "TYPE unknown THICKNESS 0.01 CELLS 2 DEPTH 1" \
+  "TYPE PLATE THICKNESS -1 CELLS 2 DEPTH 1" \
+  "TYPE PLATE THICKNESS 0.01 CELLS 0 DEPTH 1" \
+  "TYPE PLATE THICKNESS 0.01 CELLS 1.5 DEPTH 1" \
+  "TYPE PLATE THICKNESS 0.01 CELLS 10001 DEPTH 1" \
+  "TYPE PLATE THICKNESS 0.01 CELLS 2 DEPTH 0" \
+  "TYPE PLATE THICKNESS 0.01 CELLS 2 DEPTH 1 INNER_RADIUS 0.005" \
+  "TYPE PLATE THICKNESS 0.01 CELLS 2 DEPTH 1 PERIMETER_PRIMARY -1" \
+  "TYPE TUBE THICKNESS 0.01 CELLS 2 INNER_RADIUS -1" \
+  "TYPE PLATE THICKNESS 0.01+t CELLS 2 DEPTH 1"; do
+  if ${feenox} ${dir}/thermal-hydraulics-exchanger-setup.fee "${geometry}"; then
+    echo "expected an error for invalid exchanger geometry: ${geometry}"
+    exit 1
+  fi
+done
+for coefficients in "H_PRIMARY 0 H_SECONDARY 1e4" "H_PRIMARY 1e4 H_SECONDARY -1" "H_PRIMARY 1e4+x H_SECONDARY 1e4" "H_PRIMARY 1e4"; do
+  if ${feenox} ${dir}/thermal-hydraulics-exchanger-setup.fee "TYPE PLATE THICKNESS 0.01 CELLS 2 DEPTH 1" relap7-heat-exchanger.msh "${coefficients}"; then
+    echo "expected an error for invalid exchanger coefficients: ${coefficients}"
+    exit 1
+  fi
+done
+if diagnostic=$(${feenox} ${dir}/thermal-hydraulics-exchanger-setup.fee "TYPE PLATE THICKNESS 0.01 CELLS 2 DEPTH 1" relap7-heat-exchanger-mismatch.msh 2>&1); then
+  echo "expected an error for nonmatching axial stations"
+  exit 1
+fi
+echo "${diagnostic}" | grep -q "matching.*axial" || exit 1
+
 gmsh -v 0 -1 ${dir}/relap7-core-channel.geo || exit $?
 for declaration in "HEAT_STRUCTURE" "HEAT_STRUCTURE PIPE channel" "HEAT_STRUCTURE FUEL fuel" "HEAT_STRUCTURE PIPE channel FUEL fuel extra" "HEAT_STRUCTURE PIPE channel FUEL" "HEAT_STRUCTURE PIPE channel FUEL fuel GAP" "HEAT_STRUCTURE PIPE channel FUEL fuel CLAD" "HEAT_STRUCTURE PIPE channel FUEL fuel PIPE other" "HEAT_STRUCTURE PIPE channel FUEL fuel FUEL other" "HEAT_STRUCTURE PIPE channel FUEL fuel GAP gap GAP other" "HEAT_STRUCTURE PIPE channel FUEL fuel CLAD clad CLAD other"; do
   echo "Rejecting invalid heat-structure declaration: ${declaration}"

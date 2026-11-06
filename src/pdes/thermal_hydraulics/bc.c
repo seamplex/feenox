@@ -33,6 +33,21 @@ int feenox_problem_bc_parse_thermal_hydraulics(bc_data_t *bc_data, const char *l
 ///bc_thermal_hydraulics+p+description (or the node's temperature if `T` is not given).
   if (strcmp(lhs, "p") == 0) {
     bc_data->type_phys = BC_TYPE_TH_PRESSURE;
+
+///bc_thermal_hydraulics+p0+usage p0=<expr>
+///bc_thermal_hydraulics+p0+description Reservoir stagnation pressure (in Pa), required together with `T0` at a pipe endpoint.
+///bc_thermal_hydraulics+p0+description Uses the low-Mach relation $p + \rho v^2/2 = p_0$, with the local pipe density and velocity.
+///bc_thermal_hydraulics+p0+description Cannot be combined with `p`, `T`, `rho`, `v`, or `mdot` at the same node.
+  } else if (strcmp(lhs, "p0") == 0) {
+    bc_data->type_phys = BC_TYPE_TH_STAGNATION_PRESSURE;
+
+///bc_thermal_hydraulics+T0+usage T0=<expr>
+///bc_thermal_hydraulics+T0+description Reservoir stagnation temperature (in K), required together with `p0` at a pipe endpoint.
+///bc_thermal_hydraulics+T0+description Incoming fluid has static enthalpy $h(p_0,T_0)-v^2/2$, using the local pipe density to compute velocity.
+///bc_thermal_hydraulics+T0+description The boundary stream density is evaluated at the reservoir state $\rho(p_0,T_0)$.
+///bc_thermal_hydraulics+T0+description No reservoir enthalpy is imposed when the flow leaves the domain.
+  } else if (strcmp(lhs, "T0") == 0) {
+    bc_data->type_phys = BC_TYPE_TH_STAGNATION_TEMPERATURE;
     
 ///bc_thermal_hydraulics+T+usage T=<expr>
 ///bc_thermal_hydraulics+T+description Temperature (in K) of the fluid that enters the domain through the node.

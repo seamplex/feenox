@@ -29,6 +29,8 @@
 #define BC_TYPE_TH_DENSITY       3
 #define BC_TYPE_TH_VELOCITY      4
 #define BC_TYPE_TH_MASS_FLOW     5
+#define BC_TYPE_TH_STAGNATION_PRESSURE     6
+#define BC_TYPE_TH_STAGNATION_TEMPERATURE  7
 
 // regularization flow (kg/s) used in the energy equation of stagnant nodes
 #define TH_EPSILON_MDOT          1e-10
@@ -97,10 +99,21 @@ struct th_node_t {
   // boundary conditions evaluated at the start of each solve
   int has_p, has_T, has_rho, has_v, has_mdot;
   double p_bc, T_bc, rho_bc, v_bc, mdot_bc;
+  int has_p0, has_T0;
+  double p0_bc, T0_bc;       // paired endpoint reservoir stagnation state
 };
 
 struct th_heat_structure_t {
   char *group_name;
+  int exchanger, plate;
+  char *primary_name, *secondary_name;
+  physical_group_t *secondary;
+  expr_t thickness_expr, cells_expr, depth_expr, inner_radius_expr, axis_expr[3];
+  expr_t h_expr[2], perimeter_expr[2];
+  int has_perimeter[2];
+  double depth, axis[3], coefficient[2], perimeter[2];
+  size_t *partner;            // primary <-> secondary nodes at equal axial stations
+  var_t *side_heat[2];
   char *material_name[3];
   physical_group_t *group;
   expr_t *power_expr;

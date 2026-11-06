@@ -1,0 +1,3 @@
+# Exercise a legacy fuel rod declared after a named exchanger on the same pipe.
+MATERIAL primary fuel_radius=0.004096 gap_width=0.0001 clad_width=0.000552 fuel_cells=10 gap_cells=1 clad_cells=2 hs_power=0 h_wall=1e4
+HEAT_STRUCTURE PIPE primary FUEL wall NO_AXIAL_CONDUCTION

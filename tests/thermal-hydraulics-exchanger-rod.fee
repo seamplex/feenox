@@ -1,0 +1,9 @@
+DEFAULT_ARGUMENT_VALUE 1 "TYPE PLATE THICKNESS 0.01 CELLS 2 DEPTH 1"
+DEFAULT_ARGUMENT_VALUE 2 relap7-heat-exchanger.msh
+DEFAULT_ARGUMENT_VALUE 3 "H_PRIMARY 1e4 H_SECONDARY 1e4"
+DEFAULT_ARGUMENT_VALUE 4 "k=100 rho_s=100 cp=100"
+DEFAULT_ARGUMENT_VALUE 5 0
+DEFAULT_ARGUMENT_VALUE 6 "INCLUDE thermal-hydraulics-exchanger-rod-setup.fee"
+INCLUDE thermal-hydraulics-exchanger-setup.fee
+PRINT abs(T_fuel_center(0.5,0.02)-T_fuel_center_primary(0.5,0.02))+abs(hs_heat_primary)+abs(hs_heat_exchanger)/1e5
+WRITE_RESULTS FILE thermal-hydraulics-exchanger-rod.vtu all

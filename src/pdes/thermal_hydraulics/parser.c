@@ -146,7 +146,7 @@ int feenox_parse_heat_structure(void) {
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail Any number of heat structures can be declared, keyed by distinct pipe-group names. Named solid materials need constant `k`, `rho_s`, and `cp`.
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail Each structure defines `T_fuel_center_<pipe_group>`, `T_fuel_surface_<pipe_group>`, `T_clad_surface_<pipe_group>`, `hs_heat_<pipe_group>`, and `hs_energy_<pipe_group>`.
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail `WRITE_RESULTS all` includes every structure's temperature fields; individual suffixed temperature names can also be selected.
-///kw_thermal_hydraulics+HEAT_STRUCTURE+detail Unsuffixed temperature functions refer to the first declared structure for compatibility; `hs_heat` and `hs_energy` sum all structures. At shared fluid nodes each solid retains its own temperature; distinct structures are not conductively connected.
+///kw_thermal_hydraulics+HEAT_STRUCTURE+detail Unsuffixed fuel/cladding temperature functions refer to the first declared fuel-rod structure for compatibility; `hs_heat` and `hs_energy` sum all structures. At shared fluid nodes each solid retains its own temperature; distinct structures are not conductively connected.
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail Solid density uses `rho_s` to avoid colliding with the fluid solution function `rho`.
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail The channel material defines `fuel_radius`, `gap_width`, `clad_width`, `fuel_cells`, `gap_cells`, `clad_cells`, and total `hs_power` in W.
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail Radius and layer widths are positive lengths in m; radial cell counts are positive integers. Geometry is evaluated once and must not depend on space or time.
@@ -155,12 +155,19 @@ int feenox_parse_heat_structure(void) {
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail `hs_power` can vary with time but must not depend on space. A positive prescribed `h_wall` in W/(m^2 K) couples cladding to coolant; automatic convection is not yet supported for heat structures.
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail The heated perimeter defaults to the outer cladding circumference; an explicit `P_h` must be positive. Do not combine a heat structure with `T_wall` or `q_wall`.
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail The coolant remains single-phase IF97 region-1 water; boiling and two-phase heat transfer are not modeled.
+///kw_thermal_hydraulics+HEAT_STRUCTURE+usage HEAT_STRUCTURE NAME <name> TYPE <PLATE|TUBE> MATERIAL <solid> THICKNESS <expr> CELLS <n> PRIMARY <group> SECONDARY <group> H_PRIMARY <expr> H_SECONDARY <expr> AXIS <dx> <dy> <dz> [ DEPTH <expr> | INNER_RADIUS <expr> ] [ PERIMETER_PRIMARY <expr> ] [ PERIMETER_SECONDARY <expr> ] [ AXIAL_CONDUCTION | NO_AXIAL_CONDUCTION ]
+///kw_thermal_hydraulics+HEAT_STRUCTURE+detail Named two-sided structures couple hydraulically disconnected straight pipe groups at matching projected stations along AXIS, independent of flow or mesh orientation. Groups must span the same interval with matching axial elements; branched, shared-node and nonmatching meshes are rejected. AXIS need not be normalized.
+///kw_thermal_hydraulics+HEAT_STRUCTURE+detail PLATE requires positive DEPTH in m (wall width); TUBE requires positive INNER_RADIUS in m. PRIMARY couples to the first plate surface or inner tube surface; SECONDARY couples to the opposite or outer surface. THICKNESS and CELLS define the transverse wall grid. MATERIAL needs constant positive k, rho_s, cp.
+///kw_thermal_hydraulics+HEAT_STRUCTURE+detail The wall has insulated axial ends and no internal source. Axial conduction is enabled by default. Geometry is constant. Positive H_PRIMARY/H_SECONDARY in W/(m^2 K) may depend on time, not space. Interface perimeters in m default to DEPTH for plates and the inner/outer circumferences for tubes; explicit overrides do not change wall conduction or storage geometry.
+///kw_thermal_hydraulics+HEAT_STRUCTURE+detail Outputs T_wall_primary_<name>, T_wall_middle_<name>, T_wall_secondary_<name> are defined on both coupled pipe groups; middle uses the lower central grid node for odd CELLS. hs_heat_primary_<name> and hs_heat_secondary_<name> are signed heat rates into each fluid. hs_heat_<name> is their sum, hs_energy_<name> is wall energy. T_solid_0 takes transverse distance (plate) or radius (tube), then the primary pipe coordinates.
   if (feenox.pde.parse_problem != feenox_problem_parse_problem_thermal_hydraulics) {
     feenox_push_error_message("HEAT_STRUCTURE requires PROBLEM thermal_hydraulics first");
     return FEENOX_ERROR;
   }
-  const char *keywords[] = {"PIPE", "FUEL", "GAP", "CLAD"};
-  char *values[4] = {NULL};
+  const char *keywords[] = {"PIPE", "FUEL", "GAP", "CLAD", "NAME", "TYPE", "MATERIAL", "THICKNESS", "CELLS", "DEPTH", "INNER_RADIUS", "PRIMARY", "SECONDARY", "H_PRIMARY", "H_SECONDARY", "PERIMETER_PRIMARY", "PERIMETER_SECONDARY"};
+  char *values[17] = {NULL};
+  expr_t axis[3] = {0};
+  int axis_given = 0;
   int axial_conduction = 1;
   int axial_given = 0;
   char *token = NULL;
@@ -174,11 +181,22 @@ int feenox_parse_heat_structure(void) {
       axial_given = 1;
       continue;
     }
+    if (strcasecmp(token, "AXIS") == 0) {
+      if (axis_given) {
+        feenox_push_error_message("duplicate keyword AXIS for HEAT_STRUCTURE");
+        return FEENOX_ERROR;
+      }
+      axis_given = 1;
+      for (int d = 0; d < 3; d++) {
+        feenox_call(feenox_parser_expression(&axis[d]));
+      }
+      continue;
+    }
     
     // TODO: traditional parsing with split documentation
     int i = 0;
-    while (i < 4 && strcasecmp(token, keywords[i]) != 0) i++;
-    if (i == 4) {
+    while (i < 17 && strcasecmp(token, keywords[i]) != 0) i++;
+    if (i == 17) {
       feenox_push_error_message("undefined keyword '%s' for HEAT_STRUCTURE", token);
       return FEENOX_ERROR;
     }
@@ -191,6 +209,87 @@ int feenox_parse_heat_structure(void) {
       return FEENOX_ERROR;
     }
     feenox_check_alloc(values[i] = strdup(token));
+  }
+  if (values[4] != NULL) {
+    const int mandatory[] = {5,6,7,8,11,12,13,14};
+    for (size_t i = 0; i < sizeof(mandatory)/sizeof(mandatory[0]); i++) {
+      if (values[mandatory[i]] == NULL) {
+        feenox_push_error_message("named HEAT_STRUCTURE requires keyword '%s'", keywords[mandatory[i]]);
+        return FEENOX_ERROR;
+      }
+    }
+    if (!axis_given) {
+      feenox_push_error_message("named HEAT_STRUCTURE requires keyword AXIS");
+      return FEENOX_ERROR;
+    }
+    int plate = strcasecmp(values[5], "PLATE") == 0;
+    if (!plate && strcasecmp(values[5], "TUBE") != 0) {
+      feenox_push_error_message("HEAT_STRUCTURE TYPE must be PLATE or TUBE");
+      return FEENOX_ERROR;
+    }
+    if (values[plate ? 9 : 10] == NULL) {
+      feenox_push_error_message("HEAT_STRUCTURE TYPE %s requires keyword %s", values[5], plate ? "DEPTH" : "INNER_RADIUS");
+      return FEENOX_ERROR;
+    }
+    if (values[plate ? 10 : 9] != NULL || values[0] != NULL || values[1] != NULL || values[2] != NULL || values[3] != NULL) {
+      feenox_push_error_message("incompatible geometry or fuel-rod keywords for named HEAT_STRUCTURE");
+      return FEENOX_ERROR;
+    }
+    th_heat_structure_t *hs = NULL;
+    HASH_FIND_STR(thermal_hydraulics.heat_structures, values[4], hs);
+    if (hs != NULL) {
+      feenox_push_error_message("HEAT_STRUCTURE name '%s' already defined", values[4]);
+      return FEENOX_ERROR;
+    }
+    feenox_check_alloc(hs = calloc(1, sizeof(th_heat_structure_t)));
+    hs->group_name = values[4];
+    hs->exchanger = 1;
+    hs->plate = plate;
+    hs->axial_conduction = axial_conduction;
+    hs->material_name[0] = values[6];
+    hs->primary_name = values[11];
+    hs->secondary_name = values[12];
+    feenox_call(feenox_expression_parse(&hs->thickness_expr, values[7]));
+    feenox_call(feenox_expression_parse(&hs->cells_expr, values[8]));
+    feenox_call(feenox_expression_parse(plate ? &hs->depth_expr : &hs->inner_radius_expr, values[plate ? 9 : 10]));
+    for (int d = 0; d < 3; d++) hs->axis_expr[d] = axis[d];
+    for (int side = 0; side < 2; side++) {
+      feenox_call(feenox_expression_parse(&hs->h_expr[side], values[13+side]));
+      if (values[15+side] != NULL) {
+        hs->has_perimeter[side] = 1;
+        feenox_call(feenox_expression_parse(&hs->perimeter_expr[side], values[15+side]));
+      }
+    }
+    const char *names[] = {"T_wall_primary", "T_wall_middle", "T_wall_secondary", "hs_heat", "hs_energy", "hs_heat_primary", "hs_heat_secondary"};
+    function_t **functions[] = {&hs->center_function, &hs->fuel_surface_function, &hs->clad_surface_function};
+    var_t **variables[] = {&hs->heat, &hs->energy, &hs->side_heat[0], &hs->side_heat[1]};
+    for (int i = 0; i < 7; i++) {
+      char *name = NULL;
+      feenox_check_minusone(asprintf(&name, "%s_%s", names[i], hs->group_name));
+      if (i < 3) {
+        feenox_call(feenox_problem_define_solution_function(name, functions[i], FEENOX_SOLUTION_NOT_GRADIENT));
+      } else {
+        feenox_check_alloc(*variables[i-3] = feenox_get_or_define_variable_get_ptr(name));
+      }
+      feenox_free(name);
+    }
+    feenox_check_alloc(thermal_hydraulics.hs_heat = feenox_get_or_define_variable_get_ptr("hs_heat"));
+    feenox_check_alloc(thermal_hydraulics.hs_energy = feenox_get_or_define_variable_get_ptr("hs_energy"));
+    HASH_ADD_STR(thermal_hydraulics.heat_structures, group_name, hs);
+    for (int i = 0; i < 17; i++) {
+      if (i != 4 && i != 6 && i != 11 && i != 12) feenox_free(values[i]);
+    }
+    return FEENOX_OK;
+  }
+  for (int i = 5; i < 17; i++) {
+    if (values[i] != NULL) {
+      feenox_push_error_message("HEAT_STRUCTURE keyword '%s' requires NAME", keywords[i]);
+      return FEENOX_ERROR;
+    }
+  }
+  if (axis_given) {
+    feenox_push_error_message("HEAT_STRUCTURE keyword AXIS requires NAME");
+    return FEENOX_ERROR;
   }
   for (int i = 0; i < 2; i++) {
     if (values[i] == NULL) {
@@ -232,7 +331,7 @@ int feenox_parse_heat_structure(void) {
   }
   
   // we need one for each, not only one for the first one
-  if (thermal_hydraulics.heat_structures == NULL) {
+  if (thermal_hydraulics.fuel_center_function == NULL) {
 ///re_thermal_hydraulics+T_fuel_center+description First heat structure's fuel centerline temperature (K), NaN outside its pipe group. Use `T_fuel_center_<pipe_group>` for each structure.
     feenox_call(feenox_problem_define_solution_function("T_fuel_center", &thermal_hydraulics.fuel_center_function, FEENOX_SOLUTION_NOT_GRADIENT));
 ///re_thermal_hydraulics+T_fuel_surface+description First heat structure's fuel outer-surface temperature (K). Use `T_fuel_surface_<pipe_group>` for each structure.
@@ -261,9 +360,11 @@ int feenox_problem_parse_write_post_thermal_hydraulics(mesh_write_t *mesh_write,
     feenox_call(feenox_problem_parse_write_post_thermal_hydraulics(mesh_write, "v"));
     feenox_call(feenox_problem_parse_write_post_thermal_hydraulics(mesh_write, "mdot"));
     if (thermal_hydraulics.heat_structures != NULL) {
-      feenox_call(feenox_problem_parse_write_post_thermal_hydraulics(mesh_write, "T_fuel_center"));
-      feenox_call(feenox_problem_parse_write_post_thermal_hydraulics(mesh_write, "T_fuel_surface"));
-      feenox_call(feenox_problem_parse_write_post_thermal_hydraulics(mesh_write, "T_clad_surface"));
+      if (thermal_hydraulics.fuel_center_function != NULL) {
+        feenox_call(feenox_problem_parse_write_post_thermal_hydraulics(mesh_write, "T_fuel_center"));
+        feenox_call(feenox_problem_parse_write_post_thermal_hydraulics(mesh_write, "T_fuel_surface"));
+        feenox_call(feenox_problem_parse_write_post_thermal_hydraulics(mesh_write, "T_clad_surface"));
+      }
       for (th_heat_structure_t *hs = thermal_hydraulics.heat_structures; hs != NULL; hs = hs->hh.next) {
         feenox_call(feenox_add_post_field(mesh_write, 1, &hs->center_function->name, NULL, field_location_nodes));
         feenox_call(feenox_add_post_field(mesh_write, 1, &hs->fuel_surface_function->name, NULL, field_location_nodes));
@@ -283,11 +384,11 @@ int feenox_problem_parse_write_post_thermal_hydraulics(mesh_write_t *mesh_write,
     feenox_call(feenox_add_post_field(mesh_write, 1, &thermal_hydraulics.v_function->name, NULL, field_location_nodes));
   } else if (strcmp(token, "mdot") == 0 || strcmp(token, "mass_flow") == 0) {
     feenox_call(feenox_add_post_field(mesh_write, 1, &thermal_hydraulics.mdot_function->name, NULL, field_location_nodes));
-  } else if (thermal_hydraulics.heat_structures != NULL && strcmp(token, "T_fuel_center") == 0) {
+  } else if (thermal_hydraulics.fuel_center_function != NULL && strcmp(token, "T_fuel_center") == 0) {
     feenox_call(feenox_add_post_field(mesh_write, 1, &thermal_hydraulics.fuel_center_function->name, NULL, field_location_nodes));
-  } else if (thermal_hydraulics.heat_structures != NULL && strcmp(token, "T_fuel_surface") == 0) {
+  } else if (thermal_hydraulics.fuel_surface_function != NULL && strcmp(token, "T_fuel_surface") == 0) {
     feenox_call(feenox_add_post_field(mesh_write, 1, &thermal_hydraulics.fuel_surface_function->name, NULL, field_location_nodes));
-  } else if (thermal_hydraulics.heat_structures != NULL && strcmp(token, "T_clad_surface") == 0) {
+  } else if (thermal_hydraulics.clad_surface_function != NULL && strcmp(token, "T_clad_surface") == 0) {
     feenox_call(feenox_add_post_field(mesh_write, 1, &thermal_hydraulics.clad_surface_function->name, NULL, field_location_nodes));
   } else {
     for (th_heat_structure_t *hs = thermal_hydraulics.heat_structures; hs != NULL; hs = hs->hh.next) {

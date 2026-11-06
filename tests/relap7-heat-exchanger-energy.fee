@@ -1,0 +1,33 @@
+DEFAULT_ARGUMENT_VALUE 1 10
+DEFAULT_ARGUMENT_VALUE 2 relap7-heat-exchanger.msh
+DEFAULT_ARGUMENT_VALUE 3 0
+DEFAULT_ARGUMENT_VALUE 4 1
+INCLUDE relap7-heat-exchanger-startup.fee
+VAR old_energy old_total_energy old_hot_in_density old_hot_out_density old_cold_in_density old_cold_out_density
+area = 0.785398163e-4
+fluid_energy(x,y) = rho(x,y)*h(x,y)-p(x,y)
+branch_energy(y) = area*(0.05*(fluid_energy(0,y)+fluid_energy(1,y))+0.1*sum(fluid_energy(i/10,y),i,1,9))
+total_energy = branch_energy(0.02)+branch_energy(0)+hs_energy_exchanger
+IF in_static
+  initial_error = abs(T_wall_primary_exchanger(0.5,0.02)/300-1)+abs(T_wall_secondary_exchanger(0.5,0)/300-1)
+  initial_energy = hs_energy_exchanger
+ELSE
+  energy_error = max(energy_error,abs((hs_energy_exchanger-old_energy)/dt+hs_heat_primary_exchanger+hs_heat_secondary_exchanger)/1e5)
+  hot_in_flow = $4*mdot(0,0.02)+0.05*area*(rho(0,0.02)-old_hot_in_density)/dt
+  hot_out_flow = -$4*mdot(1,0.02)+0.05*area*(rho(1,0.02)-old_hot_out_density)/dt
+  cold_in_flow = $4*mdot(1,0)+0.05*area*(rho(1,0)-old_cold_in_density)/dt
+  cold_out_flow = -$4*mdot(0,0)+0.05*area*(rho(0,0)-old_cold_out_density)/dt
+  # Independent Python iapws.IF97 reference enthalpies at 1.005 MPa.
+  boundary_power = hot_in_flow*if(hot_in_flow>0,533466.6946390772-v(0,0.02)^2/2,h(0,0.02))+cold_in_flow*if(cold_in_flow>0,113496.90309951777-v(1,0)^2/2,h(1,0))+hot_out_flow*h(1,0.02)+cold_out_flow*h(0,0)
+  total_error = max(total_error,abs((total_energy-old_total_energy)/dt-boundary_power)/1e5)
+ENDIF
+old_energy = hs_energy_exchanger
+old_total_energy = total_energy
+old_hot_in_density = rho(0,0.02)
+old_hot_out_density = rho(1,0.02)
+old_cold_in_density = rho(1,0)
+old_cold_out_density = rho(0,0)
+IF done
+  direction_error = if(hs_heat_primary_exchanger<0&hs_heat_secondary_exchanger>0&T(1,0.02)<400&T(0,0)>300,0,1)
+  PRINT initial_error+energy_error+total_error+direction_error+if(hs_energy_exchanger>initial_energy,0,1)
+ENDIF

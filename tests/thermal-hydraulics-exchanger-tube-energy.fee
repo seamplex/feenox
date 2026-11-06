@@ -1,0 +1,21 @@
+DEFAULT_ARGUMENT_VALUE 1 "TYPE TUBE THICKNESS 0.001 CELLS 10 INNER_RADIUS 0.005"
+DEFAULT_ARGUMENT_VALUE 2 relap7-heat-exchanger.msh
+DEFAULT_ARGUMENT_VALUE 3 "H_PRIMARY if(t<0.2,1000,10000) H_SECONDARY 1e4"
+DEFAULT_ARGUMENT_VALUE 4 "k=100 rho_s=100 cp=100"
+DEFAULT_ARGUMENT_VALUE 5 1
+DEFAULT_ARGUMENT_VALUE 6 "dummy=0"
+p_0(x,y) = 1e6
+T_0(x,y) = 300
+v_0(x,y) = 1
+T_solid_0(r,x,y) = 300
+INCLUDE thermal-hydraulics-exchanger-setup.fee
+VAR old_energy
+IF in_static
+  initial_error = abs(T_wall_primary_exchanger(0.5,0.02)/300-1)
+ELSE
+  error = max(error,abs((hs_energy_exchanger-old_energy)/dt+hs_heat_exchanger)/1000)
+ENDIF
+old_energy = hs_energy_exchanger
+IF done
+  PRINT initial_error+error+if(hs_heat_primary_exchanger<0&hs_heat_secondary_exchanger>0,0,1)
+ENDIF
