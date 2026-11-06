@@ -1,0 +1,51 @@
+DEFAULT_ARGUMENT_VALUE 1 relap7-pump-loop.msh
+DEFAULT_ARGUMENT_VALUE 2 0
+DEFAULT_ARGUMENT_VALUE 3 1
+INCLUDE relap7-pump-loop.fee
+
+VECTOR old_start_density SIZE 5
+VECTOR old_end_density SIZE 5
+VAR k old_outlet_density old_mass old_energy first_step_seen first_step_error
+bx(b,s) = if(b=1,s,if(b=2|b=5,1,if(b=3,1-s,0)))
+by(b,s) = if(b=2,s,if(b=3,1,if(b=4,1-s,if(b=5,1+0.5*s,0))))
+area(b) = if(b=2|b=4,3.14159e-4,0.785398163e-4)
+step(b) = if(b=5,0.025,0.05)
+density(b,s) = rho(bx(b,s),by(b,s))
+enthalpy(b,s) = h(bx(b,s),by(b,s))
+pressure(b,s) = p(bx(b,s),by(b,s))
+internal_energy(b,s) = density(b,s)*enthalpy(b,s)-pressure(b,s)
+branch_mass(b) = area(b)*step(b)*(0.5*(density(b,0)+density(b,1))+sum(density(b,k/20),k,1,19))
+branch_energy(b) = area(b)*step(b)*(0.5*(internal_energy(b,0)+internal_energy(b,1))+sum(internal_energy(b,k/20),k,1,19))
+# Recover individual endpoint element flows from the interior nodal averages
+# and local mass accumulation; a shared node's mdot is not a port flow.
+portflow(b,side) = $3*mdot(bx(b,if(side,0.95,0.05)),by(b,if(side,0.95,0.05)))+if(side,-1,1)*area(b)*step(b)/2*(density(b,if(side,0.95,0.05))-if(side,old_end_density(b),old_start_density(b)))/dt
+kinetic_energy(b,side) = step(b)*portflow(b,side)^2/(4*density(b,side)*area(b))
+kinetic_flux(b,side) = if(side,1,-1)*portflow(b,side)^3/(2*density(b,side)^2*area(b)^2)
+
+mass = sum(branch_mass(b),b,1,5)
+energy = sum(branch_energy(b),b,1,5)
+IF in_static
+  initial_error = abs(mass/(sum(area(b)*20*step(b),b,1,5)*rho(0,0))-1)+abs(T(0.5,0)/300-1)+abs(p(0.5,0)/1e5-1)+abs(mdot(0.5,0))
+  kinetic = 0
+ELSE
+  kinetic = sum(kinetic_energy(b,0),b,1,5)+sum(kinetic_energy(b,1),b,1,4)
+  flux = sum(kinetic_flux(b,0),b,1,5)+sum(kinetic_flux(b,1),b,1,4)
+  boundary_flow = area(5)*step(5)/2*(density(5,1)-old_outlet_density)/dt-portflow(5,1)
+  pump_power = portflow(1,1)*9.80665
+  mass_error = max(mass_error,abs((mass-old_mass)/dt-boundary_flow))
+  energy_error = max(energy_error,abs((energy+kinetic-old_energy)/dt-pump_power-flux-boundary_flow*enthalpy(5,1)))
+ENDIF
+old_mass = mass
+old_energy = energy+kinetic
+old_outlet_density = density(5,1)
+old_start_density[i] = density(i,0.05)
+old_end_density[i] = density(i,0.95)
+IF done
+  final_error = abs($3*mdot(0.5,0)/0.228312596297-1)+abs(T(0.5,0)/300.006309325-1)
+  direction_error = if($3*mdot(1,0.5)>0&$3*mdot(0.5,1)>0&$3*mdot(0,0.5)>0,0,1)
+  PRINT initial_error+mass_error/0.2+energy_error/2+final_error+direction_error+abs(first_step_seen-1)+first_step_error+abs(t-10)
+ENDIF
+IF abs(t-0.1)<1e-8
+  first_step_seen = 1
+  first_step_error = abs($3*mdot(0.5,0)/0.0301697980682-1)+abs(T(0.5,0)/299.999899489-1)
+ENDIF

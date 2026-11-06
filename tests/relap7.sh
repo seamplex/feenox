@@ -52,6 +52,92 @@ exitifwrong $?
 gmsh -v 0 -1 ${dir}/thermal-hydraulics-tee.geo || exit $?
 answerzero thermal-hydraulics-junction-tee.fee 1e-6
 exitifwrong $?
+
+# RELAP-7 Example 7: two heated inflows mixing into three heated outflows.
+gmsh -v 0 -1 ${dir}/relap7-five-pipes.geo || exit $?
+answerzero relap7-five-pipes-verify.fee 1e-6
+exitifwrong $?
+answerzero relap7-five-pipes-startup-verify.fee 1e-6
+exitifwrong $?
+
+# RELAP-7 Example 8: prescribed-head pump and an initially stagnant loop.
+gmsh -v 0 -1 ${dir}/relap7-pump-loop.geo || exit $?
+gmsh -v 0 -1 -setnumber Orientation 1 ${dir}/relap7-pump-loop.geo -o ${dir}/relap7-pump-loop-oriented.msh || exit $?
+checkpump() {
+  input=$1
+  shift
+  echo "Checking pump: ${input} $*"
+  answer=$(${feenox} ${dir}/${input} "$@") || exit $?
+  result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})" 1e-6) || exit $?
+  test "${result}" = 1 || { echo "pump balance error: ${answer}"; exit 1; }
+}
+answerzero relap7-pump-loop-verify.fee 1e-6
+exitifwrong $?
+checkpump relap7-pump-loop-verify.fee relap7-pump-loop-oriented.msh 0 "(0-1)"
+gmsh -v 0 -1 ${dir}/thermal-hydraulics-pump.geo || exit $?
+checkpump thermal-hydraulics-pump.fee 1 1000 1 thermal-hydraulics-pump.msh
+checkpump thermal-hydraulics-pump.fee 1 1000 "if(t<0.2,0,1)" relap7-two-pipes.msh 1 10
+${feenox} ${dir}/thermal-hydraulics-point-invalid.fee "PUMP A_REF 2 K_REVERSE 10 20 DIRECTION 1 0 0 HEAD 1 POINT connection" || exit $?
+${feenox} ${dir}/thermal-hydraulics-point-invalid.fee "JUNCTION POINT connection" || exit $?
+for topology in 1 2; do
+  gmsh -v 0 -1 -setnumber Topology "${topology}" ${dir}/thermal-hydraulics-pump.geo -o ${dir}/thermal-hydraulics-pump-invalid.msh || exit $?
+  if diagnostic=$(${feenox} ${dir}/thermal-hydraulics-point-invalid.fee "PUMP POINT connection HEAD 1 DIRECTION 1 0 0" "dummy=0" thermal-hydraulics-pump-invalid.msh "${topology}" 2>&1); then
+    echo "expected an error for invalid pump topology"
+    exit 1
+  fi
+  if [ "${topology}" = 1 ]; then
+    echo "${diagnostic}" | grep -q "needs exactly one physical point" || exit 1
+  else
+    echo "${diagnostic}" | grep -q "needs exactly two incident pipe elements" || exit 1
+  fi
+done
+for direction in 1 "(0-1)"; do
+  for area in 1 2; do
+    for head in 0 1; do
+      checkpump thermal-hydraulics-pump.fee "${direction}" 1000 "${head}" relap7-two-pipes.msh "${area}"
+      checkpump thermal-hydraulics-pump.fee "${direction}" "(0-1000)" "${head}" relap7-two-pipes-reverse.msh "${area}"
+    done
+  done
+done
+for declaration in \
+  "PUMP POINT connection HEAD 1" \
+  "PUMP POINT connection DIRECTION 1 0 0" \
+  "PUMP HEAD 1 DIRECTION 1 0 0" \
+  "PUMP POINT connection HEAD" \
+  "PUMP POINT connection HEAD 1 DIRECTION 1 0" \
+  "PUMP POINT connection HEAD 1 DIRECTION 0 0 0" \
+  "PUMP POINT connection HEAD 1 DIRECTION 0 1 0" \
+  "PUMP POINT connection HEAD -1 DIRECTION 1 0 0" \
+  "PUMP POINT connection HEAD 1 DIRECTION 1 0 0 K_REVERSE -1 0" \
+  "PUMP POINT connection HEAD 1 DIRECTION 1 0 0 K_REVERSE 1" \
+  "PUMP POINT connection HEAD 1 DIRECTION 1 0 0 A_REF 0" \
+  "PUMP POINT connection HEAD 1 DIRECTION 1 0 0 HEAD 2" \
+  "PUMP POINT inlet HEAD 1 DIRECTION 1 0 0" \
+  "PUMP POINT pipe1 HEAD 1 DIRECTION 1 0 0" \
+  "PUMP POINT missing HEAD 1 DIRECTION 1 0 0" \
+  "JUNCTION POINT connection K=-1" \
+  "JUNCTION POINT connection A_ref=0" \
+  "JUNCTION POINT connection K_missing=1" \
+  "JUNCTION POINT connection K=1 K=2" \
+  "JUNCTION POINT connection K=" \
+  "JUNCTION POINT connection unknown=1"; do
+  echo "Rejecting invalid point component: ${declaration}"
+  if ${feenox} ${dir}/thermal-hydraulics-point-invalid.fee "${declaration}"; then
+    echo "expected an error"
+    exit 1
+  fi
+done
+for conflict in \
+  "PUMP POINT connection HEAD 1 DIRECTION 1 0 0" \
+  "JUNCTION POINT connection K=1" \
+  "MATERIAL connection K=1" \
+  "BC connection p=1e5"; do
+  if ${feenox} ${dir}/thermal-hydraulics-point-invalid.fee "PUMP POINT connection HEAD 1 DIRECTION 1 0 0" "${conflict}"; then
+    echo "expected an error for conflicting point declarations"
+    exit 1
+  fi
+done
+
 for properties in "K=-1" "A_ref=0" "A_ref=-1" "K_pipe1=-1" "K_missing=1"; do
   echo "Rejecting invalid junction properties: ${properties}"
   if ${feenox} ${dir}/thermal-hydraulics-junction-invalid.fee connection "${properties}"; then
@@ -124,6 +210,8 @@ fi
 ${feenox} --check ${dir}/relap7-core-parser.fee "PROBLEM thermal_hydraulics" "HEAT_STRUCTURE PIPE channel FUEL fuel" "HEAT_STRUCTURE FUEL fuel PIPE other" || exit $?
 ${feenox} --check ${dir}/relap7-core-parser.fee "PROBLEM thermal_hydraulics" "HEAT_STRUCTURE PIPE channel FUEL fuel GAP gap CLAD clad" "WRITE_RESULTS FORMAT vtu all" || exit $?
 gmsh -v 0 -1 ${dir}/thermal-hydraulics-structures.geo || exit $?
+answerzero thermal-hydraulics-pump-series.fee 1e-6
+exitifwrong $?
 answerzero thermal-hydraulics-junction-series.fee 1e-5
 exitifwrong $?
 for axial in 0 1; do

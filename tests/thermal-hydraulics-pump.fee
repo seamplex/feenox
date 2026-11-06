@@ -1,0 +1,30 @@
+# Exact steady pump pressure and enthalpy balances, including reverse flow.
+DEFAULT_ARGUMENT_VALUE 1 1
+DEFAULT_ARGUMENT_VALUE 2 1000
+DEFAULT_ARGUMENT_VALUE 3 1
+DEFAULT_ARGUMENT_VALUE 4 relap7-two-pipes.msh
+DEFAULT_ARGUMENT_VALUE 5 1
+DEFAULT_ARGUMENT_VALUE 6 0
+PROBLEM thermal_hydraulics MESH $4
+end_time = $6
+dt = 0.1
+MATERIAL pipe1 A=$5 f=0.01
+MATERIAL pipe2 A=1 f=0.01
+PUMP POINT connection HEAD $3 DIRECTION $1 0 0 K_REVERSE 10 20 A_REF 2
+BC inlet mdot=abs($2) T=300
+BC outlet p=1e5 T=300
+SOLVE_PROBLEM
+VAR flow
+mean_density(i) = (rho((i-1)/20)+rho(i/20))/2
+section_area(i) = if(i<21,$5,1)
+friction(i) = 0.01*0.05/sqrt(4*section_area(i)/pi)*flow*abs(flow)/(2*mean_density(i)*section_area(i)^2)
+density_acceleration(i) = flow^2/section_area(i)^2*(1/rho(i/20)-1/rho((i-1)/20))
+IF end_time=0|done
+  flow = $2
+  acceleration = sum(density_acceleration(i),i,1,40)
+  loss_drop = if(flow*$1<0,30,0)*flow*abs(flow)/(2*rho(1)*2^2)
+  pump_rise = $1*rho(1)*9.80665*$3
+  area_drop = flow^2/(2*rho(1))*(1-1/($5)^2)
+  kinetic_change = flow^2/(2*rho(1)^2)*(1-1/($5)^2)
+  PRINT abs(mdot(0.5)/flow-1)+abs(mdot(1.5)/flow-1)+abs((p(0)-p(2)-sum(friction(i),i,1,40)-acceleration-loss_drop-area_drop+pump_rise)/1e4)+abs((h(2)-h(0)+kinetic_change-$1*9.80665*$3)/1000)
+ENDIF

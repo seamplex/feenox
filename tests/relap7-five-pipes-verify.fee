@@ -1,0 +1,38 @@
+DEFAULT_ARGUMENT_VALUE 1 0
+DEFAULT_ARGUMENT_VALUE 2 0
+INCLUDE relap7-five-pipes.fee
+
+# s follows the flow in each unit-length branch, including both half end cells.
+bx(b,s) = if(b=1,s-1,if(b=3,s,0))
+by(b,s) = if(b=2,s-1,if(b=4,s,0))
+bz(b,s) = if(b=5,s,0)
+area(b) = if(b=1|b=3,2,if(b=5,1.5,1))
+diameter(b) = sqrt(4*area(b)/pi)
+loss(b) = if(b=1,5,if(b=2,7,if(b=3,11,if(b=4,13,17))))
+flow(b) = mdot(bx(b,0.5),by(b,0.5),bz(b,0.5))
+density(b,s) = rho(bx(b,s),by(b,s),bz(b,s))
+enthalpy(b,s) = h(bx(b,s),by(b,s),bz(b,s))
+temperature(b,s) = T(bx(b,s),by(b,s),bz(b,s))
+pressure(b,s) = p(bx(b,s),by(b,s),bz(b,s))
+wall(b,s) = pi*diameter(b)*1e4*(310-temperature(b,s))
+friction(b,i) = 0.02/diameter(b)*flow(b)^2/(area(b)^2*(density(b,(i-1)/50)+density(b,i/50)))
+acceleration(b) = flow(b)^2/area(b)^2*(1/density(b,1)-1/density(b,0))
+head(b) = flow(b)^2/(2*rho(0,0,0)*area(b)^2)
+local_loss(b) = loss(b)*flow(b)^2/(2*rho(0,0,0)*3^2)
+port(b) = p(0,0,0)+(3472.5/3)^2/(2*rho(0,0,0))-head(b)+if(b<3,1,-1)*local_loss(b)
+drop(b) = if(b<3,pressure(b,0)-port(b),port(b)-pressure(b,1))
+momentum_error(b) = abs(drop(b)-sum(friction(b,i),i,1,50)-acceleration(b))/1e4
+wall_heat(b) = 0.01*(wall(b,0)+wall(b,1))+0.02*sum(wall(b,i/50),i,1,49)
+# The inlet boundary half cell has already heated the reported inlet enthalpy.
+boundary_energy(b) = if(b<3,-1,1)*flow(b)*if(b<3,enthalpy(b,0)-0.01*wall(b,0)/flow(b),enthalpy(b,1))
+kinetic_flux(b) = if(b<3,1,-1)*flow(b)^3/(2*rho(0,0,0)^2*area(b)^2)
+mixing_flux(b) = if(b<3,flow(b)*(enthalpy(b,0.98)-h(0,0,0)),0)+0.01*wall(b,if(b<3,1,0))+kinetic_flux(b)
+
+IF end_time=0|done
+  mass_error = (abs(flow(1)-1980)+abs(flow(2)-1492.5)+abs(sum(flow(b),b,3,5)-3472.5))/3472.5
+  direction_error = sum(if(flow(b)>0,0,1),b,1,5)
+  pressure_error = sum(abs(pressure(b,1)-95000),b,3,5)/95000
+  energy_error = abs(sum(boundary_energy(b),b,1,5)-sum(wall_heat(b),b,1,5)-sum(kinetic_flux(b),b,1,5))/1e6
+  mixing_error = abs(sum(mixing_flux(b),b,1,5))/1e6
+  PRINT mass_error+direction_error+pressure_error+sum(momentum_error(b),b,1,5)+energy_error+mixing_error
+ENDIF

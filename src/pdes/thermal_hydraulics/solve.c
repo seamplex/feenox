@@ -422,10 +422,97 @@ static int thermal_hydraulics_property_defined(distribution_t *property, int gro
   return property->defined && (property->full || (group >= 0 && property->defined_per_group[group]));
 }
 
+static expr_t *thermal_hydraulics_point_expression(material_t *material, th_point_t *point, const char *name) {
+  if (point != NULL) {
+    th_point_property_t *property = NULL;
+    HASH_FIND_STR(point->properties, name, property);
+    return property != NULL ? &property->expr : NULL;
+  }
+  property_data_t *data = NULL;
+  HASH_FIND_STR(material->property_datums, name, data);
+  return data != NULL ? &data->expr : NULL;
+}
+
+static int thermal_hydraulics_port_loss(physical_group_t *group, size_t j, const char *name, expr_t *expr) {
+  if (strncmp(name, "K_", 2) != 0) return FEENOX_OK;
+  double value = feenox_expression_eval(expr);
+  if (!isfinite(value) || value < 0) {
+    feenox_push_error_message("junction '%s' needs finite %s >= 0", group->name, name);
+    return FEENOX_ERROR;
+  }
+  th_node_t *node = &thermal_hydraulics.nodes[j];
+  int matched = 0;
+  for (size_t i = 0; i < node->n_pipes; i++) {
+    th_pipe_t *pipe = &thermal_hydraulics.pipes[node->pipe[i]];
+    physical_group_t *pipe_group = pipe->element->physical_group;
+    if (pipe_group != NULL && strcmp(name+2, pipe_group->name) == 0) {
+      pipe->K[pipe->a == j ? 0 : 1] = value;
+      matched = 1;
+    }
+  }
+  if (!matched) {
+    feenox_push_error_message("junction '%s' property '%s' does not match an attached pipe group", group->name, name);
+    return FEENOX_ERROR;
+  }
+  return FEENOX_OK;
+}
+
+static int thermal_hydraulics_update_pump(th_point_t *pump, size_t j) {
+  th_node_t *node = &thermal_hydraulics.nodes[j];
+  if (node->n_pipes != 2) {
+    feenox_push_error_message("PUMP '%s' needs exactly two incident pipe elements", pump->group_name);
+    return FEENOX_ERROR;
+  }
+  double direction[3];
+  for (int d = 0; d < 3; d++) {
+    direction[d] = feenox_expression_eval(&pump->direction[d]);
+  }
+  double norm = gsl_hypot3(direction[0], direction[1], direction[2]);
+  if (!isfinite(norm) || norm <= 0) {
+    feenox_push_error_message("PUMP '%s' needs a finite nonzero DIRECTION", pump->group_name);
+    return FEENOX_ERROR;
+  }
+  int suction_found = 0, discharge_found = 0;
+  for (size_t i = 0; i < 2; i++) {
+    th_pipe_t *pipe = &thermal_hydraulics.pipes[node->pipe[i]];
+    double projection = 0;
+    for (int d = 0; d < 3; d++) {
+      projection += (pipe->a == j ? 1 : -1)*(pipe->dx[d]/pipe->L)*(direction[d]/norm);
+    }
+    if (projection < -1e-10) {
+      pump->suction = node->pipe[i];
+      suction_found++;
+    } else if (projection > 1e-10) {
+      pump->discharge = node->pipe[i];
+      discharge_found++;
+    }
+  }
+  if (suction_found != 1 || discharge_found != 1) {
+    feenox_push_error_message("PUMP '%s' DIRECTION must have opposite nonzero projections on the two outward pipe tangents", pump->group_name);
+    return FEENOX_ERROR;
+  }
+  double head = feenox_expression_eval(&pump->head);
+  pump->A_ref = pump->has_area ? feenox_expression_eval(&pump->area) : 0;
+  for (int side = 0; side < 2; side++) {
+    pump->K_reverse[side] = feenox_expression_eval(&pump->reverse_loss[side]);
+  }
+  if (!isfinite(head) || head < 0 ||
+      !isfinite(pump->K_reverse[0]) || pump->K_reverse[0] < 0 ||
+      !isfinite(pump->K_reverse[1]) || pump->K_reverse[1] < 0 ||
+      (pump->has_area && (!isfinite(pump->A_ref) || pump->A_ref <= 0))) {
+    feenox_push_error_message("PUMP '%s' needs finite HEAD >= 0, K_REVERSE >= 0 and, if specified, A_REF > 0", pump->group_name);
+    return FEENOX_ERROR;
+  }
+  pump->specific_work = 9.80665*head;
+  node->pump = pump;
+  return FEENOX_OK;
+}
+
 static int thermal_hydraulics_update_junctions(void) {
   mesh_t *mesh = feenox.pde.mesh;
   for (size_t j = 0; j < thermal_hydraulics.n_nodes; j++) {
     thermal_hydraulics.nodes[j].junction_group = NULL;
+    thermal_hydraulics.nodes[j].pump = NULL;
   }
   for (size_t k = 0; k < thermal_hydraulics.n_pipes; k++) {
     for (int side = 0; side < 2; side++) {
@@ -433,17 +520,33 @@ static int thermal_hydraulics_update_junctions(void) {
       thermal_hydraulics.pipes[k].loss_area[side] = thermal_hydraulics.pipes[k].A;
     }
   }
+  for (th_point_t *point = thermal_hydraulics.points; point != NULL; point = point->hh.next) {
+    if (feenox_get_physical_group_ptr(point->group_name, mesh) == NULL) {
+      feenox_push_error_message("undefined physical point group '%s' for %s", point->group_name, point->is_pump ? "PUMP" : "JUNCTION");
+      return FEENOX_ERROR;
+    }
+  }
   for (physical_group_t *group = mesh->physical_groups; group != NULL; group = group->hh.next) {
     material_t *material = group->material;
-    if (material == NULL) continue;
-    int configured = 0;
-    for (property_data_t *data = material->property_datums; data != NULL; data = data->hh.next) {
+    th_point_t *point = NULL;
+    HASH_FIND_STR(thermal_hydraulics.points, group->name, point);
+    if (material == NULL && point == NULL) continue;
+    if (material != NULL && point != NULL) {
+      feenox_push_error_message("point group '%s' has both a MATERIAL and a PUMP/JUNCTION declaration", group->name);
+      return FEENOX_ERROR;
+    }
+    int configured = point != NULL;
+    for (property_data_t *data = material != NULL ? material->property_datums : NULL; data != NULL; data = data->hh.next) {
       const char *name = data->property->name;
       configured |= strcmp(name, "K") == 0 || strcmp(name, "A_ref") == 0 || strncmp(name, "K_", 2) == 0;
     }
     if (!configured) continue;
     if (group->dimension != 0 || group->n_elements == 0) {
-      feenox_push_error_message("junction material '%s' needs a non-empty physical point group, not '%s'", material->name, group->name);
+      feenox_push_error_message("point component needs a non-empty physical point group, not '%s'", group->name);
+      return FEENOX_ERROR;
+    }
+    if (point != NULL && point->is_pump && group->n_elements != 1) {
+      feenox_push_error_message("PUMP '%s' needs exactly one physical point", group->name);
       return FEENOX_ERROR;
     }
     for (size_t e = 0; e < group->n_elements; e++) {
@@ -463,12 +566,14 @@ static int thermal_hydraulics_update_junctions(void) {
       for (int d = 0; d < 3; d++) {
         feenox_var_value(feenox.mesh.vars.arr_x[d]) = mesh->node[j].x[d];
       }
-      property_data_t *data = NULL;
-      HASH_FIND_STR(material->property_datums, "K", data);
-      double K = data != NULL ? feenox_expression_eval(&data->expr) : 0;
-      HASH_FIND_STR(material->property_datums, "A_ref", data);
-      int has_area = data != NULL;
-      double A_ref = has_area ? feenox_expression_eval(&data->expr) : 0;
+      if (point != NULL && point->is_pump) {
+        feenox_call(thermal_hydraulics_update_pump(point, j));
+      }
+      expr_t *expr = thermal_hydraulics_point_expression(material, point, "K");
+      double K = expr != NULL ? feenox_expression_eval(expr) : 0;
+      expr = thermal_hydraulics_point_expression(material, point, "A_ref");
+      int has_area = expr != NULL || (node->pump != NULL && node->pump->has_area);
+      double A_ref = expr != NULL ? feenox_expression_eval(expr) : node->pump != NULL ? node->pump->A_ref : 0;
       if (!isfinite(K) || K < 0 || (has_area && (!isfinite(A_ref) || A_ref <= 0))) {
         feenox_push_error_message("junction '%s' needs finite K >= 0 and, if specified, finite A_ref > 0", group->name);
         return FEENOX_ERROR;
@@ -482,26 +587,13 @@ static int thermal_hydraulics_update_junctions(void) {
         node->junction_area = GSL_MIN(node->junction_area, pipe->A);
       }
       if (has_area) node->junction_area = A_ref;
-      for (data = material->property_datums; data != NULL; data = data->hh.next) {
-        const char *name = data->property->name;
-        if (strncmp(name, "K_", 2) != 0) continue;
-        double value = feenox_expression_eval(&data->expr);
-        if (!isfinite(value) || value < 0) {
-          feenox_push_error_message("junction '%s' needs finite %s >= 0", group->name, name);
-          return FEENOX_ERROR;
+      if (point != NULL) {
+        for (th_point_property_t *property = point->properties; property != NULL; property = property->hh.next) {
+          feenox_call(thermal_hydraulics_port_loss(group, j, property->name, &property->expr));
         }
-        int matched = 0;
-        for (size_t i = 0; i < node->n_pipes; i++) {
-          th_pipe_t *pipe = &thermal_hydraulics.pipes[node->pipe[i]];
-          physical_group_t *pipe_group = pipe->element->physical_group;
-          if (pipe_group != NULL && strcmp(name+2, pipe_group->name) == 0) {
-            pipe->K[pipe->a == j ? 0 : 1] = value;
-            matched = 1;
-          }
-        }
-        if (!matched) {
-          feenox_push_error_message("junction '%s' property '%s' does not match an attached pipe group", group->name, name);
-          return FEENOX_ERROR;
+      } else {
+        for (property_data_t *data = material->property_datums; data != NULL; data = data->hh.next) {
+          feenox_call(thermal_hydraulics_port_loss(group, j, data->property->name, &data->expr));
         }
       }
     }
@@ -525,8 +617,18 @@ static double thermal_hydraulics_port_pressure(th_pipe_t *pipe, int side, const 
   double rho = thermal_hydraulics.rho[j];
   double reference_head = gsl_pow_2(throughflow/node->junction_area)/(2*rho);
   double port_head = gsl_pow_2(mdot/pipe->A)/(2*rho);
-  double loss = pipe->K[side]*mdot*fabs(mdot)/(2*rho*gsl_pow_2(pipe->loss_area[side]));
-  return x[TH_P(j)]+reference_head-port_head+(side == 0 ? -loss : loss);
+  double K = pipe->K[side];
+  double pump_head = 0;
+  if (node->pump != NULL) {
+    th_point_t *pump = node->pump;
+    int suction = (size_t)(pipe-thermal_hydraulics.pipes) == pump->suction;
+    th_pipe_t *in = &thermal_hydraulics.pipes[pump->suction];
+    double pump_flow = (in->b == j ? 1 : -1)*x[TH_MDOT(pump->suction)];
+    if (pump_flow < 0) K += pump->K_reverse[suction ? 0 : 1];
+    pump_head = (suction ? -0.5 : 0.5)*rho*pump->specific_work;
+  }
+  double loss = K*mdot*fabs(mdot)/(2*rho*gsl_pow_2(pipe->loss_area[side]));
+  return x[TH_P(j)]+reference_head-port_head+pump_head+(side == 0 ? -loss : loss);
 }
 
 static double thermal_hydraulics_junction_kinetic_energy(size_t j, const PetscScalar *x, double rho) {
@@ -768,7 +870,7 @@ static int thermal_hydraulics_update_properties(void) {
     feenox_push_error_message("steady-state thermal_hydraulics problems need at least one pressure boundary condition 'p'");
     return FEENOX_ERROR;
   }
-  if (n_T == 0) {
+  if (n_T == 0 && !(feenox_special_var_value(end_time) > 0 && feenox_get_function_ptr("T_0") != NULL)) {
     feenox_push_error_message("thermal_hydraulics problems need at least one boundary condition with either temperature 'T' or density 'rho'");
     return FEENOX_ERROR;
   }
@@ -1089,6 +1191,12 @@ static PetscErrorCode thermal_hydraulics_residual(SNES snes, Vec X, Vec R, void 
     
     double net_in = 0;          // net mass flow entering the node through the pipes
     double energy = node->Q;    // energy balance in W
+    if (node->pump != NULL) {
+      th_point_t *pump = node->pump;
+      th_pipe_t *in = &thermal_hydraulics.pipes[pump->suction];
+      double pump_flow = (in->b == j ? 1 : -1)*x[TH_MDOT(pump->suction)];
+      energy += pump_flow*pump->specific_work;
+    }
     for (size_t i = 0; i < node->n_pipes; i++) {
       size_t k = node->pipe[i];
       th_pipe_t *pipe = &thermal_hydraulics.pipes[k];

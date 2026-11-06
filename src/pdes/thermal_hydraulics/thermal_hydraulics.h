@@ -37,6 +37,7 @@ typedef struct th_fluid_t th_fluid_t;
 typedef struct th_pipe_t th_pipe_t;
 typedef struct th_node_t th_node_t;
 typedef struct th_heat_structure_t th_heat_structure_t;
+typedef struct th_point_t th_point_t;
 typedef struct thermal_hydraulics_t thermal_hydraulics_t;
 
 // equation of state and transport properties of the working fluid
@@ -86,6 +87,7 @@ struct th_node_t {
   physical_group_t *junction_group;
   double junction_area;      // area defining the junction reference pressure
   double kinetic_energy_old;
+  th_point_t *pump;
   
   // adjacency (CSR-like, indexes into the pipe array)
   size_t n_pipes;
@@ -117,8 +119,26 @@ struct th_heat_structure_t {
   UT_hash_handle hh;
 };
 
+typedef struct th_point_property_t {
+  char *name;
+  expr_t expr;
+  UT_hash_handle hh;
+} th_point_property_t;
+
+struct th_point_t {
+  char *group_name;
+  int is_pump;
+  th_point_property_t *properties;
+  expr_t head, direction[3], reverse_loss[2], area;
+  int has_area;
+  double specific_work, K_reverse[2], A_ref;
+  size_t suction, discharge;  // incident pipe indexes, independent of element orientation
+  UT_hash_handle hh;
+};
+
 struct thermal_hydraulics_t {
   th_fluid_t fluid;
+  th_point_t *points;
   th_heat_structure_t *heat_structures;
   size_t n_solid_unknowns;
   var_t *hs_heat, *hs_energy;

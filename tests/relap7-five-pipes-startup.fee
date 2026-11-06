@@ -1,0 +1,6 @@
+DEFAULT_ARGUMENT_VALUE 1 5
+DEFAULT_ARGUMENT_VALUE 2 1
+p_0(x,y,z) = 1e5
+T_0(x,y,z) = 305
+v_0(x,y,z) = 1
+INCLUDE relap7-five-pipes.fee

@@ -39,6 +39,103 @@ int feenox_problem_parse_problem_thermal_hydraulics(const char *token) {
   return FEENOX_OK;
 }
 
+static int thermal_hydraulics_parse_point(int is_pump) {
+  const char *keyword = is_pump ? "PUMP" : "JUNCTION";
+  if (feenox.pde.parse_problem != feenox_problem_parse_problem_thermal_hydraulics) {
+    feenox_push_error_message("%s requires PROBLEM thermal_hydraulics first", keyword);
+    return FEENOX_ERROR;
+  }
+  th_point_t *point = NULL;
+  feenox_check_alloc(point = calloc(1, sizeof(th_point_t)));
+  point->is_pump = is_pump;
+  int head_given = 0, direction_given = 0, reverse_given = 0;
+  char *token = NULL;
+  while ((token = feenox_get_next_token(NULL)) != NULL) {
+    if (strcasecmp(token, "POINT") == 0) {
+      if (point->group_name != NULL) {
+        feenox_push_error_message("duplicate POINT for %s", keyword);
+        return FEENOX_ERROR;
+      }
+      feenox_call(feenox_parser_string(&point->group_name));
+    } else if (is_pump && strcasecmp(token, "HEAD") == 0 && !head_given) {
+      head_given = 1;
+      feenox_call(feenox_parser_expression(&point->head));
+    } else if (is_pump && strcasecmp(token, "DIRECTION") == 0 && !direction_given) {
+      direction_given = 1;
+      for (int d = 0; d < 3; d++) {
+        feenox_call(feenox_parser_expression(&point->direction[d]));
+      }
+    } else if (is_pump && strcasecmp(token, "K_REVERSE") == 0 && !reverse_given) {
+      reverse_given = 1;
+      for (int side = 0; side < 2; side++) {
+        feenox_call(feenox_parser_expression(&point->reverse_loss[side]));
+      }
+    } else if (is_pump && strcasecmp(token, "A_REF") == 0 && !point->has_area) {
+      point->has_area = 1;
+      feenox_call(feenox_parser_expression(&point->area));
+    } else if (!is_pump && strchr(token, '=') != NULL) {
+      char *equal = strchr(token, '=');
+      *equal = '\0';
+      if (equal[1] == '\0') {
+        feenox_push_error_message("JUNCTION property '%s' needs an expression", token);
+        return FEENOX_ERROR;
+      }
+      if (strcmp(token, "K") != 0 && strcmp(token, "A_ref") != 0 &&
+          !(strncmp(token, "K_", 2) == 0 && token[2] != '\0')) {
+        feenox_push_error_message("undefined JUNCTION property '%s'", token);
+        return FEENOX_ERROR;
+      }
+      th_point_property_t *property = NULL;
+      HASH_FIND_STR(point->properties, token, property);
+      if (property != NULL) {
+        feenox_push_error_message("duplicate JUNCTION property '%s'", token);
+        return FEENOX_ERROR;
+      }
+      feenox_check_alloc(property = calloc(1, sizeof(th_point_property_t)));
+      feenox_check_alloc(property->name = strdup(token));
+      feenox_call(feenox_expression_parse(&property->expr, equal+1));
+      HASH_ADD_KEYPTR(hh, point->properties, property->name, strlen(property->name), property);
+    } else {
+      feenox_push_error_message("undefined or duplicate keyword '%s' for %s", token, keyword);
+      return FEENOX_ERROR;
+    }
+  }
+  if (point->group_name == NULL || point->group_name[0] == '\0') {
+    feenox_push_error_message("%s requires keyword POINT", keyword);
+    return FEENOX_ERROR;
+  }
+  if (is_pump && (!head_given || !direction_given)) {
+    feenox_push_error_message("PUMP requires keyword %s", !head_given ? "HEAD" : "DIRECTION");
+    return FEENOX_ERROR;
+  }
+  th_point_t *existing = NULL;
+  HASH_FIND_STR(thermal_hydraulics.points, point->group_name, existing);
+  if (existing != NULL) {
+    feenox_push_error_message("point group '%s' already has a PUMP or JUNCTION declaration", point->group_name);
+    return FEENOX_ERROR;
+  }
+  HASH_ADD_KEYPTR(hh, thermal_hydraulics.points, point->group_name, strlen(point->group_name), point);
+  return FEENOX_OK;
+}
+
+int feenox_parse_pump(void) {
+///kw_thermal_hydraulics+PUMP+desc Attach an ideal prescribed-head pump to a physical point.
+///kw_thermal_hydraulics+PUMP+usage PUMP POINT <group> HEAD <expr> DIRECTION <dx> <dy> <dz> [ K_REVERSE <suction_K> <discharge_K> ] [ A_REF <expr> ]
+///kw_thermal_hydraulics+PUMP+detail Secondary keywords can appear in any order. POINT, HEAD and DIRECTION are mandatory. The group must contain exactly one point with exactly two incident first-order pipe elements.
+///kw_thermal_hydraulics+PUMP+detail Outward element tangents must have opposite nonzero projections on DIRECTION: negative identifies suction, positive discharge. Direction expressions are evaluated at each solve and need not form a unit vector. Mesh element orientation and pipe materials do not define pump direction.
+///kw_thermal_hydraulics+PUMP+detail HEAD is finite and nonnegative, in m, and may vary with time. Total-pressure addition is rho*9.80665*HEAD, independently of the problem gravity vector. Hydraulic power is signed suction mass flow times 9.80665*HEAD; reverse flow does not reverse the imposed head.
+///kw_thermal_hydraulics+PUMP+detail K_REVERSE gives nonnegative suction and discharge port losses active only during reverse flow, defaulting to zero. A_REF must be positive; if omitted each port uses its own flow area for losses. The pump includes reversible area-change and port kinetic-energy terms like a junction.
+///kw_thermal_hydraulics+PUMP+detail The nodal pressure is the midpoint reference, not either port pressure. No extra storage volume, efficiency, shaft dynamics or check valve is modeled. Do not combine PUMP with another point component, point material, or p/v/mdot boundary conditions at that node.
+  return thermal_hydraulics_parse_point(1);
+}
+
+int feenox_parse_junction(void) {
+///kw_thermal_hydraulics+JUNCTION+desc Configure junction losses at shared mesh nodes without a point MATERIAL.
+///kw_thermal_hydraulics+JUNCTION+usage JUNCTION POINT <group> [ K=<expr> ] [ K_<pipe_group>=<expr> ... ] [ A_ref=<expr> ]
+///kw_thermal_hydraulics+JUNCTION+detail Uses the same low-Mach point-junction model as the legacy MATERIAL syntax, which remains supported. Omitted K is zero, enabling ideal area transitions. Each point needs at least two incident pipe elements. Multiple points in one group are supported. Do not combine with a material or another point-component declaration on the same node.
+  return thermal_hydraulics_parse_point(0);
+}
+
 int feenox_parse_heat_structure(void) {
 
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+desc Couple a cylindrical fuel-gap-clad heat structure to a physical pipe group.

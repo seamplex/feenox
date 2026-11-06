@@ -64,6 +64,7 @@ int feenox_problem_parse_time_init_thermal_hydraulics(void) {
   feenox_call(feenox_problem_define_solution_function("mdot", &thermal_hydraulics.mdot_function, FEENOX_SOLUTION_NOT_GRADIENT));
 ///pr_thermal_hydraulics+T_0+description Initial fluid temperature as a function of the spatial coordinates.
 ///pr_thermal_hydraulics+T_0+description For transients, any prescribed initial field skips the t=0 steady solve. Unspecified fluid fields use the boundary-based initial guess.
+///pr_thermal_hydraulics+T_0+description A transient with T_0 need not prescribe a temperature or density boundary condition, allowing initially filled circulating loops.
 ///pr_thermal_hydraulics+p_0+description Initial pressure (Pa), as a function of the spatial coordinates.
 ///pr_thermal_hydraulics+v_0+description Initial signed pipe velocity (m/s), evaluated at element centers. Mutually exclusive with `mdot_0`.
 ///pr_thermal_hydraulics+mdot_0+description Initial signed mass flow (kg/s), evaluated at element centers.
@@ -144,6 +145,7 @@ int feenox_problem_init_runtime_thermal_hydraulics(void) {
 ///pr_thermal_hydraulics+A_ref+description Pipe-port pressures subtract the port velocity head and add an incoming or subtract an outgoing local loss. Static pressures on either side need not equal the point pressure.
 ///pr_thermal_hydraulics+A_ref+description The junction energy balance includes signed port kinetic-energy fluxes and backward-Euler kinetic-energy storage in its adjacent half elements. The point uses the existing fluid volumes; no extra junction volume, pump, or compressible entropy/Riemann junction model is added.
 ///pr_thermal_hydraulics+A_ref+description Point properties are evaluated at the point coordinates before each solve and can depend on time. Do not prescribe p, v, or mdot at an internal junction point. Overlapping configured point groups are rejected.
+///pr_thermal_hydraulics+A_ref+description The JUNCTION primary keyword configures this same model without a point MATERIAL. A PUMP adds directed head and signed hydraulic power to a two-port point; see those keywords.
 ///pr_thermal_hydraulics+q+description Volumetric power\ $q'''$ (in W/m^3) deposited into the fluid.
 ///pr_thermal_hydraulics+q+description Default is zero.
   feenox_call(feenox_distribution_init(&thermal_hydraulics.q, "q"));

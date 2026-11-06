@@ -1,0 +1,18 @@
+DEFAULT_ARGUMENT_VALUE 1 5
+DEFAULT_ARGUMENT_VALUE 2 0
+INCLUDE relap7-five-pipes-startup.fee
+initial_state_error(x,y,z) = abs(p(x,y,z)/1e5-1)+abs(T(x,y,z)/305-1)+abs(v(x,y,z)-1)
+IF in_static
+  initial_error = initial_state_error(-0.5,0,0)+initial_state_error(0,-0.5,0)+initial_state_error(0.5,0,0)+initial_state_error(0,0.5,0)+initial_state_error(0,0,0.5)
+ENDIF
+# Backward-Euler regression values, not RELAP-7 reference results.
+IF abs(t-0.1)<1e-8
+  first_step_seen = 1
+  first_flow_error = abs(mdot(0.5,0,0)/1508.52200902-1)+abs(mdot(0,0.5,0)/826.256266985-1)+abs(mdot(0,0,0.5)/1147.35124526-1)
+  first_temperature_error = abs(T(1,0,0)/305.002849499-1)+abs(T(0,1,0)/305.004110699-1)+abs(T(0,0,1)/305.003317401-1)
+ENDIF
+IF done
+  final_flow_error = abs(mdot(0.5,0,0)/1398.73002562-1)+abs(mdot(0,0.5,0)/978.168607114-1)+abs(mdot(0,0,0.5)/1095.60136762-1)
+  final_temperature_error = abs(T(1,0,0)/312.861056983-1)+abs(T(0,1,0)/312.861068818-1)+abs(T(0,0,1)/312.858615267-1)
+  PRINT initial_error+abs(first_step_seen-1)+abs(t-5)+first_flow_error+first_temperature_error+final_flow_error+final_temperature_error
+ENDIF
