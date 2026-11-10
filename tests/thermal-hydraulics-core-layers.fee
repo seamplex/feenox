@@ -1,0 +1,14 @@
+DEFAULT_ARGUMENT_VALUE 1 "fuel_radius=0.00348 fuel_cells=4"
+DEFAULT_ARGUMENT_VALUE 2 0.00348
+PROBLEM thermal_hydraulics DIM 3 MESH relap7-core-channel.msh
+MATERIAL solid k=29.3 rho_s=14583 cp=191.67
+MATERIAL channel {
+  A=0.44934 D_h=0.002972 f=0.022 h_wall=1.6129e5
+  $1 rod_count=100 hs_power=0
+}
+HEAT_STRUCTURE PIPE channel FUEL solid
+BC inlet mdot=1 T=300
+BC outlet p=15.5e6
+SOLVE_PROBLEM
+expected_energy = 100*3.865*pi*($2)^2*14583*191.67*300
+PRINT abs(hs_energy_channel/expected_energy-1)+abs(hs_heat_channel)

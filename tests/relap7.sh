@@ -230,6 +230,40 @@ fi
 echo "${diagnostic}" | grep -q "matching.*axial" || exit 1
 
 gmsh -v 0 -1 ${dir}/relap7-core-channel.geo || exit $?
+for count in 1 100; do
+  answerzero1 thermal-hydraulics-core-bundle.fee "${count}" 7e-4
+  exitifwrong $?
+  answerzero2 thermal-hydraulics-core-bundle.fee "${count}" 1 1e-6
+  exitifwrong $?
+done
+checkexchanger thermal-hydraulics-core-layers.fee
+checkexchanger thermal-hydraulics-core-layers.fee "fuel_radius=0.00348 fuel_cells=4 gap_width=0 gap_cells=0 clad_width=0 clad_cells=0"
+checkexchanger thermal-hydraulics-core-layers.fee "fuel_radius=0.00348 fuel_cells=4 clad_width=0.00052" 0.004
+checkexchanger thermal-hydraulics-core-layers.fee "fuel_radius=0.00348 fuel_cells=4 gap_width=0.0001 clad_width=0.00052" 0.0041
+for geometry in \
+  "fuel_radius=0.00348 fuel_cells=4 gap_width=0 gap_cells=1" \
+  "fuel_radius=0.00348 fuel_cells=4 clad_width=0.00052 clad_cells=0" \
+  "fuel_radius=0.00348 fuel_cells=4 clad_width=-1"; do
+  if ${feenox} ${dir}/thermal-hydraulics-core-layers.fee "${geometry}"; then
+    echo "expected an error for inconsistent core layers"
+    exit 1
+  fi
+done
+for count in 0 "(0-1)" "1+t"; do
+  if ${feenox} ${dir}/thermal-hydraulics-core-bundle.fee "${count}"; then
+    echo "expected an error for invalid rod_count"
+    exit 1
+  fi
+done
+
+# RELAP-7 Example 10: buoyancy-driven primary with an open counterflow secondary.
+gmsh -v 0 -1 ${dir}/relap7-natural-loop.geo || exit $?
+gmsh -v 0 -1 -setnumber Orientation 1 ${dir}/relap7-natural-loop.geo -o ${dir}/relap7-natural-loop-oriented.msh || exit $?
+checkexchanger relap7-natural-loop-verify.fee
+checkexchanger relap7-natural-loop-balances.fee
+checkexchanger relap7-natural-loop-balances.fee relap7-natural-loop-oriented.msh 50 0 "(0-1)" 15.5e6 "(0-1)"
+checkexchanger relap7-natural-loop-verify.fee relap7-natural-loop.msh 50 0 0
+
 for declaration in "HEAT_STRUCTURE" "HEAT_STRUCTURE PIPE channel" "HEAT_STRUCTURE FUEL fuel" "HEAT_STRUCTURE PIPE channel FUEL fuel extra" "HEAT_STRUCTURE PIPE channel FUEL" "HEAT_STRUCTURE PIPE channel FUEL fuel GAP" "HEAT_STRUCTURE PIPE channel FUEL fuel CLAD" "HEAT_STRUCTURE PIPE channel FUEL fuel PIPE other" "HEAT_STRUCTURE PIPE channel FUEL fuel FUEL other" "HEAT_STRUCTURE PIPE channel FUEL fuel GAP gap GAP other" "HEAT_STRUCTURE PIPE channel FUEL fuel CLAD clad CLAD other"; do
   echo "Rejecting invalid heat-structure declaration: ${declaration}"
   if ${feenox} --check ${dir}/relap7-core-parser.fee "PROBLEM thermal_hydraulics" "${declaration}" "#"; then

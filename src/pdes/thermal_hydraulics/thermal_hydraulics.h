@@ -120,6 +120,7 @@ struct th_heat_structure_t {
   expr_t *properties[3][3];   // k, rho, cp
   double k[3], rho[3], cp[3];
   double power, length;
+  double rod_count;
   int axial_conduction;
   size_t nr;
   size_t offset;
