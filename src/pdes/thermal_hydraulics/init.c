@@ -32,7 +32,14 @@ int feenox_problem_parse_time_init_thermal_hydraulics(void) {
   feenox.pde.parse_bc = feenox_problem_bc_parse_thermal_hydraulics;
   feenox.pde.parse_write_results = feenox_problem_parse_write_post_thermal_hydraulics;
   feenox.pde.init_before_run = feenox_problem_init_runtime_thermal_hydraulics;
+  feenox.pde.solve_pre = feenox_problem_solve_pre_thermal_hydraulics;
   feenox.pde.solve_post = feenox_problem_solve_post_thermal_hydraulics;
+  feenox.pde.residual = feenox_problem_residual_thermal_hydraulics;
+  feenox.pde.create_jacobian = feenox_problem_create_jacobian_thermal_hydraulics;
+  feenox.pde.phi_initial_condition = feenox_problem_initial_condition_thermal_hydraulics;
+  feenox.pde.setup_ksp = feenox_problem_setup_ksp_thermal_hydraulics;
+  feenox.pde.setup_pc = feenox_problem_setup_pc_thermal_hydraulics;
+  feenox.pde.setup_ts = feenox_problem_setup_ts_thermal_hydraulics;
   
   // the scalar unknowns live at the nodes
   feenox.mesh.default_field_location = field_location_nodes;
@@ -71,7 +78,13 @@ int feenox_problem_parse_time_init_thermal_hydraulics(void) {
 ///pr_thermal_hydraulics+T_solid_0+description Initial solid temperature (K), with radius as the first argument followed by the spatial coordinates.
 ///pr_thermal_hydraulics+T_solid_0+description This function initializes every heat structure on its own radial grid.
 ///pr_thermal_hydraulics+T_solid_0+description If absent with prescribed fluid initial conditions, the solid starts at the local initial fluid temperature.
-///pr_thermal_hydraulics+T_solid_0+description Without any initial fields, a coupled steady state initializes the transient. Time integration uses backward Euler.
+///pr_thermal_hydraulics+T_solid_0+description Without any initial fields, a coupled steady state initializes the transient.
+///pr_thermal_hydraulics+T_solid_0+description Transients use PETSc's TS with backward Euler, which damps the acoustic waves, and adaptive time steps by default.
+///pr_thermal_hydraulics+T_solid_0+description The step is doubled after a step whose Newton solve took at most three iterations and halved after one that took eight or more, within `min_dt` and `max_dt`.
+///pr_thermal_hydraulics+T_solid_0+description A step whose nonlinear solve fails is retried with half the step.
+///pr_thermal_hydraulics+T_solid_0+description Assigning `dt_0` sets the first step only, while assigning `dt` (i.e. `dt = 0.1`) dictates a fixed step.
+///pr_thermal_hydraulics+T_solid_0+description Other schemes can be chosen with `TRANSIENT_SOLVER` (e.g. `bdf`) and local-error control with `TIME_ADAPTATION basic`.
+///pr_thermal_hydraulics+T_solid_0+description Each control volume carries its mass and internal energy as unknowns, so any linear multistep scheme conserves them discretely.
 
 ///va_thermal_hydraulics+g_x+detail The $x$ component of the gravity acceleration vector in m/s^2. Default is zero.
   feenox_check_alloc(thermal_hydraulics.g[0] = feenox_get_or_define_variable_get_ptr("g_x"));
@@ -112,7 +125,10 @@ int feenox_problem_init_runtime_thermal_hydraulics(void) {
   mesh->data_type = data_type_node;
   feenox.pde.spatial_unknowns = mesh->n_nodes;
   feenox.pde.math_type = math_type_nonlinear;
-  feenox.pde.solve = feenox_problem_solve_thermal_hydraulics;
+  // the residual is computed directly by the physics so we re-use the
+  // generic PETSc drivers with the virtual methods set above
+  feenox.pde.solve = (feenox_special_var_value(end_time) > 0) ? feenox_problem_solve_petsc_transient :
+                                                                 feenox_problem_solve_petsc_nonlinear;
   
   feenox.pde.has_stiffness = 0;
   feenox.pde.has_mass = 0;
@@ -278,6 +294,11 @@ int feenox_problem_init_runtime_thermal_hydraulics(void) {
   // caches
   feenox_check_alloc(thermal_hydraulics.rho = calloc(thermal_hydraulics.n_nodes, sizeof(double)));
   feenox_check_alloc(thermal_hydraulics.h = calloc(thermal_hydraulics.n_nodes, sizeof(double)));
+  
+  // the heat structures add their radial temperatures to the global unknowns
+  // [ p_0 T_0 ... p_{N-1} T_{N-1} mdot_0 ... mdot_{K-1} M_0 ... M_{N-1} U_0 ... U_{N-1} solid blocks ... ]
+  feenox_call(thermal_hydraulics_init_heat_structures());
+  feenox.pde.size_global = 4*thermal_hydraulics.n_nodes + thermal_hydraulics.n_pipes + thermal_hydraulics.n_solid_unknowns;
   
   // secondary fields
   feenox_call(feenox_problem_fill_aux_solution(thermal_hydraulics.rho_function));

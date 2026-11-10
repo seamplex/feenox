@@ -37,7 +37,15 @@ extern int feenox_problem_init_runtime_thermal_hydraulics(void);
 extern int feenox_problem_bc_parse_thermal_hydraulics(bc_data_t *bc_data, const char *lhs, char *rhs);
 
 // thermal_hydraulics/solve.c
-extern int feenox_problem_solve_thermal_hydraulics(void);
+extern int feenox_problem_solve_pre_thermal_hydraulics(void);
 extern int feenox_problem_solve_post_thermal_hydraulics(void);
+#ifdef HAVE_PETSC
+extern int feenox_problem_residual_thermal_hydraulics(double t, Vec phi, Vec phi_dot, Vec r, int *domain_error);
+extern Mat feenox_problem_create_jacobian_thermal_hydraulics(const char *name);
+extern int feenox_problem_initial_condition_thermal_hydraulics(Vec phi, int *given);
+extern int feenox_problem_setup_ksp_thermal_hydraulics(KSP ksp);
+extern int feenox_problem_setup_pc_thermal_hydraulics(PC pc);
+extern int feenox_problem_setup_ts_thermal_hydraulics(TS ts);
+#endif
 
 #endif

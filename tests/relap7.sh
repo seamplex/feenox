@@ -91,6 +91,11 @@ checkpump() {
 answerzero relap7-pump-loop-verify.fee 1e-6
 exitifwrong $?
 checkpump relap7-pump-loop-verify.fee relap7-pump-loop-oriented.msh 0 "(0-1)"
+# closed pump loop: mass and energy are unknowns so any linear multistep TS keeps the total mass
+for ts in beuler bdf cn; do
+  answerzero1 thermal-hydraulics-closed-loop.fee ${ts} 1e-9
+  exitifwrong $?
+done
 gmsh -v 0 -1 ${dir}/thermal-hydraulics-pump.geo || exit $?
 checkpump thermal-hydraulics-pump.fee 1 1000 1 thermal-hydraulics-pump.msh
 checkpump thermal-hydraulics-pump.fee 1 1000 "if(t<0.2,0,1)" relap7-two-pipes.msh 1 10

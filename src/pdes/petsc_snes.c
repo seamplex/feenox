@@ -33,9 +33,9 @@ int feenox_problem_solve_petsc_nonlinear(void) {
 //    petsc_call(SNESMonitorSet(feenox.pde.snes, feenox.pde.snes_monitor, NULL, 0));
 
     feenox_check_alloc(feenox.pde.r = feenox_problem_create_vector("r"));
-    petsc_call(SNESSetFunction(feenox.pde.snes, feenox.pde.r, feenox_snes_residual, NULL));
-    feenox_check_alloc(feenox.pde.J_snes = feenox_problem_create_matrix("J_snes"));
-    petsc_call(SNESSetJacobian(feenox.pde.snes, feenox.pde.J_snes, feenox.pde.J_snes, feenox_snes_jacobian, NULL));    
+    petsc_call(SNESSetFunction(feenox.pde.snes, feenox.pde.r, (feenox.pde.residual != NULL) ? feenox_snes_residual_physics : feenox_snes_residual, NULL));
+    feenox_check_alloc(feenox.pde.J_snes = (feenox.pde.create_jacobian != NULL) ? feenox.pde.create_jacobian("J_snes") : feenox_problem_create_matrix("J_snes"));
+    petsc_call(SNESSetJacobian(feenox.pde.snes, feenox.pde.J_snes, feenox.pde.J_snes, (feenox.pde.create_jacobian != NULL) ? SNESComputeJacobianDefaultColor : feenox_snes_jacobian, NULL));
 
     // TODO
     feenox_call(feenox_problem_setup_snes(feenox.pde.snes));
@@ -56,7 +56,11 @@ int feenox_problem_solve_petsc_nonlinear(void) {
     }
   } else {
     // this branch is for the fee2ccx converter
-    feenox_snes_residual(feenox.pde.snes, feenox.pde.phi, feenox.pde.r, NULL);
+    if (feenox.pde.residual != NULL) {
+      feenox_call(feenox_snes_residual_physics(feenox.pde.snes, feenox.pde.phi, feenox.pde.r, NULL));
+    } else {
+      feenox_call(feenox_snes_residual(feenox.pde.snes, feenox.pde.phi, feenox.pde.r, NULL));
+    }
   }
 
   // finish the progress line
@@ -168,6 +172,16 @@ PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r, void *ctx) {
   return FEENOX_OK;
 }
 
+
+// residual given directly by the physics (i.e. not built from element objects)
+PetscErrorCode feenox_snes_residual_physics(SNES snes, Vec phi, Vec r, void *ctx) {
+  int domain_error = 0;
+  feenox_call(feenox.pde.residual(feenox_special_var_value(t), phi, NULL, r, &domain_error));
+  if (domain_error) {
+    petsc_call(SNESSetFunctionDomainError(snes));
+  }
+  return FEENOX_OK;
+}
 
 PetscErrorCode feenox_snes_jacobian(SNES snes, Vec phi, Mat J_snes, Mat P, void *ctx) {
 

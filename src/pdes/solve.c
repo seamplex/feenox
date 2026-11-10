@@ -55,6 +55,11 @@ int feenox_instruction_solve_problem(void *arg) {
   petsc_call(PetscLogStagePop());
   // ---------------------------------------------------------------------------
   
+  // physics-specific preparation (e.g. evaluation of time-dependent properties)
+  if (feenox.pde.solve_pre != NULL) {
+    feenox_call(feenox.pde.solve_pre());
+  }
+  
   // solve the problem with this per-mathematics virtual method
   // (which in turn calls a per-physics matrix & vector builds)
   feenox_call(feenox.pde.solve());

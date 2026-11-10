@@ -88,7 +88,6 @@ struct th_node_t {
   double A;                  // area of the first adjacent pipe (used in velocity BCs)
   physical_group_t *junction_group;
   double junction_area;      // area defining the junction reference pressure
-  double kinetic_energy_old;
   th_point_t *pump;
   size_t alias;              // representative node of a MERGE point group (itself otherwise)
 
@@ -186,16 +185,16 @@ struct thermal_hydraulics_t {
   double p_ref;
   double h_ref;
   
-  // flag for transient steps (backward euler)
+  // flag for transient steps
   int transient;
-  double dt;
+  // time at which the properties and boundary conditions were evaluated
+  double t_properties;
+  // the initial guess is computed only once
+  int guessed;
   
   // caches of nodal properties evaluated within the residual
   double *rho;
   double *h;
-  double *rho_old;
-  double *rhou_old;          // rho*h - p
-  double *mdot_old;
   
   // secondary fields
   function_t *rho_function;
@@ -203,13 +202,6 @@ struct thermal_hydraulics_t {
   function_t *v_function;
   function_t *mdot_function;
   
-#ifdef HAVE_PETSC
-  SNES snes;
-  Vec x;
-  Vec r;
-  Vec x_old;
-  Mat J;
-#endif
 };  
 extern thermal_hydraulics_t thermal_hydraulics;
 
@@ -222,6 +214,9 @@ extern double thermal_hydraulics_iapws_mu(double rho, double T);
 extern double thermal_hydraulics_if97_k(double p, double T);
 extern double thermal_hydraulics_if97_beta(double p, double T);
 extern double thermal_hydraulics_if97_psat(double T);
+
+// solve.c
+extern int thermal_hydraulics_init_heat_structures(void);
 
 // friction.c
 extern double thermal_hydraulics_friction_churchill(double Re, double relative_roughness);

@@ -508,6 +508,12 @@ int feenox_problem_init_runtime_general(void) {
   }
 
   // allocate global petsc objects
+  // a physics might set its own size if it has unknowns other than the nodal dofs
+  int size_given = (feenox.pde.size_global != 0);
+  if (size_given && feenox.mpi_size > 1) {
+    feenox_push_error_message("problems with non-nodal unknowns cannot be run in parallel (yet)");
+    return FEENOX_ERROR;
+  }
   if (feenox.pde.size_global == 0) {
     if (feenox.pde.spatial_unknowns == 0) {
       feenox_push_error_message("internal error, problem init did not set global spatial unknowns");
@@ -534,7 +540,7 @@ int feenox_problem_init_runtime_general(void) {
   feenox.pde.nodes_local = PETSC_DECIDE;
   PetscInt n_nodes = feenox.pde.mesh->n_nodes;
   petsc_call(PetscSplitOwnership(PETSC_COMM_WORLD, &feenox.pde.nodes_local, &n_nodes));
-  feenox.pde.size_local = feenox.pde.dofs * feenox.pde.nodes_local;
+  feenox.pde.size_local = size_given ? feenox.pde.size_global : feenox.pde.dofs * feenox.pde.nodes_local;
   
   // the global stiffnes matrix
   feenox_check_alloc(feenox.pde.K = feenox_problem_create_matrix("K"));
@@ -568,8 +574,8 @@ int feenox_problem_init_runtime_general(void) {
   
   // ask for the local ownership range
   petsc_call(MatGetOwnershipRange(feenox.pde.K, &feenox.pde.first_row, &feenox.pde.last_row));
-  feenox.pde.first_node = feenox.pde.first_row / feenox.pde.dofs;
-  feenox.pde.last_node = feenox.pde.last_row / feenox.pde.dofs;
+  feenox.pde.first_node = size_given ? 0 : feenox.pde.first_row / feenox.pde.dofs;
+  feenox.pde.last_node = size_given ? feenox.pde.mesh->n_nodes : feenox.pde.last_row / feenox.pde.dofs;
   
   // TODO: honor mesh partitions
   // https://lists.mcs.anl.gov/pipermail/petsc-users/2014-April/021433.html
@@ -659,7 +665,7 @@ Mat feenox_problem_create_matrix(const char *name) {
     petsc_call_null(MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE));
   }  
   
-  if (feenox.pde.dofs > 1) {
+  if (feenox.pde.dofs > 1 && feenox.pde.size_global == feenox.pde.dofs*feenox.pde.spatial_unknowns) {
     petsc_call_null(MatSetBlockSize(A, feenox.pde.dofs));
   }  
 
