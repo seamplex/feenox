@@ -200,6 +200,30 @@ int feenox_problem_init_runtime_thermal_hydraulics(void) {
   feenox_check_alloc(thermal_hydraulics.pipes = calloc(thermal_hydraulics.n_pipes, sizeof(th_pipe_t)));
   feenox_check_alloc(thermal_hydraulics.nodes = calloc(thermal_hydraulics.n_nodes, sizeof(th_node_t)));
   
+  // MERGE point groups: every point of the group is represented by the
+  // first one, so the pipes that end at any of them share a single node
+  for (size_t j = 0; j < thermal_hydraulics.n_nodes; j++) {
+    thermal_hydraulics.nodes[j].alias = j;
+  }
+  for (th_point_t *point = thermal_hydraulics.points; point != NULL; point = point->hh.next) {
+    if (!point->merge) continue;
+    physical_group_t *group = feenox_get_physical_group_ptr(point->group_name, mesh);
+    if (group == NULL || group->dimension != 0 || group->n_elements == 0) {
+      feenox_push_error_message("%s MERGE needs a non-empty physical point group, not '%s'", point->is_pump ? "PUMP" : "JUNCTION", point->group_name);
+      return FEENOX_ERROR;
+    }
+    size_t representative = mesh->element[group->element[0]].node[0]->index_mesh;
+    for (size_t e = 0; e < group->n_elements; e++) {
+      size_t j = mesh->element[group->element[e]].node[0]->index_mesh;
+      th_node_t *node = &thermal_hydraulics.nodes[j];
+      if (node->alias != j) {
+        feenox_push_error_message("node %ld belongs to more than one MERGE point group", mesh->node[j].tag);
+        return FEENOX_ERROR;
+      }
+      node->alias = representative;
+    }
+  }
+
   // fill the pipe geometry and count the number of pipes per node
   size_t k = 0;
   for (size_t i = 0; i < mesh->n_elements; i++) {
@@ -207,8 +231,12 @@ int feenox_problem_init_runtime_thermal_hydraulics(void) {
     if (e->type->dim == 1) {
       th_pipe_t *pipe = &thermal_hydraulics.pipes[k++];
       pipe->element = e;
-      pipe->a = e->node[0]->index_mesh;
-      pipe->b = e->node[1]->index_mesh;
+      pipe->a = thermal_hydraulics.nodes[e->node[0]->index_mesh].alias;
+      pipe->b = thermal_hydraulics.nodes[e->node[1]->index_mesh].alias;
+      if (pipe->a == pipe->b) {
+        feenox_push_error_message("element %ld has both ends in the same MERGE point group", e->tag);
+        return FEENOX_ERROR;
+      }
       for (int d = 0; d < 3; d++) {
         pipe->dx[d] = e->node[1]->x[d] - e->node[0]->x[d];
       }
@@ -225,6 +253,10 @@ int feenox_problem_init_runtime_thermal_hydraulics(void) {
   // build the node-to-pipe adjacency
   for (size_t j = 0; j < thermal_hydraulics.n_nodes; j++) {
     th_node_t *node = &thermal_hydraulics.nodes[j];
+    if (node->alias != j) {
+      // merged into another node, it only mirrors its state
+      continue;
+    }
     if (node->n_pipes == 0) {
       feenox_push_error_message("node %ld does not belong to any pipe", mesh->node[j].tag);
       return FEENOX_ERROR;

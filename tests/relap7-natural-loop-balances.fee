@@ -2,7 +2,7 @@ DEFAULT_ARGUMENT_VALUE 1 relap7-natural-loop.msh
 DEFAULT_ARGUMENT_VALUE 2 50
 DEFAULT_ARGUMENT_VALUE 3 0
 DEFAULT_ARGUMENT_VALUE 4 1
-DEFAULT_ARGUMENT_VALUE 5 15.5e6
+DEFAULT_ARGUMENT_VALUE 5 2e5
 DEFAULT_ARGUMENT_VALUE 6 1
 INCLUDE relap7-natural-loop.fee
 VAR b n old_mass old_energy
@@ -32,8 +32,10 @@ is_junction(b,side) = if(b<7,1,if(b=7|b=9,1-side,side))
 kinetic_storage(b,side) = is_junction(b,side)*step(b)*port_flow(b,side)^2/(4*density(b,side)*0.44934)
 kinetic_flux(b,side) = is_junction(b,side)*if(side,1,-1)*port_flow(b,side)^3/(2*density(b,side)^2*0.44934^2)
 boundary_flow(b,side) = accumulation(b,side*axial_cells(b))/2+if(side,-1,1)*port_flow(b,side)
-# Independent iapws IF97 quadratic at 300.15 K; maximum error <3e-6 J/kg over +/-0.2 MPa.
-reservoir_h(pressure_value) = 127381.66593086922+909.6259941541211*(pressure_value/1e6-15.5)-0.34098132309736684*(pressure_value/1e6-15.5)^2
+# Independent iapws IF97 quadratic at 300.15 K; maximum error <2e-7 J/kg over 0.15 to 0.35 MPa.
+reservoir_h(pressure_value) = 113429.04119865193+920.3272176696235*(pressure_value/1e6-0.25)-0.3608007963526311*(pressure_value/1e6-0.25)^2
+# Independent iapws IF97 saturation temperature cubic; maximum error <0.05 K over 0.15 to 0.35 MPa.
+saturation_T(pressure_value) = 400.57828644575045+131.66968226140256*(pressure_value/1e6-0.25)-228.34462111694162*(pressure_value/1e6-0.25)^2+581.4736901271943*(pressure_value/1e6-0.25)^3
 boundary_power(b,side) = boundary_flow(b,side)*if(boundary_flow(b,side)>0,reservoir_h(pressure(b,side)),enthalpy(b,side))
 friction_factor(b) = if(b=2|b=5,0.022,0.001)
 hydraulic_diameter(b) = if(b=5,0.0186,0.002972)
@@ -43,8 +45,8 @@ loss_coefficient(b,side) = if(b=2,0.5,if(b=1,0.5*side,if(b=3,0.5*(1-side),if(b=4
 port_head(b,side) = port_flow(b,side)^2/(2*density(b,side)*0.44934^2)
 port_loss(b,side) = loss_coefficient(b,side)*port_flow(b,side)*abs(port_flow(b,side))/(2*density(b,side)*0.44934^2)
 loop_momentum(b) = sum(segment_momentum(b,n),n,0,axial_cells(b)-1)+port_head(b,1)-port_head(b,0)-port_loss(b,0)-port_loss(b,1)
-# At pressures above 15 MPa, temperatures below 600 K remain subcooled IF97 region 1.
-phase_violation(b,s) = if(pressure(b,s)>15e6&T(0,by(b,s),bz(b,s))<600&T(0,by(b,s),bz(b,s))>273.15,0,1)
+# Every node must stay subcooled (0.1 K margin over the fit error) within the fitted pressure range.
+phase_violation(b,s) = if(pressure(b,s)>0.15e6&pressure(b,s)<0.35e6&T(0,by(b,s),bz(b,s))<saturation_T(pressure(b,s))-0.1&T(0,by(b,s),bz(b,s))>273.15,0,1)
 branch_phase_violation(b) = sum(phase_violation(b,n/axial_cells(b)),n,0,axial_cells(b))
 mass = sum(branch_mass(b),b,1,9)
 energy = hs_energy+sum(branch_energy(b),b,1,9)+sum(kinetic_storage(b,0)+kinetic_storage(b,1),b,1,9)
@@ -52,7 +54,7 @@ IF in_static=0
   mass_error = max(mass_error,abs((mass-old_mass)/dt-boundary_flow(7,1)-boundary_flow(8,0)-boundary_flow(9,1))/223.77)
   power = 5.1296e7+boundary_power(7,1)+boundary_power(8,0)+boundary_power(9,1)+sum(kinetic_flux(b,0)+kinetic_flux(b,1),b,1,9)
   energy_error = max(energy_error,abs((energy-old_energy)/dt-power)/5.1296e7)
-  reservoir_error = max(reservoir_error,if(abs(pressure(8,0)/1e6-15.5)<0.2,0,1))
+  reservoir_error = max(reservoir_error,if(abs(pressure(8,0)/1e6-0.25)<0.1,0,1))
   momentum_error = max(momentum_error,abs(sum(loop_momentum(b),b,1,6))/1e4)
   phase_error = max(phase_error,sum(branch_phase_violation(b),b,1,9))
 ENDIF

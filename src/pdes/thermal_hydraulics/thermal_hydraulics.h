@@ -90,7 +90,8 @@ struct th_node_t {
   double junction_area;      // area defining the junction reference pressure
   double kinetic_energy_old;
   th_point_t *pump;
-  
+  size_t alias;              // representative node of a MERGE point group (itself otherwise)
+
   // adjacency (CSR-like, indexes into the pipe array)
   size_t n_pipes;
   size_t *pipe;
@@ -142,6 +143,7 @@ typedef struct th_point_property_t {
 struct th_point_t {
   char *group_name;
   int is_pump;
+  int merge;                  // all the points in the group form a single control volume
   th_point_property_t *properties;
   expr_t head, direction[3], reverse_loss[2], area;
   int has_area;

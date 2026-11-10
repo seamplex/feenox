@@ -47,6 +47,23 @@ for loss in 0 1; do
   exitifwrong $?
 done
 checkjunction relap7-two-pipes.msh "K=if(t<0.2,0,1) A_ref=if(t<0.2,2,1)" 10
+
+# A MERGE junction joins pipe ends that do not touch, exactly as a coincident one.
+gmsh -v 0 -1 ${dir}/thermal-hydraulics-junction-merge.geo || exit $?
+echo "Checking MERGE junction against coincident pipe ends"
+reference=$(${feenox} ${dir}/relap7-two-pipes.fee) || exit $?
+merged=$(${feenox} ${dir}/thermal-hydraulics-junction-merge.fee) || exit $?
+echo "${reference} ${merged}" | awk '{e=($1-$6)^2/$1^2+($2-$7)^2/$2^2+($2-$8)^2/$2^2+($5-$9)^2/$5^2+$10^2+$11^2; exit (e<1e-16)?0:1}' || { echo "merged ${merged} vs coincident ${reference}"; exit 1; }
+if diagnostic=$(${feenox} ${dir}/thermal-hydraulics-junction-merge.fee 0.5 "" 2>&1); then
+  echo "expected an error for a gap junction without MERGE"
+  exit 1
+fi
+echo "${diagnostic}" | grep -q "needs at least two attached pipes" || exit 1
+if diagnostic=$(${feenox} ${dir}/thermal-hydraulics-junction-merge.fee 0.5 MERGE "BC connection T=300" 2>&1); then
+  echo "expected an error for a boundary condition on a MERGE point"
+  exit 1
+fi
+echo "${diagnostic}" | grep -q "MERGE point group and cannot have boundary conditions" || exit 1
 answerzero relap7-two-pipes-startup-verify.fee 1e-6
 exitifwrong $?
 gmsh -v 0 -1 ${dir}/thermal-hydraulics-tee.geo || exit $?
@@ -261,8 +278,18 @@ gmsh -v 0 -1 ${dir}/relap7-natural-loop.geo || exit $?
 gmsh -v 0 -1 -setnumber Orientation 1 ${dir}/relap7-natural-loop.geo -o ${dir}/relap7-natural-loop-oriented.msh || exit $?
 checkexchanger relap7-natural-loop-verify.fee
 checkexchanger relap7-natural-loop-balances.fee
-checkexchanger relap7-natural-loop-balances.fee relap7-natural-loop-oriented.msh 50 0 "(0-1)" 15.5e6 "(0-1)"
-checkexchanger relap7-natural-loop-verify.fee relap7-natural-loop.msh 50 0 0
+checkexchanger relap7-natural-loop-balances.fee relap7-natural-loop-oriented.msh 50 0 "(0-1)" 2e5 "(0-1)"
+# Starting from rest the core would boil at the manual's 2 bar before natural
+# circulation develops, so this robustness check runs at 15.5 MPa.
+checkexchanger relap7-natural-loop-verify.fee relap7-natural-loop.msh 50 0 0 15.5e6
+
+# RELAP-7 Example 11: two-loop model PWR, steady state after the manual's 200 s transient.
+# The hot leg is about 1 K above saturation, as in the manual (liquid-only properties).
+gmsh -v 0 -1 ${dir}/relap7-pwr.geo || exit $?
+echo "Checking the two-loop PWR balances"
+answer=$(${feenox} ${dir}/relap7-pwr-verify.fee 2>/dev/null) || exit $?
+result=$(${feenox} ${dir}/cmp-zero.fee "(${answer})" 2e-6) || exit $?
+test "${result}" = 1 || { echo "PWR balance error: ${answer}"; exit 1; }
 
 for declaration in "HEAT_STRUCTURE" "HEAT_STRUCTURE PIPE channel" "HEAT_STRUCTURE FUEL fuel" "HEAT_STRUCTURE PIPE channel FUEL fuel extra" "HEAT_STRUCTURE PIPE channel FUEL" "HEAT_STRUCTURE PIPE channel FUEL fuel GAP" "HEAT_STRUCTURE PIPE channel FUEL fuel CLAD" "HEAT_STRUCTURE PIPE channel FUEL fuel PIPE other" "HEAT_STRUCTURE PIPE channel FUEL fuel FUEL other" "HEAT_STRUCTURE PIPE channel FUEL fuel GAP gap GAP other" "HEAT_STRUCTURE PIPE channel FUEL fuel CLAD clad CLAD other"; do
   echo "Rejecting invalid heat-structure declaration: ${declaration}"
@@ -340,12 +367,8 @@ for axial in 0 1; do
   exitifwrong $?
   answerzero2 relap7-core-verify.fee ${conduction} 1 2e-3
   exitifwrong $?
-  if [ ${axial} = 0 ]; then
-    expected="604.544 1404.87 763.445 617.127 0.293606"
-  else
-    expected="604.544 1404.87 763.444 617.127 0.293606"
-  fi
-  answer2 relap7-core-startup.fee ${conduction} 50 "${expected}"
+  # Vertical channel with gravity, as in the manual.
+  answer2 relap7-core-startup.fee ${conduction} 50 "604.559 1404.89 763.46 617.143 0.293606"
   exitifwrong $?
 done
 

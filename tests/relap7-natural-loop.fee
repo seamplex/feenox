@@ -1,11 +1,13 @@
-# RELAP-7 Example 10, IF97 water at elevated pressure to remain single phase.
+# RELAP-7 Example 10 with IF97 water at the manual's 2 bar (it stays subcooled).
 # The core is an equivalent fuel-clad bundle; the secondary is counterflow.
-# The wall retains the manual's depth=1 and explicit bundle interface perimeters.
+# RELAP-7 applies the wall flux per unit area and scales it by P_hf on the fluid side,
+# so its steady wall behaves as a plate of width P_hf. Using DEPTH = P_hf keeps that
+# steady state and conserves energy; the wall heat capacity is P_hf/1 times RELAP-7's.
 DEFAULT_ARGUMENT_VALUE 1 relap7-natural-loop.msh
 DEFAULT_ARGUMENT_VALUE 2 50
 DEFAULT_ARGUMENT_VALUE 3 1
 DEFAULT_ARGUMENT_VALUE 4 1
-DEFAULT_ARGUMENT_VALUE 5 15.5e6
+DEFAULT_ARGUMENT_VALUE 5 2e5
 DEFAULT_ARGUMENT_VALUE 6 1
 PROBLEM thermal_hydraulics DIM 3 MESH $1
 end_time = $2
@@ -32,9 +34,8 @@ MATERIAL core {
 }
 HEAT_STRUCTURE PIPE core FUEL fuel CLAD clad
 HEAT_STRUCTURE NAME exchanger {
-  TYPE PLATE MATERIAL wall THICKNESS 0.0044 CELLS 2 DEPTH 1
+  TYPE PLATE MATERIAL wall THICKNESS 0.0044 CELLS 2 DEPTH 327.56886
   PRIMARY primary SECONDARY secondary H_PRIMARY 1.6129e5 H_SECONDARY 1.6129e5
-  PERIMETER_PRIMARY 327.56886 PERIMETER_SECONDARY 327.56886
   AXIS 0 0 1
 }
 JUNCTION POINT junction1 K=0.5 A_ref=0.44934

@@ -197,16 +197,29 @@ int feenox_problem_solve_post_thermal_hydraulics(void) {
     double rho = thermal_hydraulics.fluid.rho(p, T);
     
     // the velocity and mass flow at the nodes are the average of the adjacent pipes
+    // (merged points average the pipes that geometrically end at them)
     double mdot = 0;
     double v = 0;
-    for (size_t i = 0; i < node->n_pipes; i++) {
-      th_pipe_t *pipe = &thermal_hydraulics.pipes[node->pipe[i]];
-      double mdot_pipe = x[TH_MDOT(node->pipe[i])];
+    size_t n = 0;
+    for (size_t i = 0; i < thermal_hydraulics.n_pipes; i++) {
+      size_t k = i;
+      if (node->alias == j) {
+        if (i >= node->n_pipes) break;
+        k = node->pipe[i];
+      } else if (thermal_hydraulics.pipes[k].element->node[0]->index_mesh != j &&
+                 thermal_hydraulics.pipes[k].element->node[1]->index_mesh != j) {
+        continue;
+      }
+      th_pipe_t *pipe = &thermal_hydraulics.pipes[k];
+      double mdot_pipe = x[TH_MDOT(k)];
       mdot += mdot_pipe;
       v += mdot_pipe / (rho * pipe->A);
+      n++;
     }
-    mdot /= node->n_pipes;
-    v /= node->n_pipes;
+    if (n > 0) {
+      mdot /= n;
+      v /= n;
+    }
     
     feenox_vector_set(thermal_hydraulics.rho_function->vector_value, j, rho);
     feenox_vector_set(thermal_hydraulics.h_function->vector_value, j, thermal_hydraulics.fluid.h(p, T));
@@ -214,8 +227,8 @@ int feenox_problem_solve_post_thermal_hydraulics(void) {
     feenox_vector_set(thermal_hydraulics.mdot_function->vector_value, j, mdot);
     int first_rod = 1;
     for (th_heat_structure_t *hs = thermal_hydraulics.heat_structures; hs != NULL; hs = hs->hh.next) {
-      size_t column = j;
-      if (hs->exchanger && hs->node_length[j] == 0 && hs->partner[j] < thermal_hydraulics.n_nodes) column = hs->partner[j];
+      size_t column = node->alias;
+      if (hs->exchanger && hs->node_length[column] == 0 && hs->partner[column] < thermal_hydraulics.n_nodes) column = hs->partner[column];
       int active = hs->node_length[column] > 0;
       double center = active ? x[TH_SOLID(hs,column,0)] : NAN;
       double fuel_surface = active ? x[TH_SOLID(hs,column,hs->fuel_surface)] : NAN;
@@ -637,6 +650,13 @@ static int thermal_hydraulics_set_initial_conditions(void) {
       }
     }
   }
+  // merged points start with the state of their representative node
+  for (size_t j = 0; j < thermal_hydraulics.n_nodes; j++) {
+    size_t m = thermal_hydraulics.nodes[j].alias;
+    if (m == j) continue;
+    x[TH_P(j)] = x[TH_P(m)];
+    x[TH_T(j)] = x[TH_T(m)];
+  }
   for (size_t k = 0; k < thermal_hydraulics.n_pipes; k++) {
     th_pipe_t *pipe = &thermal_hydraulics.pipes[k];
     double xx[3];
@@ -784,13 +804,13 @@ static int thermal_hydraulics_update_junctions(void) {
       feenox_push_error_message("point component needs a non-empty physical point group, not '%s'", group->name);
       return FEENOX_ERROR;
     }
-    if (point != NULL && point->is_pump && group->n_elements != 1) {
-      feenox_push_error_message("PUMP '%s' needs exactly one physical point", group->name);
+    if (point != NULL && point->is_pump && group->n_elements != 1 && !point->merge) {
+      feenox_push_error_message("PUMP '%s' needs exactly one physical point (or MERGE)", group->name);
       return FEENOX_ERROR;
     }
     for (size_t e = 0; e < group->n_elements; e++) {
       element_t *element = &mesh->element[group->element[e]];
-      size_t j = element->node[0]->index_mesh;
+      size_t j = thermal_hydraulics.nodes[element->node[0]->index_mesh].alias;
       th_node_t *node = &thermal_hydraulics.nodes[j];
       if (node->n_pipes < 2) {
         feenox_push_error_message("junction point '%s' at node %ld needs at least two attached pipes", group->name, mesh->node[j].tag);
@@ -1018,7 +1038,7 @@ static int thermal_hydraulics_update_properties(void) {
       node->V += 0.5 * pipe->A * pipe->L;
       node->Q += 0.5 * pipe->q * pipe->A * pipe->L;
     }
-    node->A = thermal_hydraulics.pipes[node->pipe[0]].A;
+    node->A = (node->n_pipes > 0) ? thermal_hydraulics.pipes[node->pipe[0]].A : 0;
     
     node->has_p = node->has_T = node->has_rho = node->has_v = node->has_mdot = 0;
     node->has_p0 = node->has_T0 = 0;
@@ -1086,6 +1106,10 @@ static int thermal_hydraulics_update_properties(void) {
   thermal_hydraulics.mdot_ref = 0;
   for (size_t j = 0; j < thermal_hydraulics.n_nodes; j++) {
     th_node_t *node = &thermal_hydraulics.nodes[j];
+    if (node->alias != j &&(node->has_p || node->has_T || node->has_rho || node->has_v || node->has_mdot || node->has_p0 || node->has_T0)) {
+      feenox_push_error_message("node %ld belongs to a MERGE point group and cannot have boundary conditions", mesh->node[j].tag);
+      return FEENOX_ERROR;
+    }
     if (node->has_p0 != node->has_T0) {
       feenox_push_error_message("node %ld requires both 'p0' and 'T0' boundary conditions", mesh->node[j].tag);
       return FEENOX_ERROR;
@@ -1301,7 +1325,8 @@ static int thermal_hydraulics_create_jacobian(void) {
   feenox_check_alloc(nnz = calloc(size, sizeof(PetscInt)));
   for (size_t j = 0; j < N; j++) {
     // own p & T plus mdot and p & T of the neighbor for each pipe
-    nnz[TH_P(j)] = nnz[TH_T(j)] = 2 + 3*thermal_hydraulics.nodes[j].n_pipes;
+    // (merged points only couple to their representative's p & T)
+    nnz[TH_P(j)] = nnz[TH_T(j)] = 4 + 3*thermal_hydraulics.nodes[j].n_pipes;
     for (th_heat_structure_t *hs = thermal_hydraulics.heat_structures; hs != NULL; hs = hs->hh.next) {
       nnz[TH_T(j)]++;
       for (size_t i = 0; i < hs->nr; i++) {
@@ -1326,6 +1351,10 @@ static int thermal_hydraulics_create_jacobian(void) {
       cols[1] = TH_T(j);
       petsc_call(MatSetValue(thermal_hydraulics.J, row, cols[0], 0, INSERT_VALUES));
       petsc_call(MatSetValue(thermal_hydraulics.J, row, cols[1], 0, INSERT_VALUES));
+      if (node->alias != j) {
+        petsc_call(MatSetValue(thermal_hydraulics.J, row, TH_P(node->alias), 0, INSERT_VALUES));
+        petsc_call(MatSetValue(thermal_hydraulics.J, row, TH_T(node->alias), 0, INSERT_VALUES));
+      }
       for (size_t i = 0; i < node->n_pipes; i++) {
         th_pipe_t *pipe = &thermal_hydraulics.pipes[node->pipe[i]];
         size_t other = (pipe->a == j) ? pipe->b : pipe->a;
@@ -1533,7 +1562,14 @@ static PetscErrorCode thermal_hydraulics_residual(SNES snes, Vec X, Vec R, void 
   for (size_t j = 0; j < thermal_hydraulics.n_nodes; j++) {
     th_node_t *node = &thermal_hydraulics.nodes[j];
     double p = x[TH_P(j)];
-    
+
+    if (node->alias != j) {
+      // a merged point carries the state of its representative node
+      r[TH_P(j)] = (p - x[TH_P(node->alias)]) / thermal_hydraulics.p_ref;
+      r[TH_T(j)] = x[TH_T(j)] - x[TH_T(node->alias)];
+      continue;
+    }
+
     double net_in = 0;          // net mass flow entering the node through the pipes
     double energy = node->Q;    // energy balance in W
     if (node->pump != NULL) {
