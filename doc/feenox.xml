@@ -63,6 +63,7 @@
       <item>GROUPS</item>
       <item>HANDLE_HANGING_NODES</item>
       <item>HEADER</item>
+      <item>HEAT_STRUCTURE</item>
       <item>HISTORY</item>
       <item>ID</item>
       <item>IF</item>
@@ -80,6 +81,7 @@
       <item>INTERPOLATION</item>
       <item>INTERPOLATION_THRESHOLD</item>
       <item>IS</item>
+      <item>JUNCTION</item>
       <item>K</item>
       <item>K_bc</item>
       <item>KSP</item>
@@ -141,6 +143,7 @@
       <item>PROBLEM</item>
       <item>PROGRESS</item>
       <item>PROGRESS_ASCII</item>
+      <item>PUMP</item>
       <item>QUASISTATIC</item>
       <item>QUASISTATIC_DUMB</item>
       <item>RANGE_MAX</item>
@@ -305,6 +308,7 @@
       <item>mumps_cntl_1</item>
       <item>mumps_icntl_14</item>
       <item>mumps_icntl_24</item>
+      <item>nearest_node_threshold</item>
       <item>nodes_rough</item>
       <item>nu</item>
       <item>nu_xy</item>
@@ -445,11 +449,14 @@
       <item>vecdot</item>
       <item>vecmax</item>
       <item>vecmaxindex</item>
+      <item>vecmean</item>
       <item>vecmin</item>
       <item>vecminindex</item>
       <item>vecnorm</item>
+      <item>vecsd</item>
       <item>vecsize</item>
       <item>vecsum</item>
+      <item>vecvariance</item>
       <item>wall_time</item>
     </list>
     <contexts>

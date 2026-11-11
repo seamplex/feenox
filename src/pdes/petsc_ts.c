@@ -157,6 +157,9 @@ int feenox_problem_setup_ts(TS ts) {
   petsc_call(TSAdaptSetStepLimits(adapt, (feenox_special_var_value(min_dt) > 0) ? (1-1e-8)*feenox_special_var_value(min_dt) : PETSC_DEFAULT,
                                          (feenox_special_var_value(max_dt) > 0) ? (1+1e-8)*feenox_special_var_value(max_dt) : feenox_special_var_value(end_time)));
   
+  // tolerances for the local-error-based adaptation
+  petsc_call(TSSetTolerances(ts, feenox_var_value(feenox.pde.vars.ts_atol), NULL, feenox_var_value(feenox.pde.vars.ts_rtol), NULL));
+
   // physics-specific defaults (to be overridden by the command-line options)
   if (feenox.pde.setup_ts != NULL) {
     feenox_call(feenox.pde.setup_ts(ts));

@@ -173,6 +173,16 @@ struct thermal_hydraulics_t {
   
   // gravity
   var_t *g[3];
+
+  // iteration-based time-step control
+  var_t *dt_grow_iterations;
+  var_t *dt_shrink_iterations;
+  var_t *dt_factor;
+
+  // scales of the local-error-based time-step control
+  var_t *ts_scale_p;
+  var_t *ts_scale_T;
+  var_t *ts_scale_mdot;
   
   // mesh-based data
   size_t n_nodes;

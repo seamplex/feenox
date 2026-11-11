@@ -80,8 +80,9 @@ int feenox_problem_parse_time_init_thermal_hydraulics(void) {
 ///pr_thermal_hydraulics+T_solid_0+description If absent with prescribed fluid initial conditions, the solid starts at the local initial fluid temperature.
 ///pr_thermal_hydraulics+T_solid_0+description Without any initial fields, a coupled steady state initializes the transient.
 ///pr_thermal_hydraulics+T_solid_0+description Transients use PETSc's TS with backward Euler, which damps the acoustic waves, and adaptive time steps by default.
-///pr_thermal_hydraulics+T_solid_0+description The step is doubled after a step whose Newton solve took at most three iterations and halved after one that took eight or more, within `min_dt` and `max_dt`.
-///pr_thermal_hydraulics+T_solid_0+description A step whose nonlinear solve fails is retried with half the step.
+///pr_thermal_hydraulics+T_solid_0+description The step is multiplied by `dt_factor` (default 2) after a step whose Newton solve took at most `dt_grow_iterations` (default 3) iterations
+///pr_thermal_hydraulics+T_solid_0+description and divided by it after one that took `dt_shrink_iterations` (default 8) or more, within `min_dt` and `max_dt`.
+///pr_thermal_hydraulics+T_solid_0+description A step whose nonlinear solve fails is retried with the step divided by `dt_factor`.
 ///pr_thermal_hydraulics+T_solid_0+description Assigning `dt_0` sets the first step only, while assigning `dt` (i.e. `dt = 0.1`) dictates a fixed step.
 ///pr_thermal_hydraulics+T_solid_0+description Other schemes can be chosen with `TRANSIENT_SOLVER` (e.g. `bdf`) and local-error control with `TIME_ADAPTATION basic`.
 ///pr_thermal_hydraulics+T_solid_0+description Each control volume carries its mass and internal energy as unknowns, so any linear multistep scheme conserves them discretely.
@@ -93,6 +94,44 @@ int feenox_problem_parse_time_init_thermal_hydraulics(void) {
 ///va_thermal_hydraulics+g_z+detail The $z$ component of the gravity acceleration vector in m/s^2. Default is zero.
 ///va_thermal_hydraulics+g_z+detail Set `g_z = -9.81` for the usual case of having $z$ pointing upwards.
   feenox_check_alloc(thermal_hydraulics.g[2] = feenox_get_or_define_variable_get_ptr("g_z"));
+
+///va_thermal_hydraulics+dt_grow_iterations+detail Iteration-based time-step control: the next time step is multiplied by `dt_factor`
+///va_thermal_hydraulics+dt_grow_iterations+detail if the nonlinear solver took at most this number of iterations. Default is 3.
+  feenox_check_alloc(thermal_hydraulics.dt_grow_iterations = feenox_get_or_define_variable_get_ptr("dt_grow_iterations"));
+  feenox_var_value(thermal_hydraulics.dt_grow_iterations) = 3;
+///va_thermal_hydraulics+dt_shrink_iterations+detail Iteration-based time-step control: the next time step is divided by `dt_factor`
+///va_thermal_hydraulics+dt_shrink_iterations+detail if the nonlinear solver took at least this number of iterations. Default is 8.
+  feenox_check_alloc(thermal_hydraulics.dt_shrink_iterations = feenox_get_or_define_variable_get_ptr("dt_shrink_iterations"));
+  feenox_var_value(thermal_hydraulics.dt_shrink_iterations) = 8;
+///va_thermal_hydraulics+dt_factor+detail Iteration-based time-step control: factor by which the time step grows or shrinks.
+///va_thermal_hydraulics+dt_factor+detail A step whose nonlinear solve fails is retried with the step divided by this factor. Default is 2.
+///va_thermal_hydraulics+dt_factor+detail The iteration-based control applies when there is no `TIME_ADAPTATION` and the input does not assign `dt`.
+  feenox_check_alloc(thermal_hydraulics.dt_factor = feenox_get_or_define_variable_get_ptr("dt_factor"));
+  feenox_var_value(thermal_hydraulics.dt_factor) = 2;
+
+///va_thermal_hydraulics+ts_scale_p+detail Pressure scale in Pa for the local-error-based time-step control (i.e. `TIME_ADAPTATION basic`).
+///va_thermal_hydraulics+ts_scale_p+detail The step is accepted if the estimated error in each pressure is below `ts_atol` times this scale,
+///va_thermal_hydraulics+ts_scale_p+detail so it should be small compared to the pressure differences that drive the flow. Default is 1000 Pa.
+  feenox_check_alloc(thermal_hydraulics.ts_scale_p = feenox_get_or_define_variable_get_ptr("ts_scale_p"));
+  feenox_var_value(thermal_hydraulics.ts_scale_p) = 1e3;
+///va_thermal_hydraulics+ts_scale_T+detail Temperature scale in K for the local-error-based time-step control, for both the fluid and the heat structures. Default is 1 K.
+  feenox_check_alloc(thermal_hydraulics.ts_scale_T = feenox_get_or_define_variable_get_ptr("ts_scale_T"));
+  feenox_var_value(thermal_hydraulics.ts_scale_T) = 1;
+///va_thermal_hydraulics+ts_scale_mdot+detail Mass-flow scale in kg/s for the local-error-based time-step control.
+///va_thermal_hydraulics+ts_scale_mdot+detail The error in each mass flow is compared against `ts_atol` times this scale plus `ts_rtol` times the flow itself.
+///va_thermal_hydraulics+ts_scale_mdot+detail Default is zero, meaning the largest mass flow of the initial state but at least 0.01 kg/s.
+///va_thermal_hydraulics+ts_scale_mdot+detail Pressures and temperatures do not have a relative tolerance because their zeros are arbitrary
+///va_thermal_hydraulics+ts_scale_mdot+detail and the masses and internal energies of the control volumes are not checked because they follow from them.
+///va_thermal_hydraulics+ts_scale_mdot+detail The error is measured with the maximum over all the unknowns (`-ts_adapt_wnormtype infinity`).
+///va_thermal_hydraulics+ts_scale_mdot+detail For thermal hydraulics, the defaults for `ts_atol` and `ts_rtol` are 0.1 (i.e. 100 Pa, 0.1 K and 10% of the flow scale).
+  feenox_check_alloc(thermal_hydraulics.ts_scale_mdot = feenox_get_or_define_variable_get_ptr("ts_scale_mdot"));
+  feenox_var_value(thermal_hydraulics.ts_scale_mdot) = 0;
+  // with the scales above, ts_atol and ts_rtol are dimensionless so the
+  // general default 1e-4 (0.1 Pa and 0.1 mK) is far too tight
+  if (feenox.pde.vars.ts_atol != NULL && feenox.pde.vars.ts_rtol != NULL) {
+    feenox_var_value(feenox.pde.vars.ts_atol) = 0.1;
+    feenox_var_value(feenox.pde.vars.ts_rtol) = 0.1;
+  }
   
   // so far, the only fluid is liquid water
   thermal_hydraulics.fluid.name = "water-if97";

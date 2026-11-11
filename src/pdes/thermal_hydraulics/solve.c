@@ -196,20 +196,29 @@ int feenox_problem_setup_pc_thermal_hydraulics(PC pc) {
 // the step grows while newton converges easily and shrinks when it struggles,
 // failed steps are retried with half the step. an input that assigns dt in
 // every step (i.e. dt = 0.1) dictates a fixed step that overrides this choice
-#define TH_DT_ITS_GROW     3    // grow if newton took at most these iterations
-#define TH_DT_ITS_SHRINK   8    // shrink if it took at least these
-#define TH_DT_FACTOR       2.0
+// the thresholds and the factor are the special variables
+// dt_grow_iterations, dt_shrink_iterations and dt_factor
 PetscErrorCode thermal_hydraulics_ts_post_step(TS ts) {
+  // only if PETSc is not adapting the step on its own (i.e. -ts_adapt_type basic)
+  TSAdapt adapt;
+  TSAdaptType adapt_type;
+  petsc_call(TSGetAdapt(ts, &adapt));
+  petsc_call(TSAdaptGetType(adapt, &adapt_type));
+  if (strcmp(adapt_type, TSADAPTNONE) != 0) {
+    return PETSC_SUCCESS;
+  }
+
   SNES snes = NULL;
   PetscInt its = 0;
   PetscReal dt = 0;
   petsc_call(TSGetSNES(ts, &snes));
   petsc_call(SNESGetIterationNumber(snes, &its));
   petsc_call(TSGetTimeStep(ts, &dt));
-  if (its <= TH_DT_ITS_GROW) {
-    dt *= TH_DT_FACTOR;
-  } else if (its >= TH_DT_ITS_SHRINK) {
-    dt /= TH_DT_FACTOR;
+  double factor = feenox_var_value(thermal_hydraulics.dt_factor);
+  if (its <= feenox_var_value(thermal_hydraulics.dt_grow_iterations)) {
+    dt *= factor;
+  } else if (its >= feenox_var_value(thermal_hydraulics.dt_shrink_iterations)) {
+    dt /= factor;
   }
   if (feenox_special_var_value(max_dt) > 0 && dt > feenox_special_var_value(max_dt)) {
     dt = feenox_special_var_value(max_dt);
@@ -219,6 +228,71 @@ PetscErrorCode thermal_hydraulics_ts_post_step(TS ts) {
   }
   petsc_call(TSSetTimeStep(ts, dt));
   return PETSC_SUCCESS;
+}
+
+// per-unknown tolerances for the local-error-based step control: absolute
+// errors scaled with physical references for p and T (their zeros are
+// arbitrary so no relative tolerance), absolute plus relative for mdot and
+// nothing for M and U which are determined by p and T
+int thermal_hydraulics_set_tolerances(TS ts) {
+  double atol = feenox_var_value(feenox.pde.vars.ts_atol);
+  double rtol = feenox_var_value(feenox.pde.vars.ts_rtol);
+  double scale_p = feenox_var_value(thermal_hydraulics.ts_scale_p);
+  double scale_T = feenox_var_value(thermal_hydraulics.ts_scale_T);
+  double scale_mdot = feenox_var_value(thermal_hydraulics.ts_scale_mdot);
+  if (scale_p <= 0 || scale_T <= 0 || scale_mdot < 0) {
+    feenox_push_error_message("ts_scale_p and ts_scale_T have to be positive and ts_scale_mdot non-negative");
+    return FEENOX_ERROR;
+  }
+
+  const PetscScalar *x = NULL;
+  petsc_call(VecGetArrayRead(feenox.pde.phi, &x));
+  if (scale_mdot == 0) {
+    scale_mdot = 1e-2;
+    for (size_t k = 0; k < thermal_hydraulics.n_pipes; k++) {
+      if (fabs(x[TH_MDOT(k)]) > scale_mdot) {
+        scale_mdot = fabs(x[TH_MDOT(k)]);
+      }
+    }
+  }
+  petsc_call(VecRestoreArrayRead(feenox.pde.phi, &x));
+
+  Vec vatol, vrtol;
+  petsc_call(VecDuplicate(feenox.pde.phi, &vatol));
+  petsc_call(VecDuplicate(feenox.pde.phi, &vrtol));
+  PetscScalar *a = NULL;
+  PetscScalar *r = NULL;
+  petsc_call(VecGetArray(vatol, &a));
+  petsc_call(VecGetArray(vrtol, &r));
+  // the solids (and anything else) are temperatures
+  for (PetscInt i = 0; i < feenox.pde.size_global; i++) {
+    a[i] = atol*scale_T;
+    r[i] = 0;
+  }
+  for (size_t j = 0; j < thermal_hydraulics.n_nodes; j++) {
+    a[TH_P(j)] = atol*scale_p;
+    a[TH_T(j)] = atol*scale_T;
+    a[TH_MASS(j)] = PETSC_MAX_REAL;
+    a[TH_ENERGY(j)] = PETSC_MAX_REAL;
+  }
+  for (size_t k = 0; k < thermal_hydraulics.n_pipes; k++) {
+    a[TH_MDOT(k)] = atol*scale_mdot;
+    r[TH_MDOT(k)] = rtol;
+  }
+  petsc_call(VecRestoreArray(vatol, &a));
+  petsc_call(VecRestoreArray(vrtol, &r));
+  petsc_call(TSSetTolerances(ts, PETSC_CURRENT, vatol, PETSC_CURRENT, vrtol));
+  petsc_call(VecDestroy(&vatol));
+  petsc_call(VecDestroy(&vrtol));
+
+  // a large error in a single place should not be averaged out
+  PetscBool set = PETSC_FALSE;
+  petsc_call(PetscOptionsHasName(NULL, NULL, "-ts_adapt_wnormtype", &set));
+  if (set == PETSC_FALSE) {
+    petsc_call(PetscOptionsSetValue(NULL, "-ts_adapt_wnormtype", "infinity"));
+  }
+
+  return FEENOX_OK;
 }
 
 // backward euler (it damps the acoustic waves) with iteration-based step
@@ -233,8 +307,18 @@ int feenox_problem_setup_ts_thermal_hydraulics(TS ts) {
     petsc_call(TSAdaptSetType(adapt, TSADAPTNONE));
     petsc_call(TSSetPostStep(ts, thermal_hydraulics_ts_post_step));
   }
-  // retry failed steps with half the step (at most 10 times per step) 
-  petsc_call(TSAdaptSetScaleSolveFailed(adapt, 1.0/TH_DT_FACTOR));
+  if (feenox_var_value(thermal_hydraulics.dt_factor) <= 1) {
+    feenox_push_error_message("dt_factor has to be greater than one and not %g", feenox_var_value(thermal_hydraulics.dt_factor));
+    return FEENOX_ERROR;
+  }
+  if (feenox_var_value(thermal_hydraulics.dt_grow_iterations) >= feenox_var_value(thermal_hydraulics.dt_shrink_iterations)) {
+    feenox_push_error_message("dt_grow_iterations (%g) has to be less than dt_shrink_iterations (%g)", feenox_var_value(thermal_hydraulics.dt_grow_iterations), feenox_var_value(thermal_hydraulics.dt_shrink_iterations));
+    return FEENOX_ERROR;
+  }
+  feenox_call(thermal_hydraulics_set_tolerances(ts));
+
+  // retry failed steps with a smaller step (at most 10 times per step)
+  petsc_call(TSAdaptSetScaleSolveFailed(adapt, 1.0/feenox_var_value(thermal_hydraulics.dt_factor)));
   petsc_call(TSSetMaxSNESFailures(ts, PETSC_UNLIMITED));
   return FEENOX_OK;
 }

@@ -96,6 +96,11 @@ for ts in beuler bdf cn; do
   answerzero1 thermal-hydraulics-closed-loop.fee ${ts} 1e-9
   exitifwrong $?
 done
+# same with the local-error-based step control (scaled per-unknown tolerances)
+for ts in beuler bdf; do
+  answerzero1 thermal-hydraulics-closed-loop.fee "${ts} 0.1 --ts_adapt_type=basic" 1e-9
+  exitifwrong $?
+done
 gmsh -v 0 -1 ${dir}/thermal-hydraulics-pump.geo || exit $?
 checkpump thermal-hydraulics-pump.fee 1 1000 1 thermal-hydraulics-pump.msh
 checkpump thermal-hydraulics-pump.fee 1 1000 "if(t<0.2,0,1)" relap7-two-pipes.msh 1 10
