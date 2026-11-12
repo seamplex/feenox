@@ -189,7 +189,7 @@ int feenox_instruction_mesh_read(void *arg) {
   }
 
   if (mesh->n_cells == 0) {
-    mesh->n_cells = mesh->n_elements_per_dim[mesh->dim];
+    mesh->n_cells = mesh->n_elements_per_dim[mesh->dim_topo];
   }
   
   if (mesh == feenox.mesh.mesh_main) {
