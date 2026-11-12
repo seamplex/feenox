@@ -21,7 +21,9 @@ head(b) = flow(b)^2/(2*rho(0,0,0)*area(b)^2)
 local_loss(b) = loss(b)*flow(b)^2/(2*rho(0,0,0)*3^2)
 port(b) = p(0,0,0)+(3472.5/3)^2/(2*rho(0,0,0))-head(b)+if(b<3,1,-1)*local_loss(b)
 drop(b) = if(b<3,pressure(b,0)-port(b),port(b)-pressure(b,1))
-momentum_error(b) = abs(drop(b)-sum(friction(b,i),i,1,50)-acceleration(b))/1e4
+# only branch 5 is vertical (z from 0 to 1): hydrostatic head with the element densities
+hydrostatic(b) = -g_z*if(b=5,1,0)*sum(0.5*(density(b,(i-1)/50)+density(b,i/50))/50,i,1,50)
+momentum_error(b) = abs(drop(b)-sum(friction(b,i),i,1,50)-acceleration(b)-hydrostatic(b))/1e4
 wall_heat(b) = 0.01*(wall(b,0)+wall(b,1))+0.02*sum(wall(b,i/50),i,1,49)
 # The inlet boundary half cell has already heated the reported inlet enthalpy.
 boundary_energy(b) = if(b<3,-1,1)*flow(b)*if(b<3,enthalpy(b,0)-0.01*wall(b,0)/flow(b),enthalpy(b,1))

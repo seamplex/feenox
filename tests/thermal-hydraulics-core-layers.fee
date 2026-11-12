@@ -1,6 +1,8 @@
 DEFAULT_ARGUMENT_VALUE 1 "fuel_radius=0.00348 fuel_cells=4"
 DEFAULT_ARGUMENT_VALUE 2 0.00348
 PROBLEM thermal_hydraulics DIM 3 MESH relap7-core-channel.msh
+# no gravity: this checks the stored energy of the solid layers with zero power
+g_z = 0
 MATERIAL solid k=29.3 rho_s=14583 cp=191.67
 MATERIAL channel {
   A=0.44934 D_h=0.002972 f=0.022 h_wall=1.6129e5
