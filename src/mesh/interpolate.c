@@ -112,11 +112,10 @@ int feenox_mesh_interp_solve_for_r(element_t *this, const double *x, double *r) 
                                     &feenox_mesh_interp_residual_jacob,
                                     this->type->dim, &p};
   
-  if (this->type->dim == 1) {
+  if (this->type->id == ELEMENT_TYPE_LINE2) {
 
-    // lines may point in any direction (e.g. pipes in 3D), so project the point
-    // onto the segment between the end nodes (nodes 0 and 1 for line2 and line3)
-    // this is exact for line2 and for line3 with the middle node in the middle
+    // Straight first-order lines may point in any direction (e.g. pipes in 3D),
+    // so project the point onto the segment between the two end nodes.
     double L2 = 0, t = 0;
     for (int m = 0; m < 3; m++) {
       double d = this->node[1]->x[m] - this->node[0]->x[m];
