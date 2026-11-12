@@ -327,7 +327,7 @@ double mesh_interpolate_function_cell(struct function_t *function, const double 
 }
 */
 
-double feenox_function_property_eval(struct function_t *function, const double *x) {
+double feenox_function_property_eval(struct function_t *function, const double *x_arg) {
   double y = 0;
   property_data_t *property_data = NULL;
   property_t *property = function->property;
@@ -338,7 +338,15 @@ double feenox_function_property_eval(struct function_t *function, const double *
   if (mesh == NULL || mesh->n_nodes == 0) {
     return 1.0;
   }
-  
+
+  // same as in feenox_mesh_interpolate_function_node(): the argument has as many
+  // components as the function has arguments but the element lookup may read
+  // the three of them, so pad with zeros
+  double x[3] = {0, 0, 0};
+  for (int d = 0; d < function->n_arguments && d < 3; d++) {
+    x[d] = x_arg[d];
+  }
+
   node_t *node = feenox_mesh_find_nearest_node(function->mesh, x);
   element_t *element = feenox_mesh_find_element(function->mesh, node, x);
   
