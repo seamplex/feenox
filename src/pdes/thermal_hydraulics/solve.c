@@ -281,7 +281,13 @@ int thermal_hydraulics_set_tolerances(TS ts) {
   }
   petsc_call(VecRestoreArray(vatol, &a));
   petsc_call(VecRestoreArray(vrtol, &r));
+  // keep the scalar tolerances, only the per-unknown vectors are set
+#if PETSC_VERSION_LT(3,22,0)
+  // before 3.22 PETSC_CURRENT did not exist and PETSC_DECIDE meant "leave unchanged"
+  petsc_call(TSSetTolerances(ts, PETSC_DECIDE, vatol, PETSC_DECIDE, vrtol));
+#else
   petsc_call(TSSetTolerances(ts, PETSC_CURRENT, vatol, PETSC_CURRENT, vrtol));
+#endif
   petsc_call(VecDestroy(&vatol));
   petsc_call(VecDestroy(&vrtol));
 
@@ -319,7 +325,12 @@ int feenox_problem_setup_ts_thermal_hydraulics(TS ts) {
 
   // retry failed steps with a smaller step (at most 10 times per step)
   petsc_call(TSAdaptSetScaleSolveFailed(adapt, 1.0/feenox_var_value(thermal_hydraulics.dt_factor)));
+#if PETSC_VERSION_LT(3,22,0)
+  // before 3.22 PETSC_UNLIMITED did not exist and -1 meant unlimited
+  petsc_call(TSSetMaxSNESFailures(ts, -1));
+#else
   petsc_call(TSSetMaxSNESFailures(ts, PETSC_UNLIMITED));
+#endif
   return FEENOX_OK;
 }
 #endif
