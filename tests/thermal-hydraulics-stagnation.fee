@@ -7,4 +7,4 @@ MATERIAL pipe2 A=0.785398163e-4 D_h=0.01 f=0.01
 BC $2 $1
 BC outlet p=1e6 T=300
 SOLVE_PROBLEM
-PRINT abs((p(0)+rho(0)*v(0)^2/2)/1.005e6-1)+abs((h(0)+v(0)^2/2)/533466.6946390772-1)+abs(mdot(1)/mdot(0)-1)
+PRINT abs((p(0,0,0)+rho(0,0,0)*v(0,0,0)^2/2)/1.005e6-1)+abs((h(0,0,0)+v(0,0,0)^2/2)/533466.6946390772-1)+abs(mdot(1,0,0)/mdot(0,0,0)-1)

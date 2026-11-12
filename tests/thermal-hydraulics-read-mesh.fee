@@ -11,4 +11,4 @@ SOLVE_PROBLEM
 
 mdot_ref = 753.632*4.43*8.78882e-5
 dp_ref = 16967.2
-PRINT abs(mdot(1)/mdot_ref-1)+abs((p(0)-p(2))/dp_ref-1)
+PRINT abs(mdot(1,0,0)/mdot_ref-1)+abs((p(0,0,0)-p(2,0,0))/dp_ref-1)

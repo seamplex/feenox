@@ -8,4 +8,4 @@ MATERIAL connection2 K=2
 BC inlet rho=995 v=1
 BC outlet p=95000
 SOLVE_PROBLEM
-PRINT abs(mdot(1.5)/1990-1)+abs((p(0)-p(3))/(497.5*(3+2*0.5+2*2))-1)+abs(h(3)-h(0))/1000
+PRINT abs(mdot(1.5,0,0)/1990-1)+abs((p(0,0,0)-p(3,0,0))/(497.5*(3+2*0.5+2*2))-1)+abs(h(3,0,0)-h(0,0,0))/1000

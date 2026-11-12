@@ -12,7 +12,7 @@ BC outlet p=15.51e6
 SOLVE_PROBLEM
 
 # Full control volumes at x=0.4,0.8,1.2,1.6; half at x=2.
-wall_heat = coefficient*perimeter*(0.4*((wall_temperature-T(0.4))+(wall_temperature-T(0.8))+(wall_temperature-T(1.2))+(wall_temperature-T(1.6)))+0.2*(wall_temperature-T(2)))
+wall_heat = coefficient*perimeter*(0.4*((wall_temperature-T(0.4,0,0))+(wall_temperature-T(0.8,0,0))+(wall_temperature-T(1.2,0,0))+(wall_temperature-T(1.6,0,0)))+0.2*(wall_temperature-T(2,0,0)))
 IF end_time=0|done
-  PRINT abs(mdot(2)*(h(2)-h(0))-wall_heat)/(1+abs(wall_heat))
+  PRINT abs(mdot(2,0,0)*(h(2,0,0)-h(0,0,0))-wall_heat)/(1+abs(wall_heat))
 ENDIF

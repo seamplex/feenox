@@ -7,6 +7,6 @@ PUMP DIRECTION 1 0 0 POINT connection2 HEAD 2
 BC inlet mdot=1000 T=300
 BC outlet p=1e5 T=300
 SOLVE_PROBLEM
-acceleration = 1000^2*(1/rho(3)-1/rho(0))
-friction(i) = 0.01*0.1/sqrt(4/pi)*1000^2/(rho((i-1)/10)+rho(i/10))
-PRINT abs(mdot(1.5)/1000-1)+abs((h(3)-h(0)-3*9.80665)/1000)+abs((p(0)-p(3)-sum(friction(i),i,1,30)-acceleration+9.80665*(rho(1)+2*rho(2)))/1e4)
+acceleration = 1000^2*(1/rho(3,0,0)-1/rho(0,0,0))
+friction(i) = 0.01*0.1/sqrt(4/pi)*1000^2/(rho((i-1)/10,0,0)+rho(i/10,0,0))
+PRINT abs(mdot(1.5,0,0)/1000-1)+abs((h(3,0,0)-h(0,0,0)-3*9.80665)/1000)+abs((p(0,0,0)-p(3,0,0)-sum(friction(i),i,1,30)-acceleration+9.80665*(rho(1,0,0)+2*rho(2,0,0)))/1e4)

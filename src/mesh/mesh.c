@@ -163,10 +163,13 @@ int feenox_instruction_mesh_read(void *arg) {
   }
  
   // check the dimensions match
+  // dim is the number of coordinates spanned by the nodes (i.e. 1 if only x
+  // varies, 2 if y does and 3 if z does), which can be lower than the spatial
+  // dimension for embedded meshes such as straight pipes in 3D
   if (mesh->dim == 0) {
     mesh->dim = dim;
-  } else if (mesh->dim != dim) {
-    feenox_push_error_message("mesh '%s' has DIMENSION %d but the highest-dimensional element has %d", mesh->file->name, mesh->dim, dim);
+  } else if (mesh->dim < dim || (mesh->dim > dim && feenox.pde.embedded_mesh == 0)) {
+    feenox_push_error_message("mesh '%s' is declared with DIMENSIONS %d but its nodes span %d coordinates", mesh->file->name, mesh->dim, dim);
     return FEENOX_ERROR;
   }
     
@@ -271,7 +274,7 @@ int feenox_instruction_mesh_read(void *arg) {
       size_t first_neighbor_nodes = 1;  // el nodo mismo
       element_ll_t *element_item;
       LL_FOREACH(mesh->node[j].element_list, element_item) {
-        if (element_item->element->type->dim == mesh->dim) {
+        if (element_item->element->type->dim == mesh->dim_topo) {
           if (element_item->element->type->id == ELEMENT_TYPE_TETRAHEDRON4 ||
               element_item->element->type->id == ELEMENT_TYPE_TETRAHEDRON10) {
             // los tetrahedros son "buenos" y con esta cuenta nos ahorramos memoria
@@ -354,7 +357,7 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
     element = NULL;
     element_ll_t *element_item = NULL;
     LL_FOREACH(nearest_node->element_list, element_item) {
-      if (element_item->element->type->dim == mesh->dim && element_item->element->type->point_inside(element_item->element, x)) {
+      if (element_item->element->type->dim == mesh->dim_topo && element_item->element->type->point_inside(element_item->element, x)) {
         return element_item->element;
       }  
     }
@@ -413,13 +416,13 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
           cached_element->id = element_item->element->tag;
           HASH_ADD_INT(cache, id, cached_element);
         
-          if (element_item->element->type->dim == mesh->dim && element_item->element->type->point_inside(element_item->element, x)) {
+          if (element_item->element->type->dim == mesh->dim_topo && element_item->element->type->point_inside(element_item->element, x)) {
             element = element_item->element;
             break;
           }
         }  
 #else
-        if (element_item->element->type->dim == mesh->dim && element_item->element->type->point_inside(element_item->element, x)) {
+        if (element_item->element->type->dim == mesh->dim_topo && element_item->element->type->point_inside(element_item->element, x)) {
           element = element_item->element;
           break;
         }
@@ -456,7 +459,7 @@ element_t *feenox_mesh_find_element(mesh_t *mesh, node_t *nearest_node, const do
     if (dist2 < DEFAULT_MULTIDIM_INTERPOLATION_THRESHOLD) {
       element_ll_t *element_item = NULL;
       LL_FOREACH(nearest_node->element_list, element_item) {
-        if (element_item->element->type->dim == mesh->dim) {
+        if (element_item->element->type->dim == mesh->dim_topo) {
           element = element_item->element;
           break;
         }

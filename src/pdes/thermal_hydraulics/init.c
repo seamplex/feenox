@@ -44,12 +44,12 @@ int feenox_problem_parse_time_init_thermal_hydraulics(void) {
   // the scalar unknowns live at the nodes
   feenox.mesh.default_field_location = field_location_nodes;
   
-///pr_thermal_hydraulics+DIMENSIONS+detail Pipes are always topologically one-dimensional but they can live in a space
-///pr_thermal_hydraulics+DIMENSIONS+detail of one, two or three dimensions. The default is one (i.e. pipes along the $x$ axis).
-///pr_thermal_hydraulics+DIMENSIONS+detail For networks in the $x$-$y$ plane or in 3D space use `DIMENSIONS 2` or `DIMENSIONS 3` respectively.
-  if (feenox.pde.dim_by_default) {
-    feenox.pde.dim = 1;
-  }
+///pr_thermal_hydraulics+DIMENSIONS+detail Pipes are always topologically one-dimensional but they live in a space
+///pr_thermal_hydraulics+DIMENSIONS+detail of one, two or three dimensions. The default is three, so spatial functions such as
+///pr_thermal_hydraulics+DIMENSIONS+detail initial conditions and the solution take $(x,y,z)$ as arguments for any network,
+///pr_thermal_hydraulics+DIMENSIONS+detail including straight pipes along the $x$ axis. Use `DIMENSIONS 1` for functions of $x$ only.
+///pr_thermal_hydraulics+DIMENSIONS+detail The nodes may span fewer coordinates than the given dimension, but not more.
+  feenox.pde.embedded_mesh = 1;
   
   // pressure and temperature at the nodes are the primary nodal unknowns
   // the mass flow at the elements is also an unknown but it is not a nodal dof

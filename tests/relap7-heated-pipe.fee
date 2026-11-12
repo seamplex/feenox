@@ -20,5 +20,5 @@ BC outlet p=15.51e6
 SOLVE_PROBLEM
 
 IF end_time=0|done
-  PRINTF "%g %g %g %g" T(0) T(2) p(0)-p(2) mdot(2)
+  PRINTF "%g %g %g %g" T(0,0,0) T(2,0,0) p(0,0,0)-p(2,0,0) mdot(2,0,0)
 ENDIF

@@ -7,4 +7,4 @@ BC outlet rho=753.632 v=4.43
 SOLVE_PROBLEM
 
 expected_heat = flux*(4*8.78882e-5/0.01179)*1.8
-PRINT abs(mdot(1)+753.632*4.43*8.78882e-5)+abs(-mdot(1)*(h(0)-h(2))-expected_heat)/(1+abs(expected_heat))
+PRINT abs(mdot(1,0,0)+753.632*4.43*8.78882e-5)+abs(-mdot(1,0,0)*(h(0,0,0)-h(2,0,0))-expected_heat)/(1+abs(expected_heat))

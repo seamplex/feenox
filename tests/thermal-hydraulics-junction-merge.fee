@@ -13,4 +13,4 @@ BC outlet p=95000
 $3
 SOLVE_PROBLEM
 # both merged points carry the junction state
-PRINT p(0)-p(2+gap) mdot(0.5) mdot(1.5+gap) T(2+gap) p(1)-p(1+gap) T(1)-T(1+gap)
+PRINT p(0,0,0)-p(2+gap,0,0) mdot(0.5,0,0) mdot(1.5+gap,0,0) T(2+gap,0,0) p(1,0,0)-p(1+gap,0,0) T(1,0,0)-T(1+gap,0,0)

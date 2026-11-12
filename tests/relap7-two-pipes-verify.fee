@@ -9,14 +9,14 @@ DEFAULT_ARGUMENT_VALUE 7 1
 INCLUDE relap7-two-pipes.fee
 VAR signed_flow
 section_area(i) = if(i<21,2,1)
-mean_density(i) = (rho((i-1)/20)+rho(i/20))/2
-momentum_term(i) = 0.05/sqrt(4*section_area(i)/pi)*signed_flow*abs(signed_flow)/(2*mean_density(i)*section_area(i)^2)+signed_flow^2/section_area(i)^2*(1/rho(i/20)-1/rho((i-1)/20))
+mean_density(i) = (rho((i-1)/20,0,0)+rho(i/20,0,0))/2
+momentum_term(i) = 0.05/sqrt(4*section_area(i)/pi)*signed_flow*abs(signed_flow)/(2*mean_density(i)*section_area(i)^2)+signed_flow^2/section_area(i)^2*(1/rho(i/20,0,0)-1/rho((i-1)/20,0,0))
 IF end_time=0|done
   # Flux signs follow the geometry, independently of mesh element orientation.
-  signed_flow = if(p(0)>p(2),1990,-1990)
+  signed_flow = if(p(0,0,0)>p(2,0,0),1990,-1990)
   momentum_drop = sum(momentum_term(i),i,1,40)
-  loss_drop = signed_flow*abs(signed_flow)/(2*rho(1))*($5/if($7,$7,2)^2+$6/if($7,$7,1)^2)
-  area_drop = signed_flow^2/(2*rho(1))*(1-1/4)
-  kinetic_change = signed_flow^2/(2*rho(1)^2)*(1-1/4)
-  PRINT abs(abs(mdot(0.5))/1990-1)+abs(abs(mdot(1.5))/1990-1)+abs((p(0)-p(2)-momentum_drop-loss_drop-area_drop)/10000)+abs((h(2)-h(0)+kinetic_change)/1000)
+  loss_drop = signed_flow*abs(signed_flow)/(2*rho(1,0,0))*($5/if($7,$7,2)^2+$6/if($7,$7,1)^2)
+  area_drop = signed_flow^2/(2*rho(1,0,0))*(1-1/4)
+  kinetic_change = signed_flow^2/(2*rho(1,0,0)^2)*(1-1/4)
+  PRINT abs(abs(mdot(0.5,0,0))/1990-1)+abs(abs(mdot(1.5,0,0))/1990-1)+abs((p(0,0,0)-p(2,0,0)-momentum_drop-loss_drop-area_drop)/10000)+abs((h(2,0,0)-h(0,0,0)+kinetic_change)/1000)
 ENDIF

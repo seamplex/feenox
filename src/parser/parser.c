@@ -391,7 +391,7 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_solve());
       return FEENOX_OK;
 
-// TODO: move this to a per-physics parser      
+// TODO: move this to a per-physics parser, these lines break the virtual method concept
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "LINEARIZE_STRESS") == 0) {
       feenox_call(feenox_parse_linearize_stress());
@@ -3397,7 +3397,6 @@ int feenox_parse_problem(void) {
     // if we still do not have a dimension, use 3d
     if (feenox.pde.dim == 0) {
       feenox.pde.dim = 3;
-      feenox.pde.dim_by_default = 1;
     }
   
     feenox_call(feenox_problem_parse_time_init());

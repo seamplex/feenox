@@ -7,4 +7,4 @@ MATERIAL connection K=$1
 BC inlet rho=995 v=1
 BC outlet p=95000
 SOLVE_PROBLEM
-PRINT abs(mdot(1)/1990-1)+abs((p(0)-p(2))/(995*(1+$1))-1)+abs(h(2)-h(0))/1000
+PRINT abs(mdot(1,0,0)/1990-1)+abs((p(0,0,0)-p(2,0,0))/(995*(1+$1))-1)+abs(h(2,0,0)-h(0,0,0))/1000

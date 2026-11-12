@@ -34,9 +34,9 @@ SOLVE_PROBLEM
 IF (end_time=0|done)&$3
   power_error = abs(hs_heat_first/1000-1)+abs(hs_heat_second/2000-1)+abs(hs_heat_third/3000-1)
   sum_error = abs(hs_heat/6000-1)+abs(hs_energy/(hs_energy_first+hs_energy_second+hs_energy_third)-1)
-  radial_error = abs((T_fuel_center_first(0.5)-T_fuel_surface_first(0.5))/(1000/(4*pi*2.5))-1)+abs((T_fuel_center_second(1.5)-T_fuel_surface_second(1.5))/(2000/(4*pi*5))-1)+abs((T_fuel_center_third(2.5)-T_fuel_surface_third(2.5))/(3000/(4*pi*2.5))-1)
+  radial_error = abs((T_fuel_center_first(0.5,0,0)-T_fuel_surface_first(0.5,0,0))/(1000/(4*pi*2.5))-1)+abs((T_fuel_center_second(1.5,0,0)-T_fuel_surface_second(1.5,0,0))/(2000/(4*pi*5))-1)+abs((T_fuel_center_third(2.5,0,0)-T_fuel_surface_third(2.5,0,0))/(3000/(4*pi*2.5))-1)
   # Independent convection drops at the shared node must not be overwritten.
-  shared_error = abs((T_clad_surface_first(1)-T(1))/(1000/(5000*2*pi*0.0046))-1)+abs((T_clad_surface_second(1)-T(1))/(2000/(10000*2*pi*0.0035))-1)
-  alias_error = abs(T_fuel_center(0.5)-T_fuel_center_first(0.5))+abs(T_fuel_surface(0.5)-T_fuel_surface_first(0.5))+abs(T_clad_surface(0.5)-T_clad_surface_first(0.5))
+  shared_error = abs((T_clad_surface_first(1,0,0)-T(1,0,0))/(1000/(5000*2*pi*0.0046))-1)+abs((T_clad_surface_second(1,0,0)-T(1,0,0))/(2000/(10000*2*pi*0.0035))-1)
+  alias_error = abs(T_fuel_center(0.5,0,0)-T_fuel_center_first(0.5,0,0))+abs(T_fuel_surface(0.5,0,0)-T_fuel_surface_first(0.5,0,0))+abs(T_clad_surface(0.5,0,0)-T_clad_surface_first(0.5,0,0))
   PRINT power_error+sum_error+radial_error+shared_error+alias_error
 ENDIF

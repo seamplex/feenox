@@ -14,4 +14,4 @@ SOLVE_PROBLEM
 # The inlet node owns a half element and is heated too. Between that node and
 # the outlet, the integrated source therefore spans L-dx/2 = 1.8 m.
 expected_heat = (flux*perimeter+power_density*8.78882e-5)*1.8
-PRINT abs(mdot(2)*(h(2)-h(0))-expected_heat)/(1+abs(expected_heat))
+PRINT abs(mdot(2,0,0)*(h(2,0,0)-h(0,0,0))-expected_heat)/(1+abs(expected_heat))
