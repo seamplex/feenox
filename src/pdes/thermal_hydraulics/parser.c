@@ -39,8 +39,26 @@ int feenox_problem_parse_problem_thermal_hydraulics(const char *token) {
   return FEENOX_OK;
 }
 
-static int thermal_hydraulics_parse_point(int is_pump) {
+int thermal_hydraulics_parse_point(int is_pump) {
   const char *keyword = is_pump ? "PUMP" : "JUNCTION";
+  
+///kw_thermal_hydraulics+PUMP+usage PUMP
+///kw_thermal_hydraulics+PUMP+desc Attach an ideal prescribed-head pump to a physical point.
+
+///kw_thermal_hydraulics+JUNCTION+usage JUNCTION [ K=<expr> ] [ K_<pipe_group>=<expr> ... ] [ A_ref=<expr> ]
+///kw_thermal_hydraulics+JUNCTION+desc Configure junction losses at shared mesh nodes without a point MATERIAL.
+
+///kw_thermal_hydraulics+PUMP+detail Secondary keywords can appear in any order. POINT, HEAD and DIRECTION are mandatory. The group must contain exactly one point with exactly two incident first-order pipe elements.
+///kw_thermal_hydraulics+PUMP+detail With MERGE, the group may contain several points (typically the suction end and the discharge end of two pipes that do not touch). They are joined into one control volume, as described for JUNCTION.
+///kw_thermal_hydraulics+PUMP+detail Outward element tangents must have opposite nonzero projections on DIRECTION: negative identifies suction, positive discharge. Direction expressions are evaluated at each solve and need not form a unit vector. Mesh element orientation and pipe materials do not define pump direction.
+///kw_thermal_hydraulics+PUMP+detail HEAD is finite and nonnegative, in m, and may vary with time. Total-pressure addition is rho*9.80665*HEAD, independently of the problem gravity vector. Hydraulic power is signed suction mass flow times 9.80665*HEAD; reverse flow does not reverse the imposed head.
+///kw_thermal_hydraulics+PUMP+detail K_REVERSE gives nonnegative suction and discharge port losses active only during reverse flow, defaulting to zero. A_REF must be positive; if omitted each port uses its own flow area for losses. The pump includes reversible area-change and port kinetic-energy terms like a junction.
+///kw_thermal_hydraulics+PUMP+detail The nodal pressure is the midpoint reference, not either port pressure. No extra storage volume, efficiency, shaft dynamics or check valve is modeled. Do not combine PUMP with another point component, point material, or p/v/mdot boundary conditions at that node.
+
+  
+///kw_thermal_hydraulics+JUNCTION+detail Uses the same low-Mach point-junction model as the legacy MATERIAL syntax, which remains supported. Omitted K is zero, enabling ideal area transitions. Each point needs at least two incident pipe elements. Multiple points in one group are supported. Do not combine with a material or another point-component declaration on the same node.
+///kw_thermal_hydraulics+JUNCTION+detail Without MERGE, each point of the group is an independent junction. With MERGE, all the points of the group are joined into a single control volume regardless of their coordinates, so pipe ends connect by topology as in RELAP-7 (e.g. a plenum fed by pipes that end at different locations). Then the merged points together need at least two incident pipe elements, the junction has no elevation (no gravity acts between its points) and the fields at every merged point show the junction state. Boundary conditions cannot be set on merged points.
+  
   if (feenox.pde.parse_problem != feenox_problem_parse_problem_thermal_hydraulics) {
     feenox_push_error_message("%s requires PROBLEM thermal_hydraulics first", keyword);
     return FEENOX_ERROR;
@@ -51,30 +69,39 @@ static int thermal_hydraulics_parse_point(int is_pump) {
   int head_given = 0, direction_given = 0, reverse_given = 0;
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
+///kw_thermal_hydraulics+PUMP+usage POINT <group>
+///kw_thermal_hydraulics+JUNCTION+usage POINT <group>
     if (strcasecmp(token, "POINT") == 0) {
       if (point->group_name != NULL) {
         feenox_push_error_message("duplicate POINT for %s", keyword);
         return FEENOX_ERROR;
       }
       feenox_call(feenox_parser_string(&point->group_name));
+///kw_thermal_hydraulics+PUMP+usage [ MERGE ]
+///kw_thermal_hydraulics+JUNCTION+usage [ MERGE ]
     } else if (strcasecmp(token, "MERGE") == 0 && !point->merge) {
       point->merge = 1;
+///kw_thermal_hydraulics+PUMP+usage HEAD <expr>
     } else if (is_pump && strcasecmp(token, "HEAD") == 0 && !head_given) {
       head_given = 1;
       feenox_call(feenox_parser_expression(&point->head));
+///kw_thermal_hydraulics+PUMP+usage DIRECTION <dx> <dy> <dz>
     } else if (is_pump && strcasecmp(token, "DIRECTION") == 0 && !direction_given) {
       direction_given = 1;
       for (int d = 0; d < 3; d++) {
         feenox_call(feenox_parser_expression(&point->direction[d]));
       }
+///kw_thermal_hydraulics+PUMP+usage [ K_REVERSE <suction_K> <discharge_K> ]
     } else if (is_pump && strcasecmp(token, "K_REVERSE") == 0 && !reverse_given) {
       reverse_given = 1;
       for (int side = 0; side < 2; side++) {
         feenox_call(feenox_parser_expression(&point->reverse_loss[side]));
       }
+///kw_thermal_hydraulics+PUMP+usage PUMP [ A_REF <expr> ]
     } else if (is_pump && strcasecmp(token, "A_REF") == 0 && !point->has_area) {
       point->has_area = 1;
       feenox_call(feenox_parser_expression(&point->area));
+///kw_thermal_hydraulics+JUNCTION+usage JUNCTION [ K=<expr> ] [ K_<pipe_group>=<expr> ... ] [ A_ref=<expr> ]
     } else if (!is_pump && strchr(token, '=') != NULL) {
       char *equal = strchr(token, '=');
       *equal = '\0';
@@ -118,26 +145,6 @@ static int thermal_hydraulics_parse_point(int is_pump) {
   }
   HASH_ADD_KEYPTR(hh, thermal_hydraulics.points, point->group_name, strlen(point->group_name), point);
   return FEENOX_OK;
-}
-
-int feenox_parse_pump(void) {
-///kw_thermal_hydraulics+PUMP+desc Attach an ideal prescribed-head pump to a physical point.
-///kw_thermal_hydraulics+PUMP+usage PUMP POINT <group> HEAD <expr> DIRECTION <dx> <dy> <dz> [ K_REVERSE <suction_K> <discharge_K> ] [ A_REF <expr> ] [ MERGE ]
-///kw_thermal_hydraulics+PUMP+detail Secondary keywords can appear in any order. POINT, HEAD and DIRECTION are mandatory. The group must contain exactly one point with exactly two incident first-order pipe elements.
-///kw_thermal_hydraulics+PUMP+detail With MERGE, the group may contain several points (typically the suction end and the discharge end of two pipes that do not touch). They are joined into one control volume, as described for JUNCTION.
-///kw_thermal_hydraulics+PUMP+detail Outward element tangents must have opposite nonzero projections on DIRECTION: negative identifies suction, positive discharge. Direction expressions are evaluated at each solve and need not form a unit vector. Mesh element orientation and pipe materials do not define pump direction.
-///kw_thermal_hydraulics+PUMP+detail HEAD is finite and nonnegative, in m, and may vary with time. Total-pressure addition is rho*9.80665*HEAD, independently of the problem gravity vector. Hydraulic power is signed suction mass flow times 9.80665*HEAD; reverse flow does not reverse the imposed head.
-///kw_thermal_hydraulics+PUMP+detail K_REVERSE gives nonnegative suction and discharge port losses active only during reverse flow, defaulting to zero. A_REF must be positive; if omitted each port uses its own flow area for losses. The pump includes reversible area-change and port kinetic-energy terms like a junction.
-///kw_thermal_hydraulics+PUMP+detail The nodal pressure is the midpoint reference, not either port pressure. No extra storage volume, efficiency, shaft dynamics or check valve is modeled. Do not combine PUMP with another point component, point material, or p/v/mdot boundary conditions at that node.
-  return thermal_hydraulics_parse_point(1);
-}
-
-int feenox_parse_junction(void) {
-///kw_thermal_hydraulics+JUNCTION+desc Configure junction losses at shared mesh nodes without a point MATERIAL.
-///kw_thermal_hydraulics+JUNCTION+usage JUNCTION POINT <group> [ K=<expr> ] [ K_<pipe_group>=<expr> ... ] [ A_ref=<expr> ] [ MERGE ]
-///kw_thermal_hydraulics+JUNCTION+detail Uses the same low-Mach point-junction model as the legacy MATERIAL syntax, which remains supported. Omitted K is zero, enabling ideal area transitions. Each point needs at least two incident pipe elements. Multiple points in one group are supported. Do not combine with a material or another point-component declaration on the same node.
-///kw_thermal_hydraulics+JUNCTION+detail Without MERGE, each point of the group is an independent junction. With MERGE, all the points of the group are joined into a single control volume regardless of their coordinates, so pipe ends connect by topology as in RELAP-7 (e.g. a plenum fed by pipes that end at different locations). Then the merged points together need at least two incident pipe elements, the junction has no elevation (no gravity acts between its points) and the fields at every merged point show the junction state. Boundary conditions cannot be set on merged points.
-  return thermal_hydraulics_parse_point(0);
 }
 
 int feenox_parse_heat_structure(void) {

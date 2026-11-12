@@ -402,11 +402,11 @@ int feenox_parse_line(void) {
       return FEENOX_OK;
 
     } else if (strcasecmp(token, "PUMP") == 0) {
-      feenox_call(feenox_parse_pump());
+      feenox_call(thermal_hydraulics_parse_point(1));
       return FEENOX_OK;
 
     } else if (strcasecmp(token, "JUNCTION") == 0) {
-      feenox_call(feenox_parse_junction());
+      feenox_call(thermal_hydraulics_parse_point(0));
       return FEENOX_OK;
 
 // this should come last because there is no actual keyword apart from the equal sign

@@ -90,10 +90,13 @@ int feenox_problem_parse_time_init_thermal_hydraulics(void) {
 ///va_thermal_hydraulics+g_x+detail The $x$ component of the gravity acceleration vector in m/s^2. Default is zero.
   feenox_check_alloc(thermal_hydraulics.g[0] = feenox_get_or_define_variable_get_ptr("g_x"));
 ///va_thermal_hydraulics+g_y+detail The $y$ component of the gravity acceleration vector in m/s^2. Default is zero.
+///va_thermal_hydraulics+g_y+detail For a network drawn in the $x$-$y$ plane with $y$ pointing upwards set `g_y = -9.81` and `g_z = 0`.
   feenox_check_alloc(thermal_hydraulics.g[1] = feenox_get_or_define_variable_get_ptr("g_y"));
-///va_thermal_hydraulics+g_z+detail The $z$ component of the gravity acceleration vector in m/s^2. Default is zero.
-///va_thermal_hydraulics+g_z+detail Set `g_z = -9.81` for the usual case of having $z$ pointing upwards.
+///va_thermal_hydraulics+g_z+detail The $z$ component of the gravity acceleration vector in m/s^2.
+///va_thermal_hydraulics+g_z+detail Default is $-9.81$, i.e. $z$ points upwards (as in RELAP-7). Set `g_z = 0` to neglect gravity.
+///va_thermal_hydraulics+g_z+detail Gravity enters the momentum equation and the natural-convection part of the default wall heat transfer coefficient.
   feenox_check_alloc(thermal_hydraulics.g[2] = feenox_get_or_define_variable_get_ptr("g_z"));
+  feenox_var_value(thermal_hydraulics.g[2]) = -9.81;
 
 ///va_thermal_hydraulics+dt_grow_iterations+detail Iteration-based time-step control: the next time step is multiplied by `dt_factor`
 ///va_thermal_hydraulics+dt_grow_iterations+detail if the nonlinear solver took at most this number of iterations. Default is 3.
