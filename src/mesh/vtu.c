@@ -32,7 +32,16 @@ int feenox_mesh_write_header_vtu(mesh_t *mesh, FILE *fp) {
   if (mesh->n_cells == 0) {
     feenox_call(feenox_mesh_element2cell(mesh));
   }
-  fprintf(fp, "    <Piece NumberOfPoints=\"%ld\" NumberOfCells=\"%ld\">\n", mesh->n_nodes, mesh->n_cells);
+  // count the same elements that feenox_mesh_write_mesh_vtu() writes, i.e. those
+  // of the topological dimension, which differs from n_cells (elements of the
+  // spatial dimension) for lower-dimensional meshes embedded in 3D such as pipes
+  size_t n_cells = 0;
+  for (size_t i = 0; i < mesh->n_elements; i++) {
+    if (mesh->element[i].type->dim == mesh->dim_topo) {
+      n_cells++;
+    }
+  }
+  fprintf(fp, "    <Piece NumberOfPoints=\"%ld\" NumberOfCells=\"%ld\">\n", mesh->n_nodes, n_cells);
 
   return FEENOX_OK;
 }
