@@ -274,10 +274,11 @@ int feenox_problem_init_runtime_thermal_hydraulics(void) {
     for (size_t e = 0; e < group->n_elements; e++) {
       size_t j = mesh->element[group->element[e]].node[0]->index_mesh;
       th_node_t *node = &thermal_hydraulics.nodes[j];
-      if (node->alias != j) {
+      if (node->junction_group != NULL) {
         feenox_push_error_message("node %ld belongs to more than one MERGE point group", mesh->node[j].tag);
         return FEENOX_ERROR;
       }
+      node->junction_group = group;
       node->alias = representative;
     }
   }
