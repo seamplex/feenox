@@ -916,6 +916,30 @@ static inline double gsl_pow_6(double x) {
   return x2 * x2 * x2;
 }
 
+// same binary exponentiation as GSL so results are identical with and without it
+static inline double gsl_pow_uint(double x, unsigned int n) {
+  double value = 1.0;
+  do {
+    if (n & 1) {
+      value *= x;
+    }
+    n >>= 1;
+    x *= x;
+  } while (n);
+  return value;
+}
+
+static inline double gsl_pow_int(double x, int n) {
+  unsigned int un;
+  if (n < 0) {
+    x = 1.0/x;
+    un = -(unsigned int)n;
+  } else {
+    un = n;
+  }
+  return gsl_pow_uint(x, un);
+}
+
 static inline double gsl_hypot3(double x, double y, double z) {
   return sqrt(x*x + y*y + z*z);
 }
