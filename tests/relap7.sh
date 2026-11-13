@@ -12,7 +12,9 @@ fi
 checkpde thermal_hydraulics
 checkgmsh
 
-gmsh -v 0 -1 ${dir}/relap7-pipe.geo || exit $?
+if [ ! -e ${dir}/relap7-pipe.msh ]; then
+  gmsh -v 0 -1 ${dir}/relap7-pipe.geo || exit $?
+fi
 answerzero relap7-pipe.fee 1e-4
 exitifwrong $?
 
@@ -66,7 +68,10 @@ fi
 echo "${diagnostic}" | grep -q "MERGE point group and cannot have boundary conditions" || exit 1
 answerzero relap7-two-pipes-startup-verify.fee 1e-6
 exitifwrong $?
-gmsh -v 0 -1 ${dir}/thermal-hydraulics-tee.geo || exit $?
+
+if [ ! -e ${dir}/thermal-hydraulics-tee.msh ]; then
+  gmsh -v 0 -1 ${dir}/thermal-hydraulics-tee.geo || exit $?
+fi
 answerzero thermal-hydraulics-junction-tee.fee 1e-6
 exitifwrong $?
 
@@ -289,6 +294,16 @@ gmsh -v 0 -1 -setnumber Orientation 1 ${dir}/relap7-natural-loop.geo -o ${dir}/r
 checkexchanger relap7-natural-loop-verify.fee
 checkexchanger relap7-natural-loop-balances.fee
 checkexchanger relap7-natural-loop-balances.fee relap7-natural-loop-oriented.msh 50 0 "(0-1)" 2e5 "(0-1)"
+# The input-file coordinates give a co-current secondary whose inlet is joined
+# to pipe6 by JUNCTION MERGE. Exchanger stations must use the pipe-element
+# coordinates, so the result cannot depend on which end represents the junction.
+for order in 0 1; do
+  gmsh -v 0 -1 -setnumber MergeOrder ${order} ${dir}/relap7-natural-loop-merged.geo -o ${dir}/relap7-natural-loop-merged-${order}.msh || exit $?
+  checkexchanger relap7-natural-loop-verify.fee relap7-natural-loop-merged-${order}.msh
+done
+merged0=$(${feenox} ${dir}/relap7-natural-loop.fee relap7-natural-loop-merged-0.msh) || exit $?
+merged1=$(${feenox} ${dir}/relap7-natural-loop.fee relap7-natural-loop-merged-1.msh) || exit $?
+test "${merged0}" = "${merged1}" || { echo "MERGE representative changes the exchanger: ${merged0} vs ${merged1}"; exit 1; }
 # Starting from rest the core would boil at the manual's 2 bar before natural
 # circulation develops, so this robustness check runs at 15.5 MPa.
 checkexchanger relap7-natural-loop-verify.fee relap7-natural-loop.msh 50 0 0 15.5e6

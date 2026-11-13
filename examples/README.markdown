@@ -21,6 +21,7 @@ The FeenoX examples are divided by the type of problem they solve:
 6.  [Modal analysis]
 7.  [Neutron diffusion]
 8.  [Neutron $`S_N`$]
+9.  [Thermal hydraulics]
 
 > Each type of partial differential equation (i.e. from Laplace
 > downward) is implemented in a subdirectory within [`src/pde`] of the
@@ -55,6 +56,7 @@ Presentation” (August 2021).
   [Modal analysis]: modal.md
   [Neutron diffusion]: neutron_diffusion.md
   [Neutron $`S_N`$]: neutron_sn.md
+  [Thermal hydraulics]: thermal_hydraulics.md
   [`src/pde`]: https://github.com/seamplex/feenox/tree/main/src/pdes
   [Github discussion page]: https://github.com/seamplex/feenox/discussions
   [examples]: https://github.com/seamplex/feenox/tree/main/examples
@@ -161,6 +163,16 @@ propose benchmark problems to add to the suite.
     - [Second-order complete structured rectangular grid]
     - [Fist-order locally-refined unstructured triangular grid]
     - [Flux profiles with ray effect]
+- Thermal hydraulics
+  - [RELAP7 Example 1: A simple pipe flow problem]
+  - [RELAP7 Example 2: A transient pipe flow problem]
+  - [RELAP7 Example 3: Adding heat to a simple pipe flow problem]
+  - [RELAP7 Example 5: A core channel with a fuel rod]
+  - [RELAP7 Example 6: A two-pipe flow problem]
+  - [RELAP7 Example 7: A junction with multiple pipes in and out]
+  - [RELAP7 Example 8: A simple pipe loop with a pump]
+  - [RELAP7 Example 9: A heat exchanger]
+  - [RELAP7 Example 10: A loop with a core channel and a heat exchanger]
 
   [Hello World (and Universe)!]: https://seamplex.com/feenox/examples/basic.html#hello-world-and-universe
   [Ten ways of computing *π*]: https://seamplex.com/feenox/examples/basic.html#ten-ways-of-computing-pi
@@ -232,3 +244,12 @@ propose benchmark problems to add to the suite.
   [Second-order complete structured rectangular grid]: https://seamplex.com/feenox/examples/neutron_sn.html#second-order-complete-structured-rectangular-grid
   [Fist-order locally-refined unstructured triangular grid]: https://seamplex.com/feenox/examples/neutron_sn.html#fist-order-locally-refined-unstructured-triangular-grid
   [Flux profiles with ray effect]: https://seamplex.com/feenox/examples/neutron_sn.html#flux-profiles-with-ray-effect
+  [RELAP7 Example 1: A simple pipe flow problem]: https://seamplex.com/feenox/examples/thermal_hydraulics.html#relap7-example-1-a-simple-pipe-flow-problem
+  [RELAP7 Example 2: A transient pipe flow problem]: https://seamplex.com/feenox/examples/thermal_hydraulics.html#relap7-example-2-a-transient-pipe-flow-problem
+  [RELAP7 Example 3: Adding heat to a simple pipe flow problem]: https://seamplex.com/feenox/examples/thermal_hydraulics.html#relap7-example-3-adding-heat-to-a-simple-pipe-flow-problem
+  [RELAP7 Example 5: A core channel with a fuel rod]: https://seamplex.com/feenox/examples/thermal_hydraulics.html#relap7-example-5-a-core-channel-with-a-fuel-rod
+  [RELAP7 Example 6: A two-pipe flow problem]: https://seamplex.com/feenox/examples/thermal_hydraulics.html#relap7-example-6-a-two-pipe-flow-problem
+  [RELAP7 Example 7: A junction with multiple pipes in and out]: https://seamplex.com/feenox/examples/thermal_hydraulics.html#relap7-example-7-a-junction-with-multiple-pipes-in-and-out
+  [RELAP7 Example 8: A simple pipe loop with a pump]: https://seamplex.com/feenox/examples/thermal_hydraulics.html#relap7-example-8-a-simple-pipe-loop-with-a-pump
+  [RELAP7 Example 9: A heat exchanger]: https://seamplex.com/feenox/examples/thermal_hydraulics.html#relap7-example-9-a-heat-exchanger
+  [RELAP7 Example 10: A loop with a core channel and a heat exchanger]: https://seamplex.com/feenox/examples/thermal_hydraulics.html#relap7-example-10-a-loop-with-a-core-channel-and-a-heat-exchanger

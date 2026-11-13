@@ -113,6 +113,7 @@ struct th_heat_structure_t {
   int has_perimeter[2];
   double depth, axis[3], coefficient[2], perimeter[2];
   size_t *partner;            // primary <-> secondary nodes at equal axial stations
+  double *station;            // 3 coordinates per node of the exchanger stations, taken from the pipe elements (NaN if not a station)
   var_t *side_heat[2];
   char *material_name[3];
   physical_group_t *group;

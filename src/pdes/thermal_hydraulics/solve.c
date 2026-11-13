@@ -484,9 +484,17 @@ static int thermal_hydraulics_init_solid_outputs(th_heat_structure_t *hs) {
   return FEENOX_OK;
 }
 
+// the coordinates of an exchanger station come from the pipe elements and
+// not from the node, because MERGE replaces the node of a merged pipe end
+// by the representative of its group, which can be located anywhere
+static const double *thermal_hydraulics_station_point(th_heat_structure_t *hs, size_t j) {
+  return (hs->station != NULL && !isnan(hs->station[3*j])) ? &hs->station[3*j] : feenox.pde.mesh->node[j].x;
+}
+
 static double thermal_hydraulics_axial_coordinate(th_heat_structure_t *hs, size_t j) {
+  const double *xx = thermal_hydraulics_station_point(hs, j);
   double s = 0;
-  for (int d = 0; d < 3; d++) s += hs->axis[d]*feenox.pde.mesh->node[j].x[d];
+  for (int d = 0; d < 3; d++) s += hs->axis[d]*xx[d];
   return s;
 }
 
@@ -529,6 +537,8 @@ static int thermal_hydraulics_init_exchanger(th_heat_structure_t *hs) {
   feenox_check_alloc(hs->layer = calloc(hs->nr-1, sizeof(int)));
   feenox_check_alloc(hs->node_length = calloc(thermal_hydraulics.n_nodes, sizeof(double)));
   feenox_check_alloc(hs->partner = malloc(thermal_hydraulics.n_nodes*sizeof(size_t)));
+  feenox_check_alloc(hs->station = malloc(3*thermal_hydraulics.n_nodes*sizeof(double)));
+  for (size_t j = 0; j < 3*thermal_hydraulics.n_nodes; j++) hs->station[j] = NAN;
   for (size_t i = 0; i < hs->nr; i++) {
     hs->radius[i] = (hs->plate ? 0 : value[2])+value[0]*i/(hs->nr-1);
   }
@@ -577,10 +587,24 @@ static int thermal_hydraulics_init_exchanger(th_heat_structure_t *hs) {
     th_pipe_t *pipe = &thermal_hydraulics.pipes[k];
     for (int side = 0; side < 2; side++) {
       if (pipe->element->physical_group != (side == 0 ? hs->group : hs->secondary)) continue;
-      double projected = fabs(thermal_hydraulics_axial_coordinate(hs, pipe->b)-thermal_hydraulics_axial_coordinate(hs, pipe->a));
+      // use the element's own end coordinates, merged nodes may be elsewhere
+      double projected = 0;
+      for (int d = 0; d < 3; d++) projected += hs->axis[d]*pipe->dx[d];
+      projected = fabs(projected);
       if (fabs(projected-pipe->L) > tolerance*pipe->L || projected <= 0) {
         feenox_push_error_message("HEAT_STRUCTURE '%s' pipes must be straight and parallel to AXIS", hs->group_name);
         return FEENOX_ERROR;
+      }
+      size_t ends[2] = {pipe->a, pipe->b};
+      for (int m = 0; m < 2; m++) {
+        double *station = &hs->station[3*ends[m]];
+        const double *xx = pipe->element->node[m]->x;
+        if (isnan(station[0])) {
+          for (int d = 0; d < 3; d++) station[d] = xx[d];
+        } else if (gsl_hypot3(station[0]-xx[0], station[1]-xx[1], station[2]-xx[2]) > tolerance*pipe->L) {
+          feenox_push_error_message("HEAT_STRUCTURE '%s' has pipe ends at different locations merged into the same station", hs->group_name);
+          return FEENOX_ERROR;
+        }
       }
       degree[side][pipe->a]++;
       degree[side][pipe->b]++;
@@ -829,8 +853,9 @@ static int thermal_hydraulics_set_initial_conditions(PetscScalar *x) {
       return FEENOX_ERROR;
     }
     for (th_heat_structure_t *hs = thermal_hydraulics.heat_structures; hs != NULL; hs = hs->hh.next) {
+      const double *xs = thermal_hydraulics_station_point(hs, j);
       for (size_t i = 0; i < hs->nr; i++) {
-        double args[4] = {hs->radius[i], xx[0], xx[1], xx[2]};
+        double args[4] = {hs->radius[i], xs[0], xs[1], xs[2]};
         x[TH_SOLID(hs,j,i)] = f[4] != NULL ? feenox_function_eval(f[4], args) : x[TH_T(j)];
         if (!isfinite(x[TH_SOLID(hs,j,i)]) || x[TH_SOLID(hs,j,i)] <= 0) {
               feenox_push_error_message("invalid initial solid temperature in '%s' at node %ld", hs->group_name, feenox.pde.mesh->node[j].tag);

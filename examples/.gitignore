@@ -63,6 +63,7 @@ modal.html
 neutron_diffusion.html
 neutron_sn.html
 thermal.html
+thermal_hydraulics.html
 
 basic.pdf
 daes.pdf
@@ -72,6 +73,7 @@ modal.pdf
 neutron_diffusion.pdf
 neutron_sn.pdf
 thermal.pdf
+thermal_hydraulics.pdf
 
 two-cubes-thermal.dat
 two-cubes-thermal.pdf
@@ -134,3 +136,7 @@ steel-*.pvsm
 
 tennis*.dat
 tennis*.svg
+
+relap-example10-natural-loop-exchanger.dat
+relap-example2-transient.dat
+relap-example2-transient-pressure.dat

@@ -1,0 +1,48 @@
+# RELAP-7 manual example 2: transient flow through the same 2 m long pipe
+# as example 1 but with a time-dependent Darcy friction factor
+# initial state: p = 15.51 MPa, T = 559.15 K and v = 0 everywhere
+# inlet:  rho = 753.632 kg/m^3 and v = 4.43 m/s
+# outlet: p = 15.51 MPa
+PROBLEM thermal_hydraulics MESH relap7-pipe.msh DIM 1 TRANSIENT_SOLVER bdf
+
+end_time = 10    # integrate up to t = 10 s
+
+# to set a fixed dt just set dt
+# dt = 0.01
+
+# otherwise let feenox choose
+dt_0 = 1e-3      # initial dt
+min_dt = 1e-3    # min dt
+max_dt = 5       # max dt
+
+# initial conditions
+p_0(x) = 15.51e6
+T_0(x) = 559.15
+v_0(x) = 0
+
+# the friction factor rises linearly from 0.01 to 0.02 in the first 50 ms
+FUNCTION friction(t) INTERPOLATION linear DATA {
+0     0.01
+0.05  0.02
+0.1   0.02
+}
+
+MATERIAL pipe A=8.78882e-5 D_h=0.01179 f=friction(t)
+
+BC inlet  rho=753.632 v=4.43
+BC outlet p=15.51e6
+
+SOLVE_PROBLEM
+
+# write the evolution of the pressure drop, mass flow and outlet temperature
+PRINT t %+.4e p(0)-p(2) mdot(1) T(2) %g friction(t)
+WRITE_RESULTS   # since this is a transient, write both a single pvd and a vtu for each step
+
+# at the end, the flow should be steady with mdot = rho*v*A and the pressure
+# drop should be given by Darcy-Weisbach with the final f = 0.02
+IF done
+  mdot_ref = 753.632*4.43*8.78882e-5
+  dp_ref = 0.02 * 2/0.01179 * mdot_ref^2/(2*rho(1)*8.78882e-5^2)
+  PRINTF "\# steady-state check %g" abs(mdot(1)/mdot_ref-1)+abs((p(0)-p(2))/dp_ref-1)
+  PRINT_FUNCTION p FILE $0-pressure.dat
+ENDIF

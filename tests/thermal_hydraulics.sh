@@ -12,8 +12,13 @@ fi
 checkpde thermal_hydraulics
 checkgmsh
 
-gmsh -v 0 -1 ${dir}/thermal-hydraulics-tee.geo || exit $?
-gmsh -v 0 -1 ${dir}/relap7-pipe.geo || exit $?
+if [ ! -e ${dir}/thermal-hydraulics-tee.msh ]; then
+  gmsh -v 0 -1 ${dir}/thermal-hydraulics-tee.geo || exit $?
+fi
+
+if [ ! -e ${dir}/relap7-pipe.msh ]; then
+  gmsh -v 0 -1 ${dir}/relap7-pipe.geo || exit $?
+fi
 answerzero thermal-hydraulics-read-mesh.fee 1e-4
 exitifwrong $?
 
