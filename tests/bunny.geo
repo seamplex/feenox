@@ -16,10 +16,10 @@ Physical Volume("bunny") = {1};
 Physical Surface("rest") = {3};
 Physical Surface("base") = {2};
 
-Mesh.MeshSizeMin = 8;
-Mesh.MeshSizeMax = 15;
+Mesh.MeshSizeMin = 4;
+Mesh.MeshSizeMax = 8;
 // Mesh.ElementOrder = 1;
-Mesh.Algorithm = 6;
-Mesh.Algorithm3D = 1;
+// Mesh.Algorithm = 6;
+// Mesh.Algorithm3D = 1;
 Mesh.Optimize = 1;
 Mesh.MeshSizeExtendFromBoundary = 0;

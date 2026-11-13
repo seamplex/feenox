@@ -1,0 +1,24 @@
+# RELAP-7 user's guide, Example 3: specified wall temperature, single-phase water.
+# With no argument, solve the steady state with the final friction factor.
+# Pass an end time (e.g. 10) to run backward Euler from an initial steady state,
+# with the guide's time-dependent friction factor. This is not a startup from rest.
+DEFAULT_ARGUMENT_VALUE 1 0
+PROBLEM thermal_hydraulics MESH relap7-pipe.msh
+end_time = $1
+dt = 0.01
+
+FUNCTION f_func(t) INTERPOLATION linear DATA {
+  0    0.01
+  0.05 0.02
+  0.1  0.02
+}
+MATERIAL pipe A=8.78882e-5 D_h=0.01179 f=f_func(if(end_time>0,t,0.1)) T_wall=565
+
+BC inlet  rho=753.632 v=4.43
+BC outlet p=15.51e6
+
+SOLVE_PROBLEM
+
+IF end_time=0|done
+  PRINTF "%g %g %g %g" T(0,0,0) T(2,0,0) p(0,0,0)-p(2,0,0) mdot(2,0,0)
+ENDIF

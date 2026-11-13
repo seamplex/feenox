@@ -1803,6 +1803,7 @@ struct feenox_t {
     
 
     unsigned int dim;              // spatial dimension of the problem (currently, equal to the topological dimension)
+    int embedded_mesh;             // true if the elements may live in a higher-dimensional space (e.g. pipes/shells in 3D)
     unsigned int dofs;             // DoFs per node/cell
     size_t width;                  // number of expected non-zeros per row
     size_t spatial_unknowns;       // number of spatial unknowns (nodes in fem, cells in fvm)
@@ -1845,8 +1846,19 @@ struct feenox_t {
     int (*element_build_volumetric_at_gauss)(element_t *e, unsigned int q);
     
     // solve
+    int (*solve_pre)(void);        // optional, called before each solve (after the initialization)
     int (*solve)(void);
-    
+#ifdef HAVE_PETSC
+    // optional physics-specific residual F(t, phi, phi_dot) = 0 that bypasses the FEM build
+    // phi_dot is NULL in steady state, set *domain_error to flag an invalid state
+    int (*residual)(double t, Vec phi, Vec phi_dot, Vec r, int *domain_error);
+    // optional matrix with the non-zero pattern of dF/dphi + s*dF/dphi_dot,
+    // if given the jacobian is computed with finite differences and coloring
+    Mat (*create_jacobian)(const char *name);
+    // optional physics-specific initial conditions, set *given if phi was filled
+    int (*phi_initial_condition)(Vec phi, int *given);
+#endif
+
     // post
     int (*solve_post)(void);
     int (*gradient_fill)(void);
@@ -2001,6 +2013,11 @@ struct feenox_t {
     TS ts;
     SNES snes;
     KSP ksp;
+
+    // the step just taken by TS and the one it proposes for the next step
+    // (used unless the input assigns dt)
+    double ts_dt_taken;
+    double ts_dt_next;
 
     // strings with types
     PCType pc_type;
@@ -2471,6 +2488,7 @@ extern int feenox_problem_setup_pc(PC pc);
 extern int feenox_problem_solve_petsc_nonlinear(void);
 extern int feenox_problem_setup_snes(SNES snes);
 extern PetscErrorCode feenox_snes_residual(SNES snes, Vec phi, Vec r, void *ctx);
+extern PetscErrorCode feenox_snes_residual_physics(SNES snes, Vec phi, Vec r, void *ctx);
 extern PetscErrorCode feenox_snes_jacobian(SNES snes,Vec phi, Mat J, Mat P, void *ctx);
 extern PetscErrorCode feenox_snes_monitor(SNES snes, PetscInt n, PetscReal rnorm, void *dummy);
 
@@ -2478,6 +2496,7 @@ extern PetscErrorCode feenox_snes_monitor(SNES snes, PetscInt n, PetscReal rnorm
 extern int feenox_problem_solve_petsc_transient(void);
 extern int feenox_problem_setup_ts(TS ts);
 extern PetscErrorCode feenox_ts_residual(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r, void *ctx);
+extern PetscErrorCode feenox_ts_residual_physics(TS ts, PetscReal t, Vec phi, Vec phi_dot, Vec r, void *ctx);
 extern PetscErrorCode feenox_ts_jacobian(TS ts, PetscReal t, Vec T, Vec T_dot, PetscReal s, Mat J, Mat P,void *ctx);
 
 // slepc_eps.c

@@ -391,11 +391,23 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_solve());
       return FEENOX_OK;
 
-// TODO: move this to a per-physics parser      
+// TODO: move this to a per-physics parser, these lines break the virtual method concept
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "LINEARIZE_STRESS") == 0) {
       feenox_call(feenox_parse_linearize_stress());
       return FEENOX_OK;      
+
+    } else if (strcasecmp(token, "HEAT_STRUCTURE") == 0) {
+      feenox_call(feenox_parse_heat_structure());
+      return FEENOX_OK;
+
+    } else if (strcasecmp(token, "PUMP") == 0) {
+      feenox_call(thermal_hydraulics_parse_point(1));
+      return FEENOX_OK;
+
+    } else if (strcasecmp(token, "JUNCTION") == 0) {
+      feenox_call(thermal_hydraulics_parse_point(0));
+      return FEENOX_OK;
 
 // this should come last because there is no actual keyword apart from the equal sign
 // so if we came down here, then that means that any line containing a '=' that has
@@ -3389,6 +3401,9 @@ int feenox_parse_problem(void) {
   
     feenox_call(feenox_problem_parse_time_init());
     feenox_call(feenox.pde.parse_problem(NULL));
+    if (mesh != NULL && mesh->dim == 0) {
+      mesh->dim = feenox.pde.dim;
+    }
     if (feenox.pde.solution == NULL) {
       feenox_call(feenox_problem_define_solutions());
     }

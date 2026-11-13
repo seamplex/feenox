@@ -1,0 +1,13 @@
+PROBLEM thermal_hydraulics DIM 3 MESH relap7-core-channel.msh
+HEAT_STRUCTURE PIPE channel FUEL solid
+end_time = 1
+v_0(x,y,z) = 0
+MATERIAL solid $1
+MATERIAL channel {
+  A=8.79375e-5 D_h=0.01179 f=0.01
+  $2
+}
+$3
+BC inlet rho=753.68 v=4.43
+BC outlet p=155e5
+SOLVE_PROBLEM

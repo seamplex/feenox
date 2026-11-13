@@ -1,0 +1,8 @@
+# Prescribed initial conditions skip the t=0 steady solve.
+DEFAULT_ARGUMENT_VALUE 1 AXIAL_CONDUCTION
+DEFAULT_ARGUMENT_VALUE 2 50
+p_0(x,y,z) = 155e5
+T_0(x,y,z) = 559.15
+v_0(x,y,z) = 0
+T_solid_0(r,x,y,z) = 559.15
+INCLUDE relap7-core-channel.fee

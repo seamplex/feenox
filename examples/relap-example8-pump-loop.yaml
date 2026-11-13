@@ -1,0 +1,65 @@
+---
+category: thermal_hydraulics
+intro: |
+  # RELAP7 Example 8: A simple pipe loop with a pump
+
+  The eighth example from the RELAP7 manual is a closed loop of four pipes driven by a pump.
+
+  ![Original diagram of the loop from the RELAP7 manual.](relap-example8.png)
+
+  This example shows a single-phase flow loop made up of five pipes, three junctions and a pump.
+  The pump connects pipes\ 1 and\ 2, and pipe\ 5 connects the loop to an outlet that sets the pressure of the system.
+  The water is initially at rest with $p = 100~\text{kPa}$ and $T = 300~\text{K}$.
+  All the pipes are $1~\text{m}$ long except pipe\ 5, which is $0.5~\text{m}$ long.
+
+  The input file of the manual has the following additional data:
+
+   * pipes\ 1, 3 and\ 5 have a diameter of $1~\text{cm}$ and pipes\ 2 and\ 4 have a diameter of $2~\text{cm}$, but all of them have a hydraulic diameter $D_h = 1~\text{cm}$ and a Darcy friction factor $f=0.01$,
+   * the pump has a head $H = 1~\text{m}$, reverse-flow loss coefficients equal to\ 10 and a reference area $A_\text{ref} = 7.85398163 \times 10^{-4}~\text{m}^2$,
+   * all the junctions have loss coefficients $K=3$ in all their ports with the same reference area, and
+   * the outlet at the end of pipe\ 5 has $p=100~\text{kPa}$.
+
+  The figure is drawn differently from the coordinates in the input file (e.g. pipe\ 1 is vertical in the figure but horizontal in the input), but the topology is the same.
+  We use the coordinates from the input file:
+
+  ```{.c include="relap7-pump-loop.geo"}
+  ```
+  
+  ![Topology of the problem in Gmsh. No need for `MERGE` keywords since the topology matches the real problem.](relap7-pump-loop-geo.svg)
+
+  Since all the pipe ends do touch at the junctions, there is no need for `MERGE` in this example.
+  The pump is a `PUMP` on the physical point where pipes\ 1 and\ 2 meet:
+
+  ```feenox
+  PUMP POINT pump HEAD 1 DIRECTION 1 1 0 K_REVERSE 10 10 A_REF A_junction
+  ```
+
+  In RELAP7, the pump direction is given by which pipe is listed in `inputs` and which one in `outputs`.
+  In FeenoX, the direction is a vector whose projection is negative on the direction that goes from the pump into the suction pipe and positive on the direction that goes from the pump into the discharge pipe.
+  Here the suction pipe\ 1 leaves the pump towards $-x$ and the discharge pipe\ 2 leaves it towards $+y$, so $(1,1,0)$ is a valid direction.
+
+  As in the previous examples, we use FeenoX's default backward Euler scheme and let it choose the time step up to $t=10~\text{s}$.
+  The water starts at rest and the pump accelerates it around the loop until the total-pressure rise $\rho g H$ given by the pump balances the friction losses in pipes\ 1--4 and the local losses in the six junction ports with flow.
+  Pipe\ 5 is a dead end that only sets the reference pressure of the loop, so it has no flow at steady state.
+  The output shows the mass flow in each of the five pipes and, at the end, this balance of pressures.
+
+terminal: |
+  $ gmsh -1 relap7-pump-loop.geo
+  $ feenox relap-example8-pump-loop.fee
+  0	0.0000e+00	0.0000e+00	0.0000e+00	0.0000e+00	0.0000e+00
+  0.0625	1.9061e-02	1.9062e-02	1.9048e-02	1.9054e-02	1.3843e-05
+  0.1875	5.5191e-02	5.5191e-02	5.5191e-02	5.5191e-02	2.3208e-07
+  0.4375	1.1311e-01	1.1311e-01	1.1311e-01	1.1311e-01	4.1119e-07
+  0.6875	1.5465e-01	1.5465e-01	1.5465e-01	1.5465e-01	4.8745e-07
+  0.9375	1.8241e-01	1.8241e-01	1.8241e-01	1.8241e-01	4.4375e-07
+  1.4375	2.0823e-01	2.0823e-01	2.0823e-01	2.0823e-01	3.0989e-07
+  2.4375	2.2282e-01	2.2282e-01	2.2282e-01	2.2282e-01	1.9824e-07
+  4.4375	2.2745e-01	2.2745e-01	2.2745e-01	2.2745e-01	1.5547e-07
+  8.4375	2.2824e-01	2.2824e-01	2.2824e-01	2.2824e-01	1.4768e-07
+  10	2.2830e-01	2.2830e-01	2.2830e-01	2.2830e-01	1.4710e-07
+  # pump rho*g*H = 9772.82 Pa
+  # friction + local losses = 9008.57 + 763.079 = 9771.65 Pa
+  $
+figures: |
+  ![Pressure distribution at the final time as viewed in Paraview. The color scale is chosen to make the lines look nicer, not because of correctness.](relap-example8-pressure.png)
+...

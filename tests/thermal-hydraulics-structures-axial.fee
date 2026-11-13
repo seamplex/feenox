@@ -1,0 +1,41 @@
+# Independent insulated axial eigenmodes on three solids sharing fluid nodes.
+DEFAULT_ARGUMENT_VALUE 1 AXIAL_CONDUCTION
+DEFAULT_ARGUMENT_VALUE 2 1
+PROBLEM thermal_hydraulics MESH thermal-hydraulics-structures.msh
+# The third structure tests the default, while the second always disables
+# axial conduction regardless of the first structure's flag.
+HEAT_STRUCTURE PIPE first FUEL solid $1
+HEAT_STRUCTURE FUEL other NO_AXIAL_CONDUCTION CLAD other PIPE second
+HEAT_STRUCTURE GAP solid PIPE third FUEL solid
+end_time = 1
+dt = 0.1
+MATERIAL solid k=100 rho_s=1 cp=1000
+MATERIAL other k=200 rho_s=1 cp=1000
+MATERIAL first {
+  A=1e-4 D_h=0.01 f=0.01 h_wall=1e-6
+  fuel_radius=0.004 gap_width=0.0001 clad_width=0.0005
+  fuel_cells=2 gap_cells=1 clad_cells=2 hs_power=0
+}
+MATERIAL second {
+  A=1e-4 D_h=0.01 f=0.01 h_wall=1e-6
+  fuel_radius=0.003 gap_width=0.0002 clad_width=0.0003
+  fuel_cells=3 gap_cells=2 clad_cells=3 hs_power=0
+}
+MATERIAL third {
+  A=1e-4 D_h=0.01 f=0.01 h_wall=1e-6
+  fuel_radius=0.002 gap_width=0.0001 clad_width=0.0004
+  fuel_cells=4 gap_cells=1 clad_cells=4 hs_power=0
+}
+BC inlet p=1e6 T=300
+BC outlet p=1e6 T=300
+p_0(x,y,z) = 1e6
+T_0(x,y,z) = 300
+v_0(x,y,z) = 0
+T_solid_0(r,x,y,z) = 300+50*cos(pi*x)
+SOLVE_PROBLEM
+IF done
+  eigenvalue = 0.1*4*sin(pi/20)^2/0.1^2
+  expected_axial = 100/(1+dt*eigenvalue)^10
+  expected = if($2,expected_axial,100)
+  PRINT abs((T_fuel_center_first(0,0,0)-T_fuel_center_first(1,0,0))/expected-1)+abs((T_fuel_center_second(2,0,0)-T_fuel_center_second(1,0,0))/100-1)+abs((T_fuel_center_third(2,0,0)-T_fuel_center_third(3,0,0))/expected_axial-1)
+ENDIF

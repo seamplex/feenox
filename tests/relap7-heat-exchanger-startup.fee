@@ -1,0 +1,8 @@
+DEFAULT_ARGUMENT_VALUE 1 10
+DEFAULT_ARGUMENT_VALUE 2 relap7-heat-exchanger.msh
+DEFAULT_ARGUMENT_VALUE 3 1
+p_0(x,y) = 1e6
+T_0(x,y) = 300
+v_0(x,y) = 1
+T_solid_0(r,x,y) = 300
+INCLUDE relap7-heat-exchanger.fee

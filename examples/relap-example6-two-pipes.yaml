@@ -1,0 +1,98 @@
+---
+category: thermal_hydraulics
+intro: |
+  # RELAP7 Example 6: A two-pipe flow problem
+
+  This example demonstrates flow through two pipes with different flow areas connected by a junction.
+  The inlet boundary condition sets a density $\rho = 995~\text{kg}/\text{m}^3$ and a velocity $v = 1~\text{m}/\text{s}$.
+  The outlet boundary condition sets a pressure $p = 95~\text{kPa}$.
+  The initial velocity, pressure and temperature are $1~\text{m}/\text{s}$, $100~\text{kPa}$ and $300~\text{K}$ respectively.
+  There is no heat exchange through the pipe walls.
+
+  The first pipe goes from $x=0$ to $x=1~\text{m}$ and has a flow area $A=2~\text{m}^2$.
+  The second one goes from $x=1~\text{m}$ to $x=2~\text{m}$ and has $A=1~\text{m}^2$.
+  Both have 20\ elements and a Darcy friction factor $f=1$.
+  As in RELAP7, when the hydraulic diameter is not given FeenoX uses the one of a circle with area\ $A$, i.e. $D_h = \sqrt{4A/\pi}$.
+
+  In RELAP7, the topology is given by the position and orientation of each pipe plus a `Junction` component that lists which pipe ends it connects.
+  In FeenoX, the two pipes are just two physical curves that share a node, which we name `junction`:
+
+  ```{.c include="relap7-two-pipes.geo"}
+  ```
+
+  RELAP7's junction has `K = '1 1'` and `A_ref = 1.0`, i.e. a local loss coefficient equal to one for each of the two ports, both referred to an area of $1~\text{m}^2$.
+  In FeenoX this is
+
+  ```feenox
+  JUNCTION POINT junction K_pipe1=1 K_pipe2=1 A_ref=1
+  ```
+
+  where `K_<pipe_group>` sets the coefficient of each port by the name of the pipe that is connected to it.
+  Since here both are equal, `K=1` would also work.
+
+  The initial condition from the manual has a uniform velocity of $1~\text{m}/\text{s}$, which does not conserve mass because the second pipe has half the area of the first.
+  So the first time step has to accommodate a pressure wave.
+  Instead of the second-order BDF scheme of the original RELAP example, here we use FeenoX's default backward Euler scheme, which dissipates the pressure waves, and let it choose the time step up to $t=10~\text{s}$.
+
+  At steady state, the mass flow is $\dot{m} = \rho v A = 1990~\text{kg}/\text{s}$ in both pipes, the velocity is $1~\text{m}/\text{s}$ in the first pipe and $2~\text{m}/\text{s}$ in the second one,
+  and the pressure has a step at the junction that accounts for both the local losses and the change in kinetic energy.
+  The output shows the mass flow in each pipe, the inlet pressure and the pressure drop between the two nodes next to the junction.
+  At the end, the axial pressure and velocity profiles are written into a file.
+
+terminal: |
+  $ gmsh -1 relap7-two-pipes.geo
+  $ feenox relap-example6-two-pipes.fee
+  0	1.9931e+03	9.9656e+02	1.0000e+05	0.0000e+00
+  0.0625	1.9928e+03	1.9927e+03	1.1849e+05	6.3795e+03
+  0.1875	1.9929e+03	1.9932e+03	1.0256e+05	5.5853e+03
+  0.4375	1.9920e+03	1.9930e+03	1.0255e+05	5.5839e+03
+  0.9375	1.9907e+03	1.9923e+03	1.0255e+05	5.5812e+03
+  1.9375	1.9901e+03	1.9910e+03	1.0255e+05	5.5779e+03
+  3.9375	1.9900e+03	1.9902e+03	1.0255e+05	5.5765e+03
+  7.9375	1.9900e+03	1.9900e+03	1.0255e+05	5.5763e+03
+  10	1.9900e+03	1.9900e+03	1.0255e+05	5.5763e+03
+  $ sort -g relap-example6-two-pipes-profile.dat
+  0	102548	1
+  0.05	102532	1
+  0.1	102517	1
+  0.15	102501	1
+  0.2	102486	1
+  0.25	102470	1
+  0.3	102454	1
+  0.35	102439	1
+  0.4	102423	1
+  0.45	102408	1
+  0.5	102392	1
+  0.55	102376	1
+  0.6	102361	1
+  0.65	102345	1
+  0.7	102330	1
+  0.75	102314	1
+  0.8	102298	1
+  0.85	102283	1
+  0.9	102267	1
+  0.95	102252	1
+  1	98753.6	1.5
+  1.05	96675.4	2.00001
+  1.1	96587.2	2.00001
+  1.15	96499	2.00001
+  1.2	96410.9	2.00001
+  1.25	96322.7	2.00001
+  1.3	96234.5	2.00001
+  1.35	96146.3	2.00001
+  1.4	96058.2	2.00001
+  1.45	95970	2.00001
+  1.5	95881.8	2.00001
+  1.55	95793.6	2.00001
+  1.6	95705.4	2.00001
+  1.65	95617.3	2.00001
+  1.7	95529.1	2.00001
+  1.75	95440.9	2.00001
+  1.8	95352.7	2.00001
+  1.85	95264.5	2.00001
+  1.9	95176.4	2.00001
+  1.95	95088.2	2.00001
+  2	95000	2.00001
+  $
+
+...

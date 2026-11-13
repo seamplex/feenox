@@ -21,6 +21,12 @@
  */
 #include "feenox.h"
 
+// properties live on the bulk (i.e. highest-dimensional) elements, which
+// might not coincide with the spatial dimension (e.g. pipes in 3d space)
+static unsigned int feenox_distribution_bulk_dim(void) {
+  return (feenox.pde.mesh != NULL && feenox.pde.mesh->dim_topo != 0) ? feenox.pde.mesh->dim_topo : feenox.pde.dim;
+}
+
 // this method updates the linked list of variables and functions the distribution
 // depends on, but it does not set the non_linear nor space_dependent flags
 int feenox_distribution_init(distribution_t *this, const char *name) {
@@ -41,7 +47,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     physical_group_t *physical_group = NULL;
     int i = 0;
     for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
-      if (physical_group->dimension == feenox.pde.dim) {
+      if (physical_group->dimension == feenox_distribution_bulk_dim()) {
         if (physical_group->material != NULL) {
           property_data_t *property_data = NULL;
           HASH_FIND_STR(physical_group->material->property_datums, this->property->name, property_data);
@@ -76,7 +82,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   physical_group_t *physical_group = NULL;
   int i = 0;
   for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
-    if (physical_group->dimension == feenox.pde.dim) {
+    if (physical_group->dimension == feenox_distribution_bulk_dim()) {
       char *function_name = NULL;
       feenox_check_minusone(asprintf(&function_name, "%s_%s", name, physical_group->name));
       function_t *function = NULL;
@@ -148,7 +154,7 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
   physical_group = NULL;
   i = 0;
   for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
-    if (physical_group->dimension == feenox.pde.dim) {
+    if (physical_group->dimension == feenox_distribution_bulk_dim()) {
       char *var_name = NULL;
       feenox_check_minusone(asprintf(&var_name, "%s_%s", name, physical_group->name));
       var_t *variable = NULL;

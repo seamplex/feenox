@@ -1,0 +1,15 @@
+DEFAULT_ARGUMENT_VALUE 1 0
+DEFAULT_ARGUMENT_VALUE 2 relap7-heat-exchanger.msh
+DEFAULT_ARGUMENT_VALUE 3 0
+INCLUDE relap7-heat-exchanger.fee
+# Correct for the inlet half control volumes when recovering reservoir enthalpy.
+primary_in_flow = mdot(0,0.02)
+secondary_in_flow = mdot(1,0)
+primary_wall_in = 0.05*1e4*(T_wall_primary_exchanger(0,0.02)-T(0,0.02))
+secondary_wall_in = 0.05*1e4*(T_wall_secondary_exchanger(1,0)-T(1,0))
+hot_gain = primary_in_flow*(h(1,0.02)-h(0,0.02))+primary_wall_in
+cold_gain = secondary_in_flow*(h(0,0)-h(1,0))+secondary_wall_in
+primary_p0 = p(0,0.02)+rho(0,0.02)*v(0,0.02)^2/2
+secondary_p0 = p(1,0)+rho(1,0)*v(1,0)^2/2
+direction_error = if(primary_in_flow>0&secondary_in_flow>0&T(1,0.02)<400&T(0,0)>300,0,1)
+PRINT abs(hs_heat_exchanger)/1e5+abs(hot_gain-hs_heat_primary_exchanger)/1e5+abs(cold_gain-hs_heat_secondary_exchanger)/1e5+abs(primary_p0/1.005e6-1)+abs(secondary_p0/1.005e6-1)+direction_error

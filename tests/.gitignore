@@ -89,3 +89,5 @@ hex8-ldef.vt*
 spooles.out
 beam*.vt*
 hex8-sparse.vt*
+relap*.vtu
+thermal-hydraulics-junction-merge.msh

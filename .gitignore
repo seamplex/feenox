@@ -118,3 +118,12 @@ Stanford_Bunny.stl
 poisson-square.vtu
 hex8-ldef.txt
 beam-orthotropic-*.vtu
+relap7-*.msh
+thermal-hydraulics-tee.msh
+thermal-hydraulics-structures.msh
+thermal-hydraulics-pump*.msh
+relap7-two-pipes*.msh
+
+
+hex8-sparse.vtk
+hex8-sparse.vtu

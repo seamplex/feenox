@@ -27,10 +27,18 @@ struct mesh_interp_params {
 };
 
 
-double feenox_mesh_interpolate_function_node(struct function_t *this, const double *x) {
-  
+double feenox_mesh_interpolate_function_node(struct function_t *this, const double *x_arg) {
+
   if (this->vector_value == NULL) {
     return 0;
+  }
+
+  // the argument has as many components as the function has arguments (i.e. the
+  // spatial dimension) but elements such as lines may look at the three of them
+  // so pad with zeros, which is where the nodes of lower-dimensional meshes are
+  double x[3] = {0, 0, 0};
+  for (int d = 0; d < this->n_arguments && d < 3; d++) {
+    x[d] = x_arg[d];
   }
 
   // find the nearest node
@@ -104,7 +112,22 @@ int feenox_mesh_interp_solve_for_r(element_t *this, const double *x, double *r) 
                                     &feenox_mesh_interp_residual_jacob,
                                     this->type->dim, &p};
   
-  if (this->type->id == ELEMENT_TYPE_TETRAHEDRON4 || this->type->id == ELEMENT_TYPE_TETRAHEDRON10) {
+  if (this->type->id == ELEMENT_TYPE_LINE2) {
+
+    // Straight first-order lines may point in any direction (e.g. pipes in 3D),
+    // so project the point onto the segment between the two end nodes.
+    double L2 = 0, t = 0;
+    for (int m = 0; m < 3; m++) {
+      double d = this->node[1]->x[m] - this->node[0]->x[m];
+      L2 += d*d;
+      t += (x[m] - this->node[0]->x[m])*d;
+    }
+    if (L2 == 0) {
+      return FEENOX_ERROR;
+    }
+    r[0] = 2*t/L2 - 1;
+
+  } else if (this->type->id == ELEMENT_TYPE_TETRAHEDRON4 || this->type->id == ELEMENT_TYPE_TETRAHEDRON10) {
     
     // the tetrahedron is an easy one (it's linear)
     // usually using this for tet10 is good enough
@@ -303,7 +326,7 @@ double mesh_interpolate_function_cell(struct function_t *function, const double 
 }
 */
 
-double feenox_function_property_eval(struct function_t *function, const double *x) {
+double feenox_function_property_eval(struct function_t *function, const double *x_arg) {
   double y = 0;
   property_data_t *property_data = NULL;
   property_t *property = function->property;
@@ -314,7 +337,15 @@ double feenox_function_property_eval(struct function_t *function, const double *
   if (mesh == NULL || mesh->n_nodes == 0) {
     return 1.0;
   }
-  
+
+  // same as in feenox_mesh_interpolate_function_node(): the argument has as many
+  // components as the function has arguments but the element lookup may read
+  // the three of them, so pad with zeros
+  double x[3] = {0, 0, 0};
+  for (int d = 0; d < function->n_arguments && d < 3; d++) {
+    x[d] = x_arg[d];
+  }
+
   node_t *node = feenox_mesh_find_nearest_node(function->mesh, x);
   element_t *element = feenox_mesh_find_element(function->mesh, node, x);
   

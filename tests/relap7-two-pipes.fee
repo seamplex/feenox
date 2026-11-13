@@ -1,0 +1,17 @@
+# RELAP-7 Example 6, using the low-Mach point-junction model.
+DEFAULT_ARGUMENT_VALUE 1 relap7-two-pipes.msh
+DEFAULT_ARGUMENT_VALUE 2 "K_pipe1=1 K_pipe2=1 A_ref=1"
+DEFAULT_ARGUMENT_VALUE 3 0
+DEFAULT_ARGUMENT_VALUE 4 1
+PROBLEM thermal_hydraulics MESH $1
+end_time = $3
+dt = 0.1
+MATERIAL pipe1 A=2 f=1
+MATERIAL pipe2 A=1 f=1
+MATERIAL connection $2
+BC inlet rho=995 v=if(x<1,1,2)
+BC outlet p=95000
+SOLVE_PROBLEM
+IF (end_time=0|done)&$4
+  PRINT p(0,0,0)-p(2,0,0) mdot(0.5,0,0) v(0,0,0) v(2,0,0) T(2,0,0)
+ENDIF

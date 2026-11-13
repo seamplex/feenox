@@ -1,0 +1,39 @@
+# Closed version of RELAP-7 Example 8 (the pump loop without the outlet BC).
+# The control volumes carry their mass and internal energy as unknowns, so any
+# linear multistep scheme keeps the total mass of the closed loop.
+# Argument 1 is the PETSc TS type and argument 2 the first time step (the
+# following ones are adaptive).
+DEFAULT_ARGUMENT_VALUE 1 beuler
+DEFAULT_ARGUMENT_VALUE 2 0.1
+PROBLEM thermal_hydraulics DIM 2 MESH relap7-pump-loop.msh TRANSIENT_SOLVER $1
+p_0(x,y) = 1e5
+T_0(x,y) = 300
+v_0(x,y) = 0
+end_time = 5
+dt_0 = $2
+MATERIAL pipe1 A=0.785398163e-4 D_h=0.01 f=0.01
+MATERIAL pipe2 A=3.14159e-4 D_h=0.01 f=0.01
+MATERIAL pipe3 A=0.785398163e-4 D_h=0.01 f=0.01
+MATERIAL pipe4 A=3.14159e-4 D_h=0.01 f=0.01
+MATERIAL pipe5 A=0.785398163e-4 D_h=0.01 f=0.01
+PUMP POINT pump HEAD 1 DIRECTION 1 1 0 K_REVERSE 10 10 A_REF 0.785398163e-3
+JUNCTION POINT junction2 K=3 A_ref=0.785398163e-3
+JUNCTION POINT junction3 K=3 A_ref=0.785398163e-3
+JUNCTION POINT junction4 K=3 A_ref=0.785398163e-3
+SOLVE_PROBLEM
+
+# trapezoidal masses along each branch (exact for the linear nodal density)
+INTEGRATE rho OVER pipe1 RESULT m1
+INTEGRATE rho OVER pipe2 RESULT m2
+INTEGRATE rho OVER pipe3 RESULT m3
+INTEGRATE rho OVER pipe4 RESULT m4
+INTEGRATE rho OVER pipe5 RESULT m5
+mass = 0.785398163e-4*(m1+m3+m5) + 3.14159e-4*(m2+m4)
+IF in_static
+  mass_initial = mass
+ENDIF
+drift = max(drift, abs(mass/mass_initial-1))
+IF done
+  # the flow has to start in the pump direction
+  PRINT drift+if(mdot(0.5,0)>0.01,0,1)
+ENDIF

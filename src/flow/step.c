@@ -21,6 +21,18 @@
  */
 #include "feenox.h"
 
+// how close to end_time is close enough to be done
+static double feenox_done_tolerance(void) {
+#ifdef HAVE_PETSC
+  // PETSc's TS steps are clipped to land on end_time and might be large
+  // (i.e. adaptive) so we only need to allow for round-off
+  if (feenox.pde.ts != NULL) {
+    return 1e-9*feenox_special_var_value(dt);
+  }
+#endif
+  return 1e-1*feenox_special_var_value(dt);
+}
+
 int feenox_step(instruction_t *first, instruction_t *last) {
 
   // set the special variable done to true if we are done so it's available during the step
@@ -31,7 +43,7 @@ int feenox_step(instruction_t *first, instruction_t *last) {
   }
   if (feenox_special_var_value(end_time) == 0) {
     feenox_special_var_value(done) = feenox_special_var_value(done_static);
-  } else if (feenox_special_var_value(t) >= (feenox_special_var_value(end_time) - 1e-1*feenox_special_var_value(dt))) {
+  } else if (feenox_special_var_value(t) >= (feenox_special_var_value(end_time) - feenox_done_tolerance())) {
     feenox_special_var_value(done) = 1;
   }  
   
@@ -57,7 +69,7 @@ int feenox_step(instruction_t *first, instruction_t *last) {
   }
   if (feenox_special_var_value(end_time) == 0) {
     feenox_special_var_value(done) = feenox_special_var_value(done_static);
-  } else if (feenox_special_var_value(t) >= (feenox_special_var_value(end_time) - 1e-1*feenox_special_var_value(dt))) {
+  } else if (feenox_special_var_value(t) >= (feenox_special_var_value(end_time) - feenox_done_tolerance())) {
     feenox_special_var_value(done) = 1;
   }  
 

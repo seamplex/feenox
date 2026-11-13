@@ -1,0 +1,48 @@
+# Steady-state balances of the RELAP-7 Example 11 PWR model after the manual's
+# 200 s transient from rest-like initial conditions (v = 1 m/s, T = 564.15 K).
+DEFAULT_ARGUMENT_VALUE 1 200
+DEFAULT_ARGUMENT_VALUE 2 1
+DEFAULT_ARGUMENT_VALUE 3 0
+INCLUDE relap7-pwr.fee
+
+# Junction nodes convert the port kinetic-energy flux mdot^3/(2 rho^2 A^2) into
+# enthalpy (pipe-interior nodes do not), so the closed-loop energy balance
+# includes these terms: about 36 kW here, i.e. 1.3e-5 of the reactor power.
+ke(m,r,s) = m^3/(2*r^2*s^2)
+
+IF done
+  core_heat = hs_heat_CH1+hs_heat_CH2+hs_heat_CH3
+  # flows at pipe nodes; the lines follow the flow direction
+  loop_A = mdot(0,4,6)
+  loop_B = mdot(0,-4,6)
+  core_flow = mdot(0,-1.2,1.8288)+mdot(0,0,1.8288)+mdot(0,1.2,1.8288)+mdot(0,1.5,0.73152)
+  pump_power = 9.80665*8.66*(mdot(0,3.2,4)+mdot(0,-3.2,4))
+  # signed kinetic fluxes at the primary junctions (loop B mirrors loop A;
+  # the pumps join equal areas and the pressurizer flow is negligible)
+  r_lower = rho(0,0,0)
+  r_upper = rho(0,0,3.6576)
+  c1 = mdot(0,-1.2,1.8288)
+  c2 = mdot(0,0,1.8288)
+  c3 = mdot(0,1.2,1.8288)
+  cb = mdot(0,1.5,0.73152)
+  lower = ke(loop_A,r_lower,3.6185734)+ke(loop_B,r_lower,3.6185734)-ke(c1,r_lower,1.161864)-ke(c2,r_lower,1.549152542)-ke(c3,r_lower,1.858983051)-ke(cb,r_lower,1.589571014)
+  upper = ke(c1,r_upper,1.161864)+ke(c2,r_upper,1.549152542)+ke(c3,r_upper,1.858983051)+ke(cb,r_upper,1.589571014)-ke(loop_A,r_upper,7.562307456)-ke(loop_B,r_upper,7.562307456)
+  loop_kinetic(m,s) = ke(m,rho(0,s*0.5,8),7.562307456)-ke(m,rho(0,s*0.5,8),2.624474)+ke(m,rho(0,s*4,8),2.624474)-ke(m,rho(0,s*4,8),5)+ke(m,rho(0,s*4,4),5)-ke(m,rho(0,s*4,4),2.624474)+ke(m,rho(0,s*2,4),2.624474)-ke(m,rho(0,s*2,4),3.6185734)
+  kinetic = lower+upper+loop_kinetic(loop_A,1)+loop_kinetic(loop_B,-1)
+
+  # the rods, the steam-generator walls and the primary fluid are in steady state
+  rod_error = abs(core_heat/P_reactor-1)
+  wall_error = abs(hs_heat_primary_HX_A+hs_heat_secondary_HX_A)/P_reactor+abs(hs_heat_primary_HX_B+hs_heat_secondary_HX_B)/P_reactor
+  primary_error = abs(core_heat+pump_power+kinetic+hs_heat_primary_HX_A+hs_heat_primary_HX_B)/P_reactor
+  # mass: both loops feed the core and the bypass, the pressurizer is at rest
+  mass_error = abs(core_flow/(loop_A+loop_B)-1)+abs(mdot(0,0.5,8.5))/loop_A
+  symmetry_error = abs(loop_B/loop_A-1)+abs(hs_heat_primary_HX_B/hs_heat_primary_HX_A-1)
+  # MERGE points carry the state of their junction
+  merge_error = abs(p(0,2,0)-p(0,-1.2,0))+abs(p(0,0.5,4)-p(0,1.5,3.6576))+abs(p(0,3.2,4)-p(0,3,4))+abs(T(0,-2,0)-T(0,1.5,0))+abs(T(0,4.2,8)-T(0,4.201,8))
+  secondary_error = abs(mdot(0,4.201,4)/9419.640610595952-1)+abs(mdot(0,-4.201,4)/9419.640610595952-1)
+
+  # regression values of this model
+  regression_error = abs(loop_A/9463.047639-1)+abs(mdot(0,0,1.8288)/5477.873465-1)+abs(T(0,0,0)/597.7178792-1)+abs(T(0,0,3.6576)/616.5268698-1)+abs(T(0,4.201,8)/590.417656-1)
+
+  PRINT rod_error+wall_error+primary_error+mass_error+symmetry_error+merge_error+secondary_error+regression_error
+ENDIF

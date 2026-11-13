@@ -1,0 +1,23 @@
+DEFAULT_ARGUMENT_VALUE 1 AXIAL_CONDUCTION
+DEFAULT_ARGUMENT_VALUE 2 1
+DEFAULT_ARGUMENT_VALUE 3 0
+p_0(x,y,z) = 1e6
+T_0(x,y,z) = 300
+v_0(x,y,z) = 0
+T_solid_0(r,x,y,z) = 300
+VAR old_first old_second old_third
+INCLUDE thermal-hydraulics-structures.fee
+IF in_static
+  max_error = abs(T_fuel_center_first(0.5,0,0)-300)+abs(T_fuel_center_second(1.5,0,0)-300)+abs(T_fuel_center_third(2.5,0,0)-300)
+ELSE
+  error_first = abs((hs_energy_first-old_first)/dt+hs_heat_first-1000)/1000
+  error_second = abs((hs_energy_second-old_second)/dt+hs_heat_second-2000)/2000
+  error_third = abs((hs_energy_third-old_third)/dt+hs_heat_third-3000)/3000
+  max_error = max(max_error,error_first+error_second+error_third)
+ENDIF
+old_first = hs_energy_first
+old_second = hs_energy_second
+old_third = hs_energy_third
+IF done
+  PRINT max_error+abs(hs_heat/(hs_heat_first+hs_heat_second+hs_heat_third)-1)+abs(hs_energy/(hs_energy_first+hs_energy_second+hs_energy_third)-1)
+ENDIF
