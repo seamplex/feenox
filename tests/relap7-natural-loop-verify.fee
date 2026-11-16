@@ -1,0 +1,20 @@
+DEFAULT_ARGUMENT_VALUE 1 relap7-natural-loop.msh
+DEFAULT_ARGUMENT_VALUE 2 50
+DEFAULT_ARGUMENT_VALUE 3 0
+DEFAULT_ARGUMENT_VALUE 4 1
+DEFAULT_ARGUMENT_VALUE 5 2e5
+DEFAULT_ARGUMENT_VALUE 6 1
+INCLUDE relap7-natural-loop.fee
+VAR old_core_energy old_wall_energy
+IF in_static
+  initial_error = abs(T_fuel_center_core(0,0,0.4)/300.15-1)+abs(T_wall_primary_exchanger(0,1,4)/300.15-1)+abs(mdot(0,0,0.4)/(rho(0,0,0.4)*0.44934)-$4)
+ELSE
+  core_error = max(core_error,abs((hs_energy_core-old_core_energy)/dt+hs_heat_core-5.1296e7)/5.1296e7)
+  wall_error = max(wall_error,abs((hs_energy_exchanger-old_wall_energy)/dt+hs_heat_exchanger)/5.1296e7)
+ENDIF
+old_core_energy = hs_energy_core
+old_wall_energy = hs_energy_exchanger
+IF done
+  direction_error = if($6*mdot(0,0,0.4)>0&hs_heat_core>0&hs_heat_primary_exchanger<0&hs_heat_secondary_exchanger>0&T(0,1.2,5.98)>300.15,0,1)
+  PRINT initial_error+core_error+wall_error+direction_error
+ENDIF

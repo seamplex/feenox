@@ -1,0 +1,24 @@
+# RELAP-7 Example 9 at 1 MPa, keeping the inlet-to-outlet pressure difference.
+# PLATE is the manual's wall geometry; the pipes remain hydraulically separate.
+DEFAULT_ARGUMENT_VALUE 1 0
+DEFAULT_ARGUMENT_VALUE 2 relap7-heat-exchanger.msh
+DEFAULT_ARGUMENT_VALUE 3 1
+PROBLEM thermal_hydraulics DIM 2 MESH $2
+end_time = $1
+dt = 0.1
+MATERIAL primary A=0.785398163e-4 D_h=0.01 f=0.01
+MATERIAL secondary A=0.785398163e-4 D_h=0.01 f=0.01
+MATERIAL wall k=100 rho_s=100 cp=100
+HEAT_STRUCTURE NAME exchanger {
+  TYPE PLATE MATERIAL wall THICKNESS 0.01 CELLS 2 DEPTH 1
+  PRIMARY primary SECONDARY secondary H_PRIMARY 1e4 H_SECONDARY 1e4
+  AXIS 1 0 0 AXIAL_CONDUCTION
+}
+BC primary_inlet p0=1.005e6 T0=400
+BC primary_outlet p=1e6
+BC secondary_inlet p0=1.005e6 T0=300
+BC secondary_outlet p=1e6
+SOLVE_PROBLEM
+IF (end_time=0|done)&$3
+  PRINT T(1,0.02) T(0,0) mdot(0.5,0.02) mdot(0.5,0) hs_heat_primary_exchanger hs_heat_secondary_exchanger
+ENDIF

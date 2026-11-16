@@ -1,0 +1,16 @@
+# RELAP-7 Example 6 with a gap between the pipe ends: a MERGE junction
+# connects them by topology, so the result is the same as relap7-two-pipes.fee.
+DEFAULT_ARGUMENT_VALUE 1 0.5
+DEFAULT_ARGUMENT_VALUE 2 MERGE
+DEFAULT_ARGUMENT_VALUE 3 "dummy=0"
+PROBLEM thermal_hydraulics MESH thermal-hydraulics-junction-merge.msh
+gap = $1
+MATERIAL pipe1 A=2 f=1
+MATERIAL pipe2 A=1 f=1
+JUNCTION POINT connection $2 K_pipe1=1 K_pipe2=1 A_ref=1
+BC inlet rho=995 v=1
+BC outlet p=95000
+$3
+SOLVE_PROBLEM
+# both merged points carry the junction state
+PRINT p(0,0,0)-p(2+gap,0,0) mdot(0.5,0,0) mdot(1.5+gap,0,0) T(2+gap,0,0) p(1,0,0)-p(1+gap,0,0) T(1,0,0)-T(1+gap,0,0)

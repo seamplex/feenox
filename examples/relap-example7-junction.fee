@@ -1,0 +1,61 @@
+# RELAP-7 manual example 7: a junction with two pipes flowing in
+# and three pipes flowing out, all of them heated by the wall
+# initial state: p = 100 kPa, T = 305 K and v = 1 m/s everywhere
+# inlets:  pipe1 rho = 990 kg/m^3 and v = 1 m/s
+#          pipe2 rho = 995 kg/m^3 and v = 1.5 m/s
+# outlets: p = 95 kPa in pipes 3, 4 and 5
+PROBLEM thermal_hydraulics MESH relap7-five-pipes.msh DIM 2
+
+# integrate up to t = 5 s with the default backward Euler scheme,
+# letting FeenoX choose the time step
+end_time = 5
+
+# initial conditions, the same as RELAP-7's
+p_0(x,y) = 1e5
+T_0(x,y) = 305
+v_0(x,y) = 1
+
+# each pipe has its own flow area, all of them have the same friction factor
+# and exchange heat with a wall at 310 K with a fixed heat transfer coefficient
+# the hydraulic diameter is not given so it is sqrt(4A/pi) as in RELAP-7,
+# then the heated perimeter 4A/D_h is the circumference 2*sqrt(pi*A) as in RELAP-7
+MATERIAL pipe1 A=2   f=1 T_wall=310 h_wall=1e4
+MATERIAL pipe2 A=1   f=1 T_wall=310 h_wall=1e4
+MATERIAL pipe3 A=2   f=1 T_wall=310 h_wall=1e4
+MATERIAL pipe4 A=1   f=1 T_wall=310 h_wall=1e4
+MATERIAL pipe5 A=1.5 f=1 T_wall=310 h_wall=1e4
+
+# the five pipe ends do not touch, so MERGE joins them into a single
+# control volume as RELAP-7's Junction does
+# RELAP-7's K = '5 7 11 13 17' are the loss coefficients of each port in the
+# order inputs then outputs, all of them referred to A_ref = 3 m^2
+JUNCTION POINT junction MERGE K_pipe1=5 K_pipe2=7 K_pipe3=11 K_pipe4=13 K_pipe5=17 A_ref=3
+
+# note that at 1 bar, rho = 990 kg/m^3 means water at about 319 K, which is
+# hotter than the wall, while rho = 995 kg/m^3 means about 305 K
+BC inlet1  rho=990 v=1
+BC inlet2  rho=995 v=1.5
+BC outlet3 p=95e3
+BC outlet4 p=95e3
+BC outlet5 p=95e3
+
+SOLVE_PROBLEM
+
+# mass flows in each pipe evaluated at their mid points
+mdot1 = mdot(0.5, 0)
+mdot2 = mdot(0.5, 0.3)
+mdot3 = mdot(1.7, 0)
+mdot4 = mdot(1.7, 0.5)
+mdot5 = mdot(1.7, 1.0)
+
+# write the evolution of the mass flow in each pipe and the junction pressure
+PRINT t %.4e mdot1 mdot2 mdot3 mdot4 mdot5 p(1,0)
+WRITE_RESULTS
+
+# at the end, check the mass balance at the junction and print
+# the pressure and temperature at the junction and at each outlet
+IF done
+  PRINTF "\# junction mass imbalance %g" (mdot1+mdot2-mdot3-mdot4-mdot5)/(mdot1+mdot2)
+  PRINTF "\# junction p = %g Pa T = %g K" p(1,0) T(1,0)
+  PRINTF "\# outlet temperatures %g %g %g K" T(2.2,0) T(2.2,0.5) T(2.2,1.0)
+ENDIF

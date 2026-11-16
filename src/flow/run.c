@@ -120,7 +120,13 @@ int feenox_run(void) {
       feenox_call(feenox_step(feenox.instructions, NULL));
       
     } else if (feenox.pde.solve != NULL) {
-      
+
+#ifdef HAVE_PETSC
+      // take the step proposed by the time integrator unless dt was changed
+      if (feenox.pde.ts_dt_next > 0 && feenox_special_var_value(dt) == feenox.pde.ts_dt_taken) {
+        feenox_special_var_value(dt) = feenox.pde.ts_dt_next;
+      }
+#endif
       feenox_limit_time_step();
       feenox_special_var_value(in_time_path) = 0;
       double next_time = feenox_special_var_value(t) + feenox_special_var_value(dt);

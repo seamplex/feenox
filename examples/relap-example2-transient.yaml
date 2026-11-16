@@ -1,0 +1,52 @@
+---
+category: thermal_hydraulics
+intro: |
+  # RELAP7 Example 2: A transient pipe flow problem
+
+  The second example from the RELAP7 manual uses the same pipe as [example 1](#relap7-example-1-a-simple-pipe-flow-problem),
+  but now
+
+   1. the problem is a transient from $t=0$ to $t=10~\text{s}$, with a varaible time-stepping scheme starting from $\Delta t_0 = 1~\text{ms}$ using a second-order BDF method (the original RELAP example uses fixed $\Delta t$),
+   2. the water starts at rest with $p=15.51~\text{MPa}$ and $T=559.15~\text{K}$ everywhere, and
+   3. the Darcy friction factor is not computed from a correlation but given as a function of time that rises linearly from $f=0.01$ at $t=0$ to $f=0.02$ at $t=50~\text{ms}$ and stays constant afterwards.
+
+  The inlet still imposes $\rho = 753.632~\text{kg}/\text{m}^3$ and $v = 4.43~\text{m}/\text{s}$, and the outlet still imposes $p=15.51~\text{MPa}$.
+  We re-use the same mesh `relap7-pipe.msh` from example\ 1.
+
+  In FeenoX, a transient problem is just a problem with a positive `end_time`.
+  The initial conditions are given as functions `p_0`, `T_0` and `v_0` of the space,
+  and the time-dependent friction factor is a regular point-wise defined function of time\ $t$
+  that is used in the `f` property of the pipe material.
+
+  At the end of the transient, the mass flow should be $\rho v A$ and the pressure drop should follow Darcy-Weisbach with $f=0.02$.
+
+terminal: |
+  $ gmsh -1 relap7-pipe.geo
+  $ feenox relap-example2-transient.fee
+  0       +0.0000e+00     +0.0000e+00     +5.5915e+02     0.01
+  0.001   +3.9914e+06     +1.3394e-01     +5.5915e+02     0.0102
+  0.003   +2.4446e+06     +4.2500e-01     +5.5916e+02     0.0106
+  0.007   -1.6413e+06     +4.4023e-01     +5.5916e+02     0.0114
+  0.011   -1.5399e+06     +2.5334e-01     +5.5916e+02     0.0122
+  0.019   +6.8515e+05     +2.5802e-01     +5.5916e+02     0.0138
+  0.035   +1.3698e+05     +3.1128e-01     +5.5916e+02     0.017
+  0.067   -4.3180e+04     +2.9243e-01     +5.5916e+02     0.02
+  0.131   +3.3648e+04     +2.9301e-01     +5.5916e+02     0.02
+  0.259   +2.5104e+04     +2.9348e-01     +5.5916e+02     0.02
+  0.515   +2.5028e+04     +2.9342e-01     +5.5917e+02     0.02
+  1.027   +2.5094e+04     +2.9342e-01     +5.5917e+02     0.02
+  2.051   +2.5090e+04     +2.9342e-01     +5.5916e+02     0.02
+  4.099   +2.5090e+04     +2.9342e-01     +5.5916e+02     0.02
+  8.195   +2.5090e+04     +2.9342e-01     +5.5916e+02     0.02
+  10      +2.5090e+04     +2.9342e-01     +5.5916e+02     0.02
+  # steady-state check 2.71691e-05
+  $ cat relap-example2-transient-pressure.dat 
+  0       1.55351e+07
+  2       1.551e+07
+  0.4     1.55301e+07
+  0.8     1.55251e+07
+  1.2     1.552e+07
+  1.6     1.5515e+07
+  $
+
+...

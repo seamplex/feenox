@@ -30,11 +30,12 @@ int feenox_mesh_element2cell(mesh_t *mesh) {
   }
   feenox.mesh.need_cells = 1;
   
-  // contamos cuantas celdas hay
-  // una celda = un elemento de la dimension del problema
+  // a cell is an element of the topological dimension of the mesh, which is
+  // lower than the spatial dimension for lines or surfaces embedded in 3D
+  // (e.g. pipes), and these are also the elements the vtk/vtu writers output
   mesh->n_cells = 0;
   for (i_element = 0; i_element < mesh->n_elements; i_element++) {
-    if (mesh->element[i_element].type != NULL && mesh->element[i_element].type->dim == mesh->dim) {
+    if (mesh->element[i_element].type != NULL && mesh->element[i_element].type->dim == mesh->dim_topo) {
       mesh->n_cells++;
     }
   }
@@ -44,7 +45,7 @@ int feenox_mesh_element2cell(mesh_t *mesh) {
 
   i_cell = 0;
   for (i_element = 0; i_element < mesh->n_elements; i_element++) {
-    if (mesh->element[i_element].type != NULL && mesh->element[i_element].type->dim == mesh->dim) {
+    if (mesh->element[i_element].type != NULL && mesh->element[i_element].type->dim == mesh->dim_topo) {
   
       // las id las empezamos en uno
       mesh->cell[i_cell].id = i_cell+1;

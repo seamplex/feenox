@@ -1,0 +1,12 @@
+---
+title: Thermal hydraulics
+titleblock: |
+ Thermal hydraulics
+ ==================
+lang: en-US
+toc: true 
+abstract: |
+  FeenoX supports solving one-dimensional thermal hydraulics for modeling plant dynamics.
+  Most of these examples are taken from RELAP7 manual PDF.
+  The results may be similar but the design and implementation (see the [SRS](https://seamplex.com/feenox/doc/srs.html) and the [SDS](https://seamplex.com/feenox/doc/sds.html)) are very different.
+...

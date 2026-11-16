@@ -1,0 +1,58 @@
+---
+category: thermal_hydraulics
+intro: |
+  # RELAP7 Example 3: Adding heat to a simple pipe flow problem
+
+  The third example from the RELAP7 manual is the same transient as [example 2](#relap7-example-2-a-transient-pipe-flow-problem)
+  but now the pipe wall is kept at a fixed temperature $T_\text{wall} = 565~\text{K}$, which is higher than the incoming water at $559.15~\text{K}$.
+  As in example\ 2, we use a variable time step starting from $\Delta t_0 = 1~\text{ms}$ with a second-order BDF method (the original RELAP example uses a fixed $\Delta t = 10~\text{ms}$).
+
+  In FeenoX, the main change with respect to example\ 2 is adding `T_wall=565` to the pipe `MATERIAL`.
+  This adds a heat flux $h_\text{wall} P_h (T_\text{wall}-T)$ per unit length to the energy equation, where
+
+   * $P_h$ is the heated perimeter, and
+   * the heat transfer coefficient $h_\text{wall}$ follows the TRACE single-phase tube model, namely the maximum of laminar ($\text{Nu}=4.36$), corrected Gnielinski and natural convection, with the water conductivity from IAPWS-2011.
+
+  Both can be given with the `P_h` and `h_wall` material properties.
+  FeenoX's default heated perimeter is $4A/D_h$, but RELAP-7 assumes the circumference $2\sqrt{\pi A}$ of a circle with area\ $A$.
+  Since here $A$ and $D_h$ are not consistent with a circular pipe, these two differ by about 11%, so we set `P_h=2*sqrt(pi*A)` explicitly to match the original RELAP-7 input.
+
+  RELAP-7's input also sets `gravity = '0 0 0'`.
+  The pipe is horizontal so gravity does not enter the momentum equation, but it does enter the natural-convection part of the heat transfer coefficient.
+  FeenoX's default is $g_z = -9.81~\text{m}/\text{s}^2$, so we set `g_z = 0` to stay faithful to the original problem (it does not make any difference in this case, though).
+
+  The output shows the mass flow, the temperature at the inlet and outlet nodes and the power $\dot{m}(h_\text{out}-h_\text{in})$ absorbed between those two nodes.
+  Note that the inlet node is a control volume that already receives half the wall heat of the first element, so its temperature is higher than the $559.15~\text{K}$ of the incoming stream.
+  After the startup transient, the outlet temperature slightly overshoots and then settles at $T_\text{out} \approx 563.27~\text{K}$.
+
+terminal: |
+  $ gmsh -1 relap7-pipe.geo
+  $ feenox relap-example3-heat.fee
+  0	0.0000e+00	5.5915e+02	5.5915e+02	0.0000e+00
+  0.001	1.3445e-01	5.6057e+02	5.5915e+02	-7.4690e+02
+  0.002	3.1643e-01	5.6041e+02	5.5917e+02	-1.5567e+03
+  0.004	4.9060e-01	5.5965e+02	5.5923e+02	-8.6122e+02
+  0.006	4.2600e-01	5.5869e+02	5.5927e+02	8.9903e+02
+  0.01	2.0613e-01	5.5879e+02	5.5933e+02	4.2017e+02
+  0.018	2.6066e-01	5.5981e+02	5.5945e+02	-3.4977e+02
+  0.034	3.1912e-01	5.5961e+02	5.5972e+02	1.9061e+02
+  0.05	2.9385e-01	5.5966e+02	5.5997e+02	4.6958e+02
+  0.082	2.9411e-01	5.5980e+02	5.6044e+02	9.7355e+02
+  0.146	2.9442e-01	5.5987e+02	5.6124e+02	2.0942e+03
+  0.274	2.9353e-01	5.5989e+02	5.6238e+02	3.8149e+03
+  0.53	2.9324e-01	5.5987e+02	5.6339e+02	5.3856e+03
+  1.042	2.9332e-01	5.5986e+02	5.6360e+02	5.7139e+03
+  2.066	2.9342e-01	5.5986e+02	5.6334e+02	5.3203e+03
+  4.114	2.9343e-01	5.5986e+02	5.6325e+02	5.1832e+03
+  8.21	2.9342e-01	5.5987e+02	5.6326e+02	5.2037e+03
+  10	2.9342e-01	5.5987e+02	5.6327e+02	5.2093e+03
+  $ cat relap-example3-heat-profile.dat
+  0	559.865	1.26703e+06
+  2	563.268	1.28478e+06
+  0.4	560.963	1.27273e+06
+  0.8	561.825	1.27722e+06
+  1.2	562.502	1.28076e+06
+  1.6	563.034	1.28355e+06
+  $
+
+...

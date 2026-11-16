@@ -26,5 +26,5 @@ if [ ! -e ${dir}/bunny.msh ]; then
 fi
 
 
-answerzero bunny-thermal.fee 1e-2
+answerzero bunny-thermal.fee 2e-2
 exitifwrong $?

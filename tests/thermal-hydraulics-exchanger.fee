@@ -1,0 +1,38 @@
+# Counterflow benchmark with a prescribed mass flow on each independent side.
+DEFAULT_ARGUMENT_VALUE 1 PLATE
+DEFAULT_ARGUMENT_VALUE 2 "DEPTH 0.0314"
+DEFAULT_ARGUMENT_VALUE 3 1
+DEFAULT_ARGUMENT_VALUE 4 relap7-heat-exchanger-fine.msh
+PROBLEM thermal_hydraulics DIM 2 MESH $4
+MATERIAL primary A=0.785398163e-4 D_h=0.01 f=0.01
+MATERIAL secondary A=0.785398163e-4 D_h=0.01 f=0.01
+MATERIAL wall k=100 rho_s=100 cp=100
+HEAT_STRUCTURE NAME wall TYPE $1 MATERIAL wall THICKNESS 0.001 CELLS 20 {
+  $2 PRIMARY primary SECONDARY secondary H_PRIMARY 1e4 H_SECONDARY 1e4
+  AXIS 1 0 0 NO_AXIAL_CONDUCTION
+}
+BC primary_inlet mdot=0.1 T=400
+BC primary_outlet p=1e6
+BC secondary_inlet mdot=0.1 T=300
+BC secondary_outlet p=1e6
+SOLVE_PROBLEM
+plate = $3
+primary_perimeter = if(plate,0.0314,2*pi*0.005)
+secondary_perimeter = if(plate,0.0314,2*pi*0.006)
+radial_resistance(i) = 0.00005/(pi*100*(0.01+(2*i-1)*0.00005))
+conduction_resistance = if(plate,0.001/(100*0.0314),sum(radial_resistance(i),i,1,20))
+resistance = 1/(1e4*primary_perimeter)+conduction_resistance+1/(1e4*secondary_perimeter)
+continuum_resistance = 1/(1e4*primary_perimeter)+if(plate,conduction_resistance,log(0.006/0.005)/(2*pi*100))+1/(1e4*secondary_perimeter)
+heat_per_length(x) = (T(x,0.02)-T(x,0))/resistance
+primary_heat(x) = 1e4*primary_perimeter*(T(x,0.02)-T_wall_primary_wall(x,0.02))
+secondary_heat(x) = 1e4*secondary_perimeter*(T_wall_secondary_wall(x,0)-T(x,0))
+local_error(x) = (abs(primary_heat(x)-heat_per_length(x))+abs(secondary_heat(x)-heat_per_length(x)))/(1+abs(heat_per_length(x)))
+# Effective heat capacities permit a close comparison to constant-cp epsilon-NTU.
+hot_capacity = abs(hs_heat_primary_wall)/(400-T(1,0.02))
+cold_capacity = hs_heat_secondary_wall/(T(0,0)-300)
+capacity_min = min(hot_capacity,cold_capacity)
+capacity_ratio = capacity_min/max(hot_capacity,cold_capacity)
+ntu = 1/(continuum_resistance*capacity_min)
+effectiveness = if(abs(1-capacity_ratio)<1e-8,ntu/(1+ntu),(1-exp(-ntu*(1-capacity_ratio)))/(1-capacity_ratio*exp(-ntu*(1-capacity_ratio))))
+epsilon_error = abs(hs_heat_secondary_wall/(effectiveness*capacity_min*100)-1)
+PRINT sum(local_error(i/10),i,0,10)/11+abs(hs_heat_wall)/1e4+abs(mdot(0.5,0.02)-0.1)+abs(mdot(0.5,0)-0.1)+if(epsilon_error<0.003,0,1)

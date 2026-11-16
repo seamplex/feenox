@@ -1,0 +1,26 @@
+# RELAP-7 Example 7 with IF97 and the low-Mach point-junction model.
+# D_h and heated perimeter use the circular-equivalent defaults from A.
+DEFAULT_ARGUMENT_VALUE 1 0
+DEFAULT_ARGUMENT_VALUE 2 1
+PROBLEM thermal_hydraulics DIM 3 MESH relap7-five-pipes.msh
+end_time = $1
+dt = 0.1
+# No gravity: this is a junction-mixing test with all branches flowing forward.
+# With g_z = -9.81 the 1 m rise of pipe 5 needs about 9.6 kPa while the junction
+# is only about 5 kPa above the 95 kPa outlets, so pipe 5 would reverse.
+g_z = 0
+MATERIAL pipe1 A=2 f=1 T_wall=310 h_wall=1e4
+MATERIAL pipe2 A=1 f=1 T_wall=310 h_wall=1e4
+MATERIAL pipe3 A=2 f=1 T_wall=310 h_wall=1e4
+MATERIAL pipe4 A=1 f=1 T_wall=310 h_wall=1e4
+MATERIAL pipe5 A=1.5 f=1 T_wall=310 h_wall=1e4
+JUNCTION POINT connection K_pipe1=5 K_pipe2=7 K_pipe3=11 K_pipe4=13 K_pipe5=17 A_ref=3
+BC inlet1 rho=990 v=1
+BC inlet2 rho=995 v=1.5
+BC outlet3 p=95000
+BC outlet4 p=95000
+BC outlet5 p=95000
+SOLVE_PROBLEM
+IF (end_time=0|done)&$2
+  PRINT mdot(0.5,0,0) mdot(0,0.5,0) mdot(0,0,0.5) T(1,0,0) T(0,1,0) T(0,0,1)
+ENDIF

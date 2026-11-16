@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1530pt" height="996pt" viewBox="0 0 1530 996">
+<title>relap7-natural-loop-geo</title>
+<desc>
+Creator: GL2PS 1.4.3, (C) 1999-2020 C. Geuzaine
+For: Gmsh
+CreationDate: Fri Nov 13 12:09:52 2026
+</desc>
+<defs>
+</defs>
+<g>
+<circle fill="#5a5a5a" cx="759.75" cy="932.255" r="4"/>
+<circle fill="#5a5a5a" cx="625.616" cy="932.255" r="4"/>
+<circle fill="#5a5a5a" cx="625.616" cy="824.948" r="4"/>
+<circle fill="#5a5a5a" cx="625.616" cy="130.133" r="4"/>
+<circle fill="#5a5a5a" cx="759.75" cy="130.133" r="4"/>
+<circle fill="#5a5a5a" cx="759.75" cy="627.77" r="4"/>
+<circle fill="#5a5a5a" cx="625.616" cy="127.45" r="4"/>
+<circle fill="#5a5a5a" cx="826.817" cy="627.77" r="4"/>
+<circle fill="#5a5a5a" cx="786.577" cy="627.77" r="4"/>
+<circle fill="#5a5a5a" cx="787.167" cy="130.133" r="4"/>
+<circle fill="#5a5a5a" cx="787.167" cy="627.77" r="4"/>
+<circle fill="#5a5a5a" cx="759.75" cy="932.255" r="4"/>
+<circle fill="#5a5a5a" cx="625.616" cy="932.255" r="4"/>
+<circle fill="#5a5a5a" cx="625.616" cy="824.948" r="4"/>
+<circle fill="#5a5a5a" cx="625.616" cy="130.133" r="4"/>
+<circle fill="#5a5a5a" cx="759.75" cy="130.133" r="4"/>
+<circle fill="#5a5a5a" cx="759.75" cy="627.77" r="4"/>
+<circle fill="#5a5a5a" cx="625.616" cy="127.45" r="4"/>
+<circle fill="#5a5a5a" cx="826.817" cy="627.77" r="4"/>
+<circle fill="#5a5a5a" cx="786.577" cy="627.77" r="4"/>
+<circle fill="#5a5a5a" cx="787.167" cy="130.133" r="4"/>
+<circle fill="#5a5a5a" cx="787.167" cy="627.77" r="4"/>
+<text fill="#0000ff" x="695.283" y="929.655" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Line 1</text>
+<text fill="#0000ff" x="695.283" y="949.455" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Curve 1: pipe1</text>
+<text fill="#0000ff" x="628.216" y="876.001" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Line 2</text>
+<text fill="#0000ff" x="628.216" y="895.801" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Curve 2: core</text>
+<text fill="#0000ff" x="628.216" y="474.94" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Line 3</text>
+<text fill="#0000ff" x="628.216" y="494.74" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Curve 3: pipe2</text>
+<text fill="#0000ff" x="695.283" y="127.533" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Line 4</text>
+<text fill="#0000ff" x="695.283" y="147.333" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Curve 4: pipe3</text>
+<text fill="#0000ff" x="762.35" y="376.351" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Line 5</text>
+<text fill="#0000ff" x="762.35" y="396.151" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Curve 5: primary</text>
+<text fill="#0000ff" x="762.35" y="777.413" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Line 6</text>
+<text fill="#0000ff" x="762.35" y="797.213" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Curve 6: pipe4</text>
+<text fill="#0000ff" x="628.216" y="126.191" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Line 7</text>
+<text fill="#0000ff" x="628.216" y="145.991" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Curve 7: pipe5</text>
+<text fill="#0000ff" x="809.297" y="625.17" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Line 8</text>
+<text fill="#0000ff" x="809.297" y="644.97" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Curve 8: pipe6</text>
+<text fill="#0000ff" x="789.767" y="376.351" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Line 9</text>
+<text fill="#0000ff" x="789.767" y="396.151" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Curve 9: secondary</text>
+<polyline fill="none" stroke="#0000ff" stroke-width="2" stroke-linecap="butt" stroke-linejoin="miter" points="759.75,932.255 625.616,932.255 625.616,824.948 625.616,130.133 759.75,130.133 759.75,627.77 759.75,932.255"/>
+<polyline fill="none" stroke="#0000ff" stroke-width="2" stroke-linecap="butt" stroke-linejoin="miter" points="625.616,130.133 625.616,127.45"/>
+<polyline fill="none" stroke="#0000ff" stroke-width="2" stroke-linecap="butt" stroke-linejoin="miter" points="826.817,627.77 786.577,627.77"/>
+<polyline fill="none" stroke="#0000ff" stroke-width="2" stroke-linecap="butt" stroke-linejoin="miter" points="787.167,130.133 787.167,627.77"/>
+<text fill="#5a5a5a" x="765.35" y="926.655" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 1</text>
+<text fill="#5a5a5a" x="765.35" y="946.455" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 15: junction6</text>
+<text fill="#5a5a5a" x="631.216" y="926.655" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 2</text>
+<text fill="#5a5a5a" x="631.216" y="946.455" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 10: junction1</text>
+<text fill="#5a5a5a" x="631.216" y="819.348" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 3</text>
+<text fill="#5a5a5a" x="631.216" y="839.148" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 11: junction2</text>
+<text fill="#5a5a5a" x="631.216" y="124.533" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 4</text>
+<text fill="#5a5a5a" x="631.216" y="144.333" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 12: junction3</text>
+<text fill="#5a5a5a" x="765.35" y="124.533" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 5</text>
+<text fill="#5a5a5a" x="765.35" y="144.333" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 13: junction4</text>
+<text fill="#5a5a5a" x="765.35" y="622.17" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 6</text>
+<text fill="#5a5a5a" x="765.35" y="641.97" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 14: junction5</text>
+<text fill="#5a5a5a" x="631.216" y="121.85" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 7</text>
+<text fill="#5a5a5a" x="631.216" y="141.65" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 17: pressurizer</text>
+<text fill="#5a5a5a" x="832.417" y="622.17" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 8</text>
+<text fill="#5a5a5a" x="832.417" y="641.97" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 18: inlet</text>
+<text fill="#5a5a5a" x="792.177" y="622.17" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 9</text>
+<text fill="#5a5a5a" x="792.177" y="641.97" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 16: junction7</text>
+<text fill="#5a5a5a" x="792.767" y="124.533" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 10</text>
+<text fill="#5a5a5a" x="792.767" y="144.333" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 16: junction7</text>
+<text fill="#5a5a5a" x="792.767" y="622.17" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 11</text>
+<text fill="#5a5a5a" x="792.767" y="641.97" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 19: outlet</text>
+<text fill="#000000" x="1473" y="953" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">X</text>
+<text fill="#000000" x="1503" y="953" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Y</text>
+<text fill="#000000" x="1473" y="923" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Z</text>
+<polyline fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="butt" stroke-linejoin="miter" points="1470,956 1470,956 1500,956"/>
+<polyline fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="butt" stroke-linejoin="miter" points="1470,956 1470,926"/>
+</g>
+</svg>

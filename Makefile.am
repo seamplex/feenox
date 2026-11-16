@@ -131,7 +131,11 @@ TESTS_thermal = \
         tests/uo2-pellet.sh \
         tests/wilson.sh
 
-TESTS_serial = $(TESTS_general) $(TESTS_laplace) $(TESTS_mechanical) $(TESTS_modal) $(TESTS_neutron_diffusion) $(TESTS_neutron_sn) $(TESTS_thermal)
+TESTS_thermal_hydraulics = \
+        tests/thermal_hydraulics.sh \
+        tests/relap7.sh
+
+TESTS_serial = $(TESTS_general) $(TESTS_laplace) $(TESTS_mechanical) $(TESTS_modal) $(TESTS_neutron_diffusion) $(TESTS_neutron_sn) $(TESTS_thermal) $(TESTS_thermal_hydraulics)
 
 TESTS = $(TESTS_serial) $(TESTS_mpi)
         
@@ -160,6 +164,10 @@ check-thermal:
 check-mechanical:
 	@echo "Running mechanical tests"
 	@$(MAKE) check TESTS="$(TESTS_mechanical)"
+
+check-th:
+	@echo "Running thermal-hydraulic tests"
+	@$(MAKE) check TESTS="$(TESTS_thermal_hydraulics)"
 
 check-ldef:
 	@echo "Running mechanical tests"

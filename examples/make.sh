@@ -7,7 +7,7 @@ for i in feenox touch awk pandoc makeinfo yq grep cut xargs; do
  fi
 done
 
-for i in basic daes laplace thermal mechanical modal neutron_diffusion neutron_sn; do
+for i in basic daes laplace thermal mechanical modal neutron_diffusion neutron_sn thermal_hydraulics; do
   cp ${i}.yaml ${i}.md
 done
 
@@ -55,13 +55,13 @@ for i in hello          \
          wire                       \
          asme-expansion             \
          cube-orthotropic-expansion \
-         cube-strain-energy-force-normal \
+         cube-strain-energy-force-normal  \
          cube-strain-energy-force-bending \
-         cube-strain-energy-displ-normal \
-         veeder                     \
-         mechanical-square-temperature \
-         two-cubes-thermal    \
-         two-cubes-mechanical \
+         cube-strain-energy-displ-normal  \
+         veeder                           \
+         mechanical-square-temperature    \
+         two-cubes-thermal     \
+         two-cubes-mechanical  \
          reactivity-from-table \
          inverse-integral      \
          inverse-dae           \
@@ -72,6 +72,15 @@ for i in hello          \
          steel-alum            \
          nafems-gnl-cantilever \
          tennis                \
+         relap-example1-pipe           \
+         relap-example2-transient      \
+         relap-example3-heat           \
+         relap-example5-core-channel   \
+         relap-example6-two-pipes      \
+         relap-example7-junction       \
+         relap-example8-pump-loop      \
+         relap-example9-heat-exchanger \
+         relap-example10-natural-loop  \
   ; do
   in=${i}.fee
   in_yaml=${i}.yaml
@@ -106,7 +115,7 @@ for i in hello          \
 done
 
 rm -f examples.md
-for i in basic daes laplace thermal mechanical modal neutron_diffusion neutron_sn; do
+for i in basic daes laplace thermal mechanical modal neutron_diffusion neutron_sn thermal_hydraulics; do
   echo "- $(yq -r .title ${i}.yaml)" >> examples.md
   # shift-heading-level does not work
   pandoc ${i}.md -t commonmark --toc  --template=template_toc.md 2> /dev/null | sed s!\(\#!\(https://seamplex.com/feenox/examples/${i}.html\#! | sed 's/- /  - /'  >> examples.md

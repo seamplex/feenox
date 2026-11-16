@@ -1,0 +1,19 @@
+DEFAULT_ARGUMENT_VALUE 1 "TYPE PLATE THICKNESS 0.01 CELLS 2 DEPTH 1"
+DEFAULT_ARGUMENT_VALUE 2 relap7-heat-exchanger.msh
+DEFAULT_ARGUMENT_VALUE 3 "H_PRIMARY 1e4 H_SECONDARY 1e4"
+DEFAULT_ARGUMENT_VALUE 4 "k=100 rho_s=100 cp=100"
+DEFAULT_ARGUMENT_VALUE 5 0
+DEFAULT_ARGUMENT_VALUE 6 "dummy=0"
+PROBLEM thermal_hydraulics DIM 2 MESH $2
+end_time = $5
+dt = 0.1
+MATERIAL primary A=0.785398163e-4 D_h=0.01 f=0.01
+MATERIAL secondary A=0.785398163e-4 D_h=0.01 f=0.01
+MATERIAL wall $4
+HEAT_STRUCTURE NAME exchanger MATERIAL wall PRIMARY primary SECONDARY secondary AXIS 1 0 0 $1 $3
+$6
+BC primary_inlet mdot=0.1 T=400
+BC primary_outlet p=1e6
+BC secondary_inlet mdot=0.1 T=300
+BC secondary_outlet p=1e6
+SOLVE_PROBLEM

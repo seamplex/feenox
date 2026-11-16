@@ -1,0 +1,4 @@
+# Ramp the wall temperature by 5 K, then check the final steady energy balance.
+end_time = 10
+dt = 0.01
+INCLUDE thermal-hydraulics-wall-temperature.fee

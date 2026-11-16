@@ -179,16 +179,36 @@ double feenox_mesh_line2_dhdr(int j, int d, double *vec_xi) {
 
 
 
+// the line may point in any direction, so the point has to be within the
+// segment between the end nodes and (almost) on it
 int feenox_mesh_point_in_line(element_t *element, const double *x) {
-  return ((x[0] >= element->node[0]->x[0] && x[0] <= element->node[1]->x[0]) ||
-          (x[0] >= element->node[1]->x[0] && x[0] <= element->node[0]->x[0]));
+  double d[3], a[3];
+  double L2 = 0, t = 0;
+  for (int m = 0; m < 3; m++) {
+    d[m] = element->node[1]->x[m] - element->node[0]->x[m];
+    a[m] = x[m] - element->node[0]->x[m];
+    L2 += d[m]*d[m];
+    t += a[m]*d[m];
+  }
+  if (L2 == 0) {
+    return 0;
+  }
+  t /= L2;
+  if (t < -1e-9 || t > 1+1e-9) {
+    return 0;
+  }
+  double dist2 = 0;
+  for (int m = 0; m < 3; m++) {
+    dist2 += gsl_pow_2(a[m] - t*d[m]);
+  }
+  return (dist2 <= 1e-12*L2);
 }
 
 
 double feenox_mesh_line_volume(element_t *element) {
   
   if (element->volume == 0) {
-    element->volume = fabs(element->node[1]->x[0] - element->node[0]->x[0]);
+    element->volume = feenox_mesh_subtract_module(element->node[1]->x, element->node[0]->x);
   }  
   return element->volume;
 }

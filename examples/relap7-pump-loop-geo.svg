@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1530pt" height="996pt" viewBox="0 0 1530 996">
+<title>relap7-pump-loop-geo</title>
+<desc>
+Creator: GL2PS 1.4.3, (C) 1999-2020 C. Geuzaine
+For: Gmsh
+CreationDate: Fri Nov 13 11:19:33 2026
+</desc>
+<defs>
+</defs>
+<g>
+<circle fill="#5a5a5a" cx="527.857" cy="853.714" r="4"/>
+<circle fill="#5a5a5a" cx="1002.14" cy="853.714" r="4"/>
+<circle fill="#5a5a5a" cx="1002.14" cy="379.429" r="4"/>
+<circle fill="#5a5a5a" cx="527.857" cy="379.429" r="4"/>
+<circle fill="#5a5a5a" cx="1002.14" cy="142.286" r="4"/>
+<circle fill="#5a5a5a" cx="527.857" cy="853.714" r="4"/>
+<circle fill="#5a5a5a" cx="1002.14" cy="853.714" r="4"/>
+<circle fill="#5a5a5a" cx="1002.14" cy="379.429" r="4"/>
+<circle fill="#5a5a5a" cx="527.857" cy="379.429" r="4"/>
+<circle fill="#5a5a5a" cx="1002.14" cy="142.286" r="4"/>
+<polyline fill="none" stroke="#0000ff" stroke-width="2" stroke-linecap="butt" stroke-linejoin="miter" points="527.857,853.714 1002.14,853.714 1002.14,379.429 527.857,379.429 527.857,853.714"/>
+<polyline fill="none" stroke="#0000ff" stroke-width="2" stroke-linecap="butt" stroke-linejoin="miter" points="1002.14,379.429 1002.14,142.286"/>
+<text fill="#0000ff" x="767.6" y="851.114" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Line 1</text>
+<text fill="#0000ff" x="767.6" y="870.914" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Curve 1: pipe1</text>
+<text fill="#0000ff" x="1004.74" y="613.971" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Line 2</text>
+<text fill="#0000ff" x="1004.74" y="633.771" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Curve 2: pipe2</text>
+<text fill="#0000ff" x="767.6" y="376.829" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Line 3</text>
+<text fill="#0000ff" x="767.6" y="396.629" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Curve 3: pipe3</text>
+<text fill="#0000ff" x="530.457" y="613.971" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Line 4</text>
+<text fill="#0000ff" x="530.457" y="633.771" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Curve 4: pipe4</text>
+<text fill="#0000ff" x="1004.74" y="258.257" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Line 5</text>
+<text fill="#0000ff" x="1004.74" y="278.057" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Curve 5: pipe5</text>
+<text fill="#5a5a5a" x="533.457" y="848.114" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 1</text>
+<text fill="#5a5a5a" x="533.457" y="867.914" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 9: junction4</text>
+<text fill="#5a5a5a" x="1007.74" y="848.114" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 2</text>
+<text fill="#5a5a5a" x="1007.74" y="867.914" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 6: pump</text>
+<text fill="#5a5a5a" x="1007.74" y="373.829" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 3</text>
+<text fill="#5a5a5a" x="1007.74" y="393.629" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 7: junction2</text>
+<text fill="#5a5a5a" x="533.457" y="373.829" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 4</text>
+<text fill="#5a5a5a" x="533.457" y="393.629" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 8: junction3</text>
+<text fill="#5a5a5a" x="1007.74" y="136.686" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Point 5</text>
+<text fill="#5a5a5a" x="1007.74" y="156.486" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Physical Point 10: outlet</text>
+<text fill="#000000" x="1503" y="953" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">X</text>
+<text fill="#000000" x="1473" y="923" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Y</text>
+<text fill="#000000" x="1473" y="953" font-size="16" text-anchor="start" dy="0" font-family="Helvetica">Z</text>
+<polyline fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="butt" stroke-linejoin="miter" points="1470,956 1500,956"/>
+<polyline fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="butt" stroke-linejoin="miter" points="1470,956 1470,926"/>
+<polyline fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="butt" stroke-linejoin="miter" points="1470,956 1470,956"/>
+</g>
+</svg>

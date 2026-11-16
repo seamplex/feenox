@@ -1,0 +1,42 @@
+# RELAP-7 manual example 6: two horizontal pipes with different flow areas
+# (A = 2 m^2 and A = 1 m^2) connected by a junction with local losses
+# initial state: p = 100 kPa, T = 300 K and v = 1 m/s everywhere
+# inlet:  rho = 995 kg/m^3 and v = 1 m/s
+# outlet: p = 95 kPa
+PROBLEM thermal_hydraulics MESH relap7-two-pipes.msh DIM 1
+
+# integrate up to t = 10 s with the default backward Euler scheme,
+# letting FeenoX choose the time step
+end_time = 10
+
+# initial conditions, the same as RELAP-7's
+# note that a uniform velocity does not conserve mass because pipe2 has half the
+# area of pipe1, so the first time step has to accommodate a pressure wave
+# which is damped by the dissipative backward Euler scheme
+p_0(x) = 1e5
+T_0(x) = 300
+v_0(x) = 1
+
+# each pipe has its own flow area and the same friction factor
+# the hydraulic diameter is not given so it is sqrt(4A/pi) as in RELAP-7
+MATERIAL pipe1 A=2 f=1
+MATERIAL pipe2 A=1 f=1
+
+# RELAP-7's K = '1 1' means a loss coefficient equal to one for each port
+# of the junction, all of them referred to the area A_ref = 1 m^2
+JUNCTION POINT junction K_pipe1=1 K_pipe2=1 A_ref=1
+
+BC inlet  rho=995 v=1
+BC outlet p=95e3
+
+SOLVE_PROBLEM
+
+# write the evolution of the mass flow in each pipe,
+# the inlet pressure and the pressure drop across the junction
+PRINT t %.4e mdot(0.5) mdot(1.5) p(0) p(1-1/20)-p(1+1/20)
+WRITE_RESULTS
+
+# at the end, write the axial pressure and velocity profiles
+IF done
+  PRINT_FUNCTION p v FILE $0-profile.dat
+ENDIF

@@ -1,0 +1,11 @@
+DEFAULT_ARGUMENT_VALUE 1 relap7-two-pipes.msh
+DEFAULT_ARGUMENT_VALUE 2 "K_pipe1=1 K_pipe2=1 A_ref=1"
+DEFAULT_ARGUMENT_VALUE 3 10
+DEFAULT_ARGUMENT_VALUE 4 0
+INCLUDE relap7-two-pipes-startup.fee
+IF in_static
+  initial_error = abs(p(0,0,0)/1e5-1)+abs(T(0,0,0)/300-1)+abs(v(0,0,0)-1)+abs(v(2,0,0)-1)
+ENDIF
+IF done
+  PRINT initial_error+abs(mdot(0.5,0,0)/1990-1)+abs(mdot(1.5,0,0)/1990-1)+abs((p(0,0,0)-p(2,0,0)-7547.88)/1e5)
+ENDIF

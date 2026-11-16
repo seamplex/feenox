@@ -1,0 +1,26 @@
+# All three layers have the same diffusivity, so an axially varying, radially
+# uniform initial temperature follows the insulated 1D diffusion eigenmode.
+DEFAULT_ARGUMENT_VALUE 1 AXIAL_CONDUCTION
+DEFAULT_ARGUMENT_VALUE 2 1
+PROBLEM thermal_hydraulics DIM 3 MESH relap7-core-channel.msh
+HEAT_STRUCTURE $1 FUEL solid PIPE channel
+end_time = 1
+dt = 0.1
+MATERIAL solid k=1e4 rho_s=1 cp=1000
+MATERIAL channel {
+  A=8.79375e-5 D_h=0.01179 f=0.01 h_wall=1e-6
+  fuel_radius=0.004096 gap_width=0.0001 clad_width=0.000552
+  fuel_cells=2 gap_cells=1 clad_cells=1 hs_power=0
+}
+BC inlet p=155e5 T=559.15
+BC outlet p=155e5 T=559.15
+p_0(x,y,z) = 155e5
+T_0(x,y,z) = 559.15
+v_0(x,y,z) = 0
+T_solid_0(r,x,y,z) = 600+50*cos(pi*z/3.865)
+SOLVE_PROBLEM
+IF done
+  eigenvalue = 10*4*sin(pi/80)^2/(3.865/40)^2
+  expected_difference = 100/(1+dt*eigenvalue)^10
+  PRINT abs((T_fuel_center(0,0,0)-T_fuel_center(0,0,3.865))/if($2,expected_difference,100)-1)
+ENDIF

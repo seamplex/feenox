@@ -1,0 +1,5 @@
+PROBLEM thermal_hydraulics MESH relap7-pipe.msh
+MATERIAL pipe A=8.78882e-5 D_h=0.01179 $1
+BC inlet rho=753.632 v=4.43
+BC outlet p=15.51e6
+SOLVE_PROBLEM

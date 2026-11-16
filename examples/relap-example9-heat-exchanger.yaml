@@ -1,0 +1,70 @@
+---
+category: thermal_hydraulics
+intro: |
+  # RELAP7 Example 9: A heat exchanger
+
+  The ninth example from the RELAP7 manual is a counter-flow heat exchanger.
+  The heat exchanger consists of hot water flowing in a primary pipe and cold water flowing in a secondary pipe in the opposite direction, separated by a solid wall.
+  The inlets have a prescribed stagnation pressure of $105~\text{kPa}$ and stagnation temperatures of $400~\text{K}$ for the primary side and $300~\text{K}$ for the secondary side.
+  The outlets have a prescribed static pressure of $100~\text{kPa}$.
+  The water is initially at $p=100~\text{kPa}$, $T=300~\text{K}$ and $v = 1~\text{m}/\text{s}$, and the wall at $300~\text{K}$.
+
+  Both pipes are $1~\text{m}$ long with 10\ elements, a flow area of $7.85398163 \times 10^{-5}~\text{m}^2$, a hydraulic diameter of $1~\text{cm}$ and a Darcy friction factor $f=0.01$:
+
+  ```{.c include="relap7-heat-exchanger.geo"}
+  ```
+
+  The wall is a $1~\text{cm}$-thick plate, $1~\text{m}$ deep, with two cells across its thickness, and with $k = 100~\text{W}/(\text{m}\cdot\text{K})$, $\rho = 100~\text{kg}/\text{m}^3$ and $c_p = 100~\text{J}/(\text{kg}\cdot\text{K})$.
+  It exchanges heat with both pipes through a heat transfer coefficient of $10^4~\text{W}/(\text{m}^2\cdot\text{K})$.
+  In RELAP7 this takes three components: a `HeatStructure` plus one `HeatTransferFromHeatStructure` for each side.
+  In FeenoX, it is a single named `HEAT_STRUCTURE` with a `PRIMARY` and a `SECONDARY` pipe:
+
+  ```feenox
+  HEAT_STRUCTURE NAME exchanger {
+    TYPE PLATE MATERIAL wall THICKNESS 0.01 CELLS 2 DEPTH 1
+    PRIMARY primary SECONDARY secondary H_PRIMARY 1e4 H_SECONDARY 1e4
+    AXIS 1 0 0
+  }
+  ```
+
+  where `AXIS` is the direction along which the two pipes are matched, station by station.
+  The wall includes both transverse and axial conduction, as RELAP7's `dim = 2` heat structure does.
+
+  > **Heads up!** The manual says "this example problem is for subcooled water only", but at $1~\text{bar}$ water boils at about $373~\text{K}$, so water entering at $400~\text{K}$ is not subcooled.
+  > RELAP7 uses a liquid-only equation of state, which silently extrapolates into the metastable region.
+  > FeenoX only handles single-phase liquid water (for now) and warns when this happens.
+  > So we raise the pressure level to $1~\text{MPa}$, where the saturation temperature is about $453~\text{K}$, but keep the $5~\text{kPa}$ difference between the inlets and the outlets that drives the flow.
+  > The pressure level is the variable `p_out` in the input file, so the original problem can be solved by setting `p_out = 1e5`.
+
+  As in the previous examples, we use FeenoX's default backward Euler scheme and let it choose the time step up to $t=10~\text{s}$.
+  The output shows the outlet temperatures, the mass flows and the heat going into each fluid (negative for the primary, which is cooled down, and positive for the secondary, which is heated up).
+  At the end, the axial profiles of the primary fluid, the primary side of the wall, the middle of the wall, the secondary side of the wall and the secondary fluid temperatures are written into a file.
+
+terminal: |
+  $ gmsh -1 relap7-heat-exchanger.geo
+  $ feenox relap-example9-heat-exchanger.fee
+  0	3.0000e+02	3.0000e+02	7.8301e-02	7.8301e-02	0.0000e+00	0.0000e+00
+  0.0625	3.0000e+02	3.1042e+02	9.5808e-02	9.5505e-02	-1.4465e+04	1.0109e+04
+  0.1875	3.0014e+02	3.2787e+02	1.2205e-01	1.2090e-01	-2.9157e+04	2.4317e+04
+  0.3125	3.0077e+02	3.3935e+02	1.4066e-01	1.3867e-01	-3.9025e+04	3.4313e+04
+  0.5625	3.0435e+02	3.5219e+02	1.5959e-01	1.5648e-01	-4.9026e+04	4.5053e+04
+  1.0625	3.1243e+02	3.6424e+02	1.7141e-01	1.6731e-01	-5.4608e+04	5.2186e+04
+  2.0625	3.2026e+02	3.7262e+02	1.7528e-01	1.7064e-01	-5.5711e+04	5.4781e+04
+  4.0625	3.2400e+02	3.7632e+02	1.7578e-01	1.7097e-01	-5.5526e+04	5.5316e+04
+  8.0625	3.2495e+02	3.7725e+02	1.7575e-01	1.7091e-01	-5.5412e+04	5.5385e+04
+  10	3.2505e+02	3.7735e+02	1.7574e-01	1.7090e-01	-5.5396e+04	5.5390e+04
+  $ cat relap-example9-heat-exchanger-profile.dat
+  0	395.839	389.619	386.525	383.458	377.35
+  0.1	388.811	383.571	380.952	378.338	373.114
+  0.2	381.705	376.421	373.78	371.139	365.858
+  0.3	374.51	369.175	366.507	363.84	358.506
+  0.4	367.229	361.842	359.148	356.455	351.07
+  0.5	359.864	354.425	351.706	348.988	343.551
+  0.6	352.417	346.927	344.183	341.439	335.951
+  0.7	344.89	339.35	336.58	333.811	328.272
+  0.8	337.286	331.696	328.901	326.107	320.518
+  0.9	329.616	323.982	321.162	318.339	312.69
+  1	325.054	318.356	314.992	311.598	304.777
+  $
+
+...

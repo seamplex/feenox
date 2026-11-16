@@ -1,0 +1,46 @@
+---
+category: thermal_hydraulics
+intro: |
+  # RELAP7 Example 1: A simple pipe flow problem
+
+  Let's start with the simplest example from RELAP7 manual.
+  
+
+  ![Original problem description of the problem from the RELAP7 manual. Yes, that seems to be Word and the figure a JPG.](relap-example1.png)
+  
+
+  Let us re-write the problem formulation in the proper way. Note
+  
+   1. Proper mathematical symbols (e.g. $\text{m}$ means "meters", $m$ means "a variable named $m$")
+   2. No line breaks between a value and its unit
+   3. No monstrosities like 15.5E6
+
+  > Example 1 simulates water flowing through a pipe using IAPWS-97 fluid properties.
+  > The inlet boundary condition is set with a density at $\rho = 753.632~\text{kg} / \text{m}^{-3}$ and a velocity $v = 4.43~\text{m}/\text{s}$.
+  > The outlet boundary condition is set at a pressure of $p=15.51 \times 10^6~\text{Pa}$.
+  
+  
+  In RELAP, the topology of the piping system is given in the input file by defining the start and end coordinates of **every single pipe**.
+  In FeenoX, the topology is given by a Gmsh file. So that is what we do first:
+  
+  ```{.c include="relap7-pipe.geo"}
+  ```
+  
+  Once we have the pipe as a 1D entity named `pipe` and its inlet and outlet as 0D entities named `inlet` and `outlet`, we can then create a simple and almost self-describing English-like LLM-friendly input file for FeenoX.
+  
+  > **Note #1** FeenoX uses IAPWS-97 properties, not IAPWS-95.
+
+  > **Note #2** Please understand the difference between the input file for FeenoX and the input file for good old RELAP (both versions 5 & 7).
+  
+terminal: |
+  $ gmsh -1 relap7-pipe.geo
+  $ feenox relap-example1-pipe.fee 
+  # mass conservation check 2.86609e-05
+  0       1.5527e+07
+  2       1.551e+07
+  0.4     1.55236e+07
+  0.8     1.55202e+07
+  1.2     1.55168e+07
+  1.6     1.55134e+07
+  $ 
+...

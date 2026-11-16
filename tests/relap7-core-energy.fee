@@ -1,0 +1,16 @@
+DEFAULT_ARGUMENT_VALUE 1 AXIAL_CONDUCTION
+DEFAULT_ARGUMENT_VALUE 2 1
+DEFAULT_ARGUMENT_VALUE 3 10
+DEFAULT_ARGUMENT_VALUE 4 0
+INCLUDE relap7-core-startup.fee
+
+IF in_static
+  max_error = abs(T(0,0,0)-559.15)+abs(T_fuel_center(0,0,0)-559.15)+abs(mdot(0,0,0))
+  old_energy = hs_energy
+ELSE
+  max_error = max(max_error,abs((hs_energy-old_energy)/dt+hs_heat-77337.69407)/77337.69407)
+  old_energy = hs_energy
+ENDIF
+IF done
+  PRINT max_error
+ENDIF

@@ -1,0 +1,51 @@
+# RELAP-7 manual example 3: same as example 2 but now the pipe wall
+# is kept at a fixed temperature T_wall = 565 K so the water heats up
+# initial state: p = 15.51 MPa, T = 559.15 K and v = 0 everywhere
+# inlet:  rho = 753.632 kg/m^3 and v = 4.43 m/s
+# outlet: p = 15.51 MPa
+PROBLEM thermal_hydraulics MESH relap7-pipe.msh DIM 1 TRANSIENT_SOLVER bdf
+
+g_z = 0          # RELAP's input sets gravity = '0 0 0' (FeenoX's default is g_z = -9.81)
+
+end_time = 10    # integrate up to t = 10 s
+dt_0 = 1e-3      # initial dt
+min_dt = 1e-3    # min dt
+max_dt = 5       # max dt
+
+# initial conditions
+p_0(x) = 15.51e6
+T_0(x) = 559.15
+v_0(x) = 0
+
+# the friction factor rises linearly from 0.01 to 0.02 in the first 50 ms
+FUNCTION friction(t) INTERPOLATION linear DATA {
+0     0.01
+0.05  0.02
+0.1   0.02
+}
+
+# the main difference with example 2 is the wall temperature
+# the heat transfer coefficient is computed with the TRACE single-phase
+# tube correlations (laminar, Gnielinski and natural convection)
+# RELAP-7 takes the heated perimeter as the circumference of a circle with
+# area A, while FeenoX's default would be 4A/D_h, so we give it explicitly
+A_pipe = 8.78882e-5
+MATERIAL pipe A=A_pipe D_h=0.01179 f=friction(t) T_wall=565 P_h=2*sqrt(pi*A_pipe)
+
+BC inlet  rho=753.632 v=4.43
+BC outlet p=15.51e6
+
+SOLVE_PROBLEM
+
+# write the evolution of the mass flow, the inlet & outlet temperatures
+# and the power absorbed by the water between the inlet and the outlet nodes
+# note that T(0) is the temperature of the inlet control volume, which already
+# receives half of the first element's wall heat, so it is not the 559.15 K
+# of the stream that enters through the inlet with rho = 753.632 kg/m^3
+PRINT t %.4e mdot(1) T(0) T(2) mdot(1)*(h(2)-h(0))
+WRITE_RESULTS
+
+# at the end, write the axial temperature and enthalpy profiles
+IF done
+  PRINT_FUNCTION T h FILE $0-profile.dat
+ENDIF

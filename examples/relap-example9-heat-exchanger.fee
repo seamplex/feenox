@@ -1,0 +1,60 @@
+# RELAP-7 manual example 9: a counter-flow heat exchanger with hot water in a
+# primary pipe and cold water in a secondary pipe, separated by a solid wall
+# initial state: p = p_out, T = 300 K and v = 1 m/s everywhere
+# inlets:  stagnation p0 = p_out + 5 kPa, primary T0 = 400 K, secondary T0 = 300 K
+# outlets: p = p_out
+PROBLEM thermal_hydraulics MESH relap7-heat-exchanger.msh DIM 2
+
+# RELAP-7's input has p_out = 1e5 Pa but water at 400 K and ~1 bar would boil
+# and FeenoX only handles single-phase liquid water (yet), so we raise the
+# pressure level to 1 MPa (saturation temperature ~453 K) but keep the
+# 5 kPa pressure difference between the inlets and the outlets
+p_out = 1e6
+
+# integrate up to t = 10 s with the default backward Euler scheme,
+# letting FeenoX choose the time step
+end_time = 10
+
+# initial conditions for the fluid and for the wall
+p_0(x,y) = p_out
+T_0(x,y) = 300
+v_0(x,y) = 1
+T_solid_0(d,x,y) = 300
+
+# both pipes are the same
+MATERIAL primary   A=0.785398163e-4 D_h=0.01 f=0.01
+MATERIAL secondary A=0.785398163e-4 D_h=0.01 f=0.01
+
+# the wall is a 1 cm thick and 1 m deep plate with two cells across
+# its thickness, coupled to the primary pipe on one side and to the
+# secondary pipe on the other side, both with h = 1e4 W/(m^2 K)
+MATERIAL wall k=100 rho_s=100 cp=100
+HEAT_STRUCTURE NAME exchanger {
+  TYPE PLATE MATERIAL wall THICKNESS 0.01 CELLS 2 DEPTH 1
+  PRIMARY primary SECONDARY secondary H_PRIMARY 1e4 H_SECONDARY 1e4
+  AXIS 1 0 0
+}
+
+BC primary_inlet    p0=p_out+5e3 T0=400
+BC primary_outlet   p=p_out
+BC secondary_inlet  p0=p_out+5e3 T0=300
+BC secondary_outlet p=p_out
+
+SOLVE_PROBLEM
+
+# write the evolution of the outlet temperatures, the mass flows
+# and the heat going into each fluid (negative means out of the fluid)
+PRINT t %.4e T(1,0.02) T(0,0) mdot(0.5,0.02) mdot(0.5,0) hs_heat_primary_exchanger hs_heat_secondary_exchanger
+WRITE_RESULTS
+
+# at the end, write the axial profiles of the primary fluid, the primary side
+# of the wall, the middle of the wall, the secondary side of the wall and the
+# secondary fluid temperatures
+Tp(x) = T(x,0.02)
+Twp(x) = T_wall_primary_exchanger(x,0.02)
+Twm(x) = T_wall_middle_exchanger(x,0.02)
+Tws(x) = T_wall_secondary_exchanger(x,0.02)
+Ts(x) = T(x,0)
+IF done
+  PRINT_FUNCTION Tp Twp Twm Tws Ts MIN 0 MAX 1 NSTEPS 10 FILE $0-profile.dat
+ENDIF

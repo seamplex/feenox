@@ -1,0 +1,131 @@
+# RELAP-7 Example 11: a model two-loop PWR with three core channels, a bypass,
+# lower and upper plena, and per loop a hot leg, a steam generator (plate heat
+# exchanger with a subcooled secondary), a cold leg and a pump.
+# Loop A has the pressurizer. Component names follow the RELAP-7 input.
+#
+# Differences with respect to the manual:
+#  - RELAP-7 joins pipe ends by name only, so the plena, the pumps and the
+#    secondary-side junctions whose ends do not touch use JUNCTION/PUMP MERGE.
+#  - The steam-generator walls use DEPTH = P_hf (2695.1 m): RELAP-7 applies the
+#    wall flux per unit area and scales it by P_hf on the fluid side only, so
+#    its steady wall is equivalent to a plate of width P_hf. This keeps that
+#    steady state and conserves energy, but the wall heat capacity is P_hf
+#    times the manual's depth = 1 wall.
+#  - IF97 instead of IAPWS-95 and backward Euler instead of adaptive BDF2.
+#  - The manual's input values are kept as given, including the low fuel and
+#    clad densities and A_ref = 262.4474 m^2 in junctions 4 to 6.
+#
+# Argument 1 is the end time: zero (the default) solves the steady state,
+# a positive value runs a transient from the manual's initial conditions.
+# Argument 2 is the time step.
+DEFAULT_ARGUMENT_VALUE 1 0
+DEFAULT_ARGUMENT_VALUE 2 1
+DEFAULT_ARGUMENT_VALUE 3 1
+PROBLEM thermal_hydraulics DIM 3 MESH relap7-pwr.msh
+end_time = $1
+dt = $2
+# The manual does not override RELAP-7's default gravity.
+g_z = -9.81
+
+# initial conditions of the manual (only used in transients)
+p_0(x,y,z) = 15.17e6
+T_0(x,y,z) = 564.15
+v_0(x,y,z) = 1
+T_solid_0(r,x,y,z) = 564.15
+
+# ---- core -------------------------------------------------------------------
+P_reactor = 2.77199979e9
+MATERIAL fuel  k=3.65      rho_s=1.0412e2 cp=288.734
+MATERIAL gap   k=1.084498  rho_s=1        cp=1
+MATERIAL clad  k=16.48672  rho_s=6.6e1    cp=321.384
+MATERIAL clad3 k=16.48672  rho_s=6.6e1    cp=6.6e3
+MATERIAL wall  k=100       rho_s=100      cp=100
+
+HEAT_STRUCTURE PIPE CH1 FUEL fuel GAP gap CLAD clad
+HEAT_STRUCTURE PIPE CH2 FUEL fuel GAP gap CLAD clad
+HEAT_STRUCTURE PIPE CH3 FUEL fuel GAP gap CLAD clad3
+MATERIAL CH1 {
+  A=1.161864 D_h=0.01332254 f=0.01 h_wall=5.33e4 rod_count=9360
+  fuel_radius=0.0046955 gap_width=0.0000955 clad_width=0.000673
+  fuel_cells=9 gap_cells=3 clad_cells=3 hs_power=3.33672612e-1*P_reactor
+}
+MATERIAL CH2 {
+  A=1.549152542 D_h=0.01332254 f=0.01 h_wall=5.33e4 rod_count=12480
+  fuel_radius=0.0046955 gap_width=0.0000955 clad_width=0.000673
+  fuel_cells=9 gap_cells=3 clad_cells=3 hs_power=3.69921461e-1*P_reactor
+}
+MATERIAL CH3 {
+  A=1.858983051 D_h=0.01332254 f=0.01 h_wall=5.33e4 rod_count=14976
+  fuel_radius=0.0046955 gap_width=0.0000955 clad_width=0.000673
+  fuel_cells=9 gap_cells=3 clad_cells=3 hs_power=2.96405926e-1*P_reactor
+}
+MATERIAL bypass_pipe A=1.589571014 D_h=1.42264 f=0.001
+
+JUNCTION POINT LowerPlenum MERGE {
+  K_DownComer_A=0.2 K_DownComer_B=0.2
+  K_CH1=0.2 K_CH2=0.2 K_CH3=0.4 K_bypass_pipe=40
+  A_ref=3.618573408
+}
+JUNCTION POINT UpperPlenum MERGE {
+  K_CH1=0.5 K_CH2=0.5 K_CH3=0.5 K_bypass_pipe=80
+  K_pipe1_HL_A=0.5 K_pipe1_HL_B=0.5
+  A_ref=7.562307456
+}
+
+# ---- loops ------------------------------------------------------------------
+MATERIAL downcomers LABEL DownComer_A LABEL DownComer_B A=3.6185734 D_h=1.74724302 f=0.001
+MATERIAL hot_legs1  LABEL pipe1_HL_A  LABEL pipe1_HL_B  A=7.562307456 D_h=3.103003207 f=0.001
+MATERIAL loop_pipes {
+  LABEL pipe2_HL_A LABEL pipe1_CL_A LABEL pipe2_CL_A LABEL pipe1_SC_A LABEL pipe2_SC_A
+  LABEL pipe2_HL_B LABEL pipe1_CL_B LABEL pipe2_CL_B LABEL pipe1_SC_B LABEL pipe2_SC_B
+  A=2.624474 D_h=1.828 f=0.001
+}
+MATERIAL pipe_to_Pressurizer A=2.624474 D_h=1.828 f=10
+MATERIAL sg_tubes {
+  LABEL HX_A_primary LABEL HX_A_secondary LABEL HX_B_primary LABEL HX_B_secondary
+  A=5 D_h=0.01 f=0.01
+}
+
+HEAT_STRUCTURE NAME HX_A {
+  TYPE PLATE MATERIAL wall THICKNESS 0.001 CELLS 2 DEPTH 2695.1
+  PRIMARY HX_A_primary SECONDARY HX_A_secondary H_PRIMARY 1e4 H_SECONDARY 1e4
+  AXIS 0 0 1
+}
+HEAT_STRUCTURE NAME HX_B {
+  TYPE PLATE MATERIAL wall THICKNESS 0.001 CELLS 2 DEPTH 2695.1
+  PRIMARY HX_B_primary SECONDARY HX_B_secondary H_PRIMARY 1e4 H_SECONDARY 1e4
+  AXIS 0 0 1
+}
+
+JUNCTION POINT Junction1_A K_pipe1_HL_A=0.5 K_pipe2_HL_A=0.7 K_pipe_to_Pressurizer=80 A_ref=7.562307456
+JUNCTION POINT Junction2_A K_pipe1_CL_A=0.5 K_DownComer_A=0.7   A_ref=3.6185734
+JUNCTION POINT Junction3_A K_pipe2_HL_A=0.5 K_HX_A_primary=0.7  A_ref=2.624474
+JUNCTION POINT Junction4_A MERGE K_pipe1_SC_A=0.5 K_HX_A_secondary=0.7 A_ref=2.624474e2
+JUNCTION POINT Junction5_A MERGE K_HX_A_secondary=0.5 K_pipe2_SC_A=0.7 A_ref=2.624474e2
+JUNCTION POINT Junction6_A K_HX_A_primary=0.5 K_pipe2_CL_A=0.7  A_ref=2.624474e2
+PUMP POINT Pump_A MERGE HEAD 8.66 DIRECTION 0 -1 0 K_REVERSE 0 0 A_REF 2.624474
+
+JUNCTION POINT Junction1_B K_pipe1_HL_B=0.5 K_pipe2_HL_B=0.7    A_ref=7.562307456
+JUNCTION POINT Junction2_B K_pipe1_CL_B=0.5 K_DownComer_B=0.7   A_ref=3.6185734
+JUNCTION POINT Junction3_B K_pipe2_HL_B=0.5 K_HX_B_primary=0.7  A_ref=2.624474
+JUNCTION POINT Junction4_B MERGE K_pipe1_SC_B=0.5 K_HX_B_secondary=0.7 A_ref=2.624474e2
+JUNCTION POINT Junction5_B MERGE K_HX_B_secondary=0.5 K_pipe2_SC_B=0.7 A_ref=2.624474e2
+JUNCTION POINT Junction6_B K_HX_B_primary=0.5 K_pipe2_CL_B=0.7  A_ref=2.624474e2
+PUMP POINT Pump_B MERGE HEAD 8.66 DIRECTION 0 1 0 K_REVERSE 0 0 A_REF 2.624474
+
+# ---- boundary conditions ----------------------------------------------------
+BC MassFlowRateIn_SC_A mdot=9419.640610595952 T=564.15
+BC MassFlowRateIn_SC_B mdot=9419.640610595952 T=564.15
+BC PressureOutlet_SC_A p=15.17e6
+BC PressureOutlet_SC_B p=15.17e6
+BC Pressurizer p0=15.17e6 T0=564.15
+
+SOLVE_PROBLEM
+
+# Evaluate fields at pipe nodes: off-node points of a line embedded in 3D
+# may pick the closest node of a neighboring parallel pipe.
+IF (end_time=0|done)&$3
+  PRINT %.6g mdot(0,-1.2,1.8288) mdot(0,0,1.8288) mdot(0,1.2,1.8288) mdot(0,1.5,0.73152) mdot(0,4,6) mdot(0,-4,6) mdot(0,0.5,8.5)
+  PRINT %.6g T(0,0,0) T(0,0,4) T(0,4.201,8) T(0,-4.201,8) T_fuel_center_CH2(0,0,1.8288)
+  PRINT %.6g hs_heat_CH1+hs_heat_CH2+hs_heat_CH3 hs_heat_primary_HX_A hs_heat_primary_HX_B hs_heat_secondary_HX_A hs_heat_secondary_HX_B
+ENDIF

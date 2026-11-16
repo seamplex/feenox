@@ -1,0 +1,75 @@
+---
+category: thermal_hydraulics
+intro: |
+  # RELAP7 Example 7: A junction with multiple pipes in and out
+
+  The seventh example from the RELAP7 manual has five heated pipes connected by a single junction.
+
+  ![Original diagram of the junction from the RELAP7 manual.](relap-example7.png)
+
+  This example shows a junction that connects two pipes with water flowing into the junction and three pipes with water flowing out of the junction.
+  The pipe flow areas are different and the boundary conditions also vary.
+  The inlets of the two pipes that flow into the junction have prescribed density and velocity.
+  The outlets of the three pipes that flow out of the junction have a prescribed pressure.
+  The water in each of the pipes exchanges heat with a wall at a specified temperature.
+
+  > **Heads up!** The figure (and its caption in the manual) shows three pipes flowing in and two flowing out, but both the text and the input file have pipes\ 1 and\ 2 flowing in and pipes\ 3, 4 and\ 5 flowing out. We follow the input file.
+
+  All the pipes are $1~\text{m}$ long, horizontal, divided into 50\ elements and have a Darcy friction factor $f=1$.
+  The rest of the data is
+
+  | Pipe | Start position             | Flow area          | Boundary condition                                            |
+  |:----:|:--------------------------:|:------------------:|:-------------------------------------------------------------:|
+  |  1   | $(0, 0)~\text{m}$          | $2~\text{m}^2$     | $\rho = 990~\text{kg}/\text{m}^3$, $v = 1~\text{m}/\text{s}$   |
+  |  2   | $(0, 0.3)~\text{m}$        | $1~\text{m}^2$     | $\rho = 995~\text{kg}/\text{m}^3$, $v = 1.5~\text{m}/\text{s}$ |
+  |  3   | $(1.2, 0)~\text{m}$        | $2~\text{m}^2$     | $p = 95~\text{kPa}$                                           |
+  |  4   | $(1.2, 0.5)~\text{m}$      | $1~\text{m}^2$     | $p = 95~\text{kPa}$                                           |
+  |  5   | $(1.2, 1.0)~\text{m}$      | $1.5~\text{m}^2$   | $p = 95~\text{kPa}$                                           |
+
+  Each pipe exchanges heat with a wall at $T_\text{wall} = 310~\text{K}$ through a heat transfer coefficient $h_\text{wall} = 10^4~\text{W}/(\text{m}^2\cdot\text{K})$.
+  As in RELAP7, when the hydraulic diameter is not given FeenoX uses the one of a circle with area\ $A$, i.e. $D_h = \sqrt{4A/\pi}$, so the default heated perimeter $4A/D_h$ is the circumference $2\sqrt{\pi A}$ of that circle, which is what RELAP7 uses.
+  Note that at $p=1~\text{bar}$, a density of $990~\text{kg}/\text{m}^3$ corresponds to water at about $319~\text{K}$ (i.e. hotter than the wall) and $995~\text{kg}/\text{m}^3$ to about $305~\text{K}$.
+  So the wall heats the water in pipe\ 2 but cools the water in pipe\ 1.
+  The water initially has $p=100~\text{kPa}$, $T=305~\text{K}$ and $v=1~\text{m}/\text{s}$ everywhere.
+
+  In RELAP7, the `Junction` component connects the pipe ends listed in its `inputs` and `outputs` regardless of where they are located.
+  With the positions given in the input, none of the five ends touch: pipes\ 1 and\ 2 end at $x=1~\text{m}$ while pipes\ 3, 4 and\ 5 start at $x=1.2~\text{m}$.
+  In FeenoX, we put the five ends into a single physical group called `junction`:
+
+  ```{.c include="relap7-five-pipes.geo"}
+  ```
+
+  and use the `MERGE` keyword so they are joined into a single control volume:
+
+  ```feenox
+  JUNCTION POINT junction MERGE K_pipe1=5 K_pipe2=7 K_pipe3=11 K_pipe4=13 K_pipe5=17 A_ref=3
+  ```
+  
+  ![The geometry of the problem converted to a topology in Gmsh. The pipes are not touching (like they did in the previous example) in the topology but they are `MERGE`d in the FeenoX input file because we want to keep them horizonta.](relap-example7-geo.svg)
+  
+
+  RELAP7's `K = '5 7 11 13 17'` gives the local loss coefficients of each port, first the inputs and then the outputs.
+  In FeenoX, each coefficient is explicitly tied to a port through the name of the pipe connected to it, so there is no need to remember any order.
+
+  As in example\ 6, we use FeenoX's default backward Euler scheme, which dissipates the pressure waves caused by the non-mass-conserving uniform initial velocity, and let it choose the time step up to $t=5~\text{s}$.
+
+  The output shows the mass flow in each pipe and the junction pressure.
+  At the end we check the mass balance at the junction (it is not exactly zero because the temperatures, and thus the densities, are still slowly evolving at $t=5~\text{s}$) and print the junction state and the outlet temperatures.
+
+terminal: |
+  $ gmsh -1 relap7-five-pipes.geo
+  $ feenox relap-example7-junction.fee
+  0	1.9902e+03	9.9508e+02	1.9902e+03	9.9508e+02	1.4926e+03	1.0000e+05
+  0.0625	1.9894e+03	1.4926e+03	1.5205e+03	8.0989e+02	1.1518e+03	9.2458e+04
+  0.1875	1.9892e+03	1.4926e+03	1.4833e+03	8.6121e+02	1.1378e+03	9.5975e+04
+  0.4375	1.9866e+03	1.4926e+03	1.4445e+03	9.1699e+02	1.1208e+03	9.5953e+04
+  0.9375	1.9825e+03	1.4925e+03	1.4169e+03	9.5750e+02	1.1068e+03	9.5938e+04
+  1.9375	1.9804e+03	1.4925e+03	1.4038e+03	9.7443e+02	1.0991e+03	9.5931e+04
+  3.9375	1.9800e+03	1.4925e+03	1.3996e+03	9.7786e+02	1.0962e+03	9.5930e+04
+  5	1.9800e+03	1.4925e+03	1.3990e+03	9.7813e+02	1.0958e+03	9.5930e+04
+  # junction mass imbalance -0.000107943
+  # junction p = 95930.4 Pa T = 312.845 K
+  # outlet temperatures 311.895 312.304 311.961 K
+  $
+
+...

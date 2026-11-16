@@ -1,0 +1,24 @@
+// Schematic unit-length branches; gravity is zero.
+Point(1) = {0, 0, 0};
+Point(2) = {-1, 0, 0};
+Point(3) = {0, -1, 0};
+Point(4) = {1, 0, 0};
+Point(5) = {0, 1, 0};
+Point(6) = {0, 0, 1};
+Line(1) = {2, 1};
+Line(2) = {3, 1};
+Line(3) = {1, 4};
+Line(4) = {1, 5};
+Line(5) = {1, 6};
+Transfinite Curve{1:5} = 51;
+Physical Curve("pipe1") = {1};
+Physical Curve("pipe2") = {2};
+Physical Curve("pipe3") = {3};
+Physical Curve("pipe4") = {4};
+Physical Curve("pipe5") = {5};
+Physical Point("connection") = {1};
+Physical Point("inlet1") = {2};
+Physical Point("inlet2") = {3};
+Physical Point("outlet3") = {4};
+Physical Point("outlet4") = {5};
+Physical Point("outlet5") = {6};

@@ -46,10 +46,12 @@ int feenox_read_line(FILE *file_ptr) {
   int i = 0;
   int in_comment = 0;
   int in_brackets = 0;
+  int in_quotes = 0;
   int lines = 0;
   while ( !((c == EOF) || (in_brackets == 0 && c == '\n')) ) {
     if (in_comment == 0) {
-      if (feenox_parser.inside_yaml == 0 && (c == '#' || c == ';')) {
+      // comment characters within double quotes are literal (escaped quotes do not count)
+      if (feenox_parser.inside_yaml == 0 && in_quotes == 0 && (c == '#' || c == ';')) {
         in_comment = 1;
       } else if (feenox_parser.inside_yaml == 0 && c == '{') {
         in_brackets = 1;
@@ -104,12 +106,24 @@ int feenox_read_line(FILE *file_ptr) {
           return -1;
         }
         
-        int j = 0;
-        while (feenox.argv[feenox.optind+n][j] != 0) {
-          // watch out!
-          // this cannot be put in a single line because the '\0' might come
-          // in line[] before evaluating the condition to get out of the while
-          feenox_parser.line[i++] = feenox.argv[feenox.optind+n][j++];
+        char *argument = feenox.argv[feenox.optind+n];
+        size_t length = strlen(argument);
+        // make sure the expanded argument fits in the buffer
+        if (i + length + 16 >= feenox_parser.actual_buffer_size) {
+          feenox_parser.actual_buffer_size += length + feenox_parser.page_size;
+          feenox_check_alloc(feenox_parser.line = realloc(feenox_parser.line, feenox_parser.actual_buffer_size));
+        }
+        for (size_t j = 0; j < length; j++) {
+          // an unquoted comment character in an argument comments out the rest
+          // of the line, e.g. passing "#" to an input line that reads "$1"
+          if (in_quotes == 0 && (argument[j] == '#' || argument[j] == ';')) {
+            in_comment = 1;
+            break;
+          }
+          if (argument[j] == '"') {
+            in_quotes = !in_quotes;
+          }
+          feenox_parser.line[i++] = argument[j];
         }
 
       } else if (feenox_parser.inside_yaml == 0 &&  c == '\\') {
@@ -154,6 +168,9 @@ int feenox_read_line(FILE *file_ptr) {
           break;
         }
       } else if (!in_comment && c != '\n' && c != '\r' && c != EOF) {
+        if (c == '"') {
+          in_quotes = !in_quotes;
+        }
         feenox_parser.line[i++] = c;
       } else if (in_brackets && c == '\n') {
         feenox_parser.line[i++] = ' ';
@@ -536,6 +553,10 @@ char *feenox_get_next_token(char *line) {
   } else {
     if (*feenox_parser.strtok_internal == '"') {
       token = strtok_r(line, QUOTED_DELIM, &(feenox_parser.strtok_internal));
+      if (token == NULL) {
+        // an opening quote with nothing after it
+        return NULL;
+      }
 
       // si es quoted, barremos token y reemplazamos el caracter 0x1E por un quote
       n = strlen(token);

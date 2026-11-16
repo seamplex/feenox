@@ -1,0 +1,6 @@
+DEFAULT_ARGUMENT_VALUE 1 NO_AXIAL_CONDUCTION
+DEFAULT_ARGUMENT_VALUE 2 0
+DEFAULT_ARGUMENT_VALUE 3 0
+INCLUDE thermal-hydraulics-structures.fee
+WRITE_RESULTS FILE thermal-hydraulics-structures-all.vtu all
+WRITE_RESULTS FILE thermal-hydraulics-structures-selected.vtu T_fuel_center_first T_fuel_surface_second T_clad_surface_third

@@ -1,0 +1,17 @@
+# Positive and negative wall flux, volumetric heat, and an independent heated perimeter.
+DEFAULT_ARGUMENT_VALUE 1 10000
+DEFAULT_ARGUMENT_VALUE 2 1
+PROBLEM thermal_hydraulics MESH relap7-pipe.msh
+
+flux = $1
+power_density = 2e6
+perimeter = $2*4*8.78882e-5/0.01179
+MATERIAL pipe A=8.78882e-5 D_h=0.01179 f=0.02 q_wall=flux q=power_density P_h=perimeter
+BC inlet rho=753.632 v=4.43
+BC outlet p=15.51e6
+SOLVE_PROBLEM
+
+# The inlet node owns a half element and is heated too. Between that node and
+# the outlet, the integrated source therefore spans L-dx/2 = 1.8 m.
+expected_heat = (flux*perimeter+power_density*8.78882e-5)*1.8
+PRINT abs(mdot(2,0,0)*(h(2,0,0)-h(0,0,0))-expected_heat)/(1+abs(expected_heat))

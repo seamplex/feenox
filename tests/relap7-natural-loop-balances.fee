@@ -1,0 +1,67 @@
+DEFAULT_ARGUMENT_VALUE 1 relap7-natural-loop.msh
+DEFAULT_ARGUMENT_VALUE 2 50
+DEFAULT_ARGUMENT_VALUE 3 0
+DEFAULT_ARGUMENT_VALUE 4 1
+DEFAULT_ARGUMENT_VALUE 5 2e5
+DEFAULT_ARGUMENT_VALUE 6 1
+INCLUDE relap7-natural-loop.fee
+VAR b n old_mass old_energy
+VECTOR old_density SIZE 459
+VECTOR element_flow SIZE 459
+VECTOR old_flow SIZE 459
+axial_cells(b) = if(b=1|b=2|b=4,20,if(b=7,10,if(b=8,5,50)))
+length(b) = if(b=1|b=4,1,if(b=2,0.8,if(b=3,5.18,if(b=5|b=9,3.71,if(b=6,2.27,if(b=7,0.02,0.3))))))
+step(b) = length(b)/axial_cells(b)
+by(b,s) = if(b=1,1-s,if(b=4,s,if(b=5|b=6,1,if(b=8,1.5-0.3*s,if(b=9,1.2,0)))))
+bz(b,s) = if(b=2,0.8*s,if(b=3,0.8+5.18*s,if(b=4,5.98,if(b=5,5.98-3.71*s,if(b=6,2.27*(1-s),if(b=7,5.98+0.02*s,if(b=8,2.27,if(b=9,2.27+3.71*s,0))))))))
+density(b,s) = rho(0,by(b,s),bz(b,s))
+enthalpy(b,s) = h(0,by(b,s),bz(b,s))
+pressure(b,s) = p(0,by(b,s),bz(b,s))
+index(b,n) = (b-1)*51+n+1
+branch(i) = floor((i-1)/51)+1
+station(i) = i-1-51*(branch(i)-1)
+accumulation(b,n) = if(in_static,0,0.44934*step(b)*(density(b,n/axial_cells(b))-old_density(index(b,n)))/dt)
+# Recover port flows from the adjacent interior nodal mean and its mass balance.
+first_flow(b) = $6*mdot(0,by(b,1/axial_cells(b)),bz(b,1/axial_cells(b)))+accumulation(b,1)/2
+element_flow[i] = if(station(i)<axial_cells(branch(i)),if(station(i)=0,first_flow(branch(i)),element_flow(i-1)-accumulation(branch(i),station(i))),0)
+port_flow(b,side) = element_flow(index(b,if(side,axial_cells(b)-1,0)))
+internal_energy(b,s) = density(b,s)*enthalpy(b,s)-pressure(b,s)
+branch_mass(b) = 0.44934*step(b)*(0.5*(density(b,0)+density(b,1))+sum(density(b,n/axial_cells(b)),n,1,axial_cells(b)-1))
+branch_energy(b) = 0.44934*step(b)*(0.5*(internal_energy(b,0)+internal_energy(b,1))+sum(internal_energy(b,n/axial_cells(b)),n,1,axial_cells(b)-1))
+is_junction(b,side) = if(b<7,1,if(b=7|b=9,1-side,side))
+kinetic_storage(b,side) = is_junction(b,side)*step(b)*port_flow(b,side)^2/(4*density(b,side)*0.44934)
+kinetic_flux(b,side) = is_junction(b,side)*if(side,1,-1)*port_flow(b,side)^3/(2*density(b,side)^2*0.44934^2)
+boundary_flow(b,side) = accumulation(b,side*axial_cells(b))/2+if(side,-1,1)*port_flow(b,side)
+# Independent iapws IF97 quadratic at 300.15 K; maximum error <2e-7 J/kg over 0.15 to 0.35 MPa.
+reservoir_h(pressure_value) = 113429.04119865193+920.3272176696235*(pressure_value/1e6-0.25)-0.3608007963526311*(pressure_value/1e6-0.25)^2
+# Independent iapws IF97 saturation temperature cubic; maximum error <0.05 K over 0.15 to 0.35 MPa.
+saturation_T(pressure_value) = 400.57828644575045+131.66968226140256*(pressure_value/1e6-0.25)-228.34462111694162*(pressure_value/1e6-0.25)^2+581.4736901271943*(pressure_value/1e6-0.25)^3
+boundary_power(b,side) = boundary_flow(b,side)*if(boundary_flow(b,side)>0,reservoir_h(pressure(b,side)),enthalpy(b,side))
+friction_factor(b) = if(b=2|b=5,0.022,0.001)
+hydraulic_diameter(b) = if(b=5,0.0186,0.002972)
+mean_density(b,n) = (density(b,n/axial_cells(b))+density(b,(n+1)/axial_cells(b)))/2
+segment_momentum(b,n) = g_z*mean_density(b,n)*(bz(b,(n+1)/axial_cells(b))-bz(b,n/axial_cells(b)))-friction_factor(b)*step(b)/hydraulic_diameter(b)*element_flow(index(b,n))*abs(element_flow(index(b,n)))/(2*mean_density(b,n)*0.44934^2)-element_flow(index(b,n))^2/0.44934^2*(1/density(b,(n+1)/axial_cells(b))-1/density(b,n/axial_cells(b)))-step(b)/0.44934*(element_flow(index(b,n))-old_flow(index(b,n)))/dt
+loss_coefficient(b,side) = if(b=2,0.5,if(b=1,0.5*side,if(b=3,0.5*(1-side),if(b=4,0.1*side,if(b=5,0.1*(1-side),0)))))
+port_head(b,side) = port_flow(b,side)^2/(2*density(b,side)*0.44934^2)
+port_loss(b,side) = loss_coefficient(b,side)*port_flow(b,side)*abs(port_flow(b,side))/(2*density(b,side)*0.44934^2)
+loop_momentum(b) = sum(segment_momentum(b,n),n,0,axial_cells(b)-1)+port_head(b,1)-port_head(b,0)-port_loss(b,0)-port_loss(b,1)
+# Every node must stay subcooled (0.1 K margin over the fit error) within the fitted pressure range.
+phase_violation(b,s) = if(pressure(b,s)>0.15e6&pressure(b,s)<0.35e6&T(0,by(b,s),bz(b,s))<saturation_T(pressure(b,s))-0.1&T(0,by(b,s),bz(b,s))>273.15,0,1)
+branch_phase_violation(b) = sum(phase_violation(b,n/axial_cells(b)),n,0,axial_cells(b))
+mass = sum(branch_mass(b),b,1,9)
+energy = hs_energy+sum(branch_energy(b),b,1,9)+sum(kinetic_storage(b,0)+kinetic_storage(b,1),b,1,9)
+IF in_static=0
+  mass_error = max(mass_error,abs((mass-old_mass)/dt-boundary_flow(7,1)-boundary_flow(8,0)-boundary_flow(9,1))/223.77)
+  power = 5.1296e7+boundary_power(7,1)+boundary_power(8,0)+boundary_power(9,1)+sum(kinetic_flux(b,0)+kinetic_flux(b,1),b,1,9)
+  energy_error = max(energy_error,abs((energy-old_energy)/dt-power)/5.1296e7)
+  reservoir_error = max(reservoir_error,if(abs(pressure(8,0)/1e6-0.25)<0.1,0,1))
+  momentum_error = max(momentum_error,abs(sum(loop_momentum(b),b,1,6))/1e4)
+  phase_error = max(phase_error,sum(branch_phase_violation(b),b,1,9))
+ENDIF
+old_mass = mass
+old_energy = energy
+old_flow[i] = element_flow(i)
+old_density[i] = if(station(i)<axial_cells(branch(i))+1,density(branch(i),station(i)/axial_cells(branch(i))),0)
+IF done
+  PRINT mass_error+energy_error+reservoir_error+momentum_error+phase_error
+ENDIF

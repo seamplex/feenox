@@ -1,0 +1,89 @@
+---
+category: thermal_hydraulics
+intro: |
+  # RELAP7 Example 5: A core channel with a fuel rod
+
+  The fifth example from the RELAP7 manual simulates the flow of water through a vertical PWR subchannel heated by a single fuel rod.
+
+  ![Schematic view of the core channel (figure 4 of the RELAP7 manual).](relap-example5.png)
+
+  This example simulates fluid flow and heat transfer in a core channel.
+  It simulates the fluid flow in one subchannel with a single fuel rod as the heat source.
+  A prescribed power of $77.3~\text{kW}$ is supplied to the fuel rod.
+  The inlet boundary condition sets a density $\rho = 753.68~\text{kg}/\text{m}^3$ and a velocity $v = 4.43~\text{m}/\text{s}$.
+  The outlet boundary condition sets a pressure $p = 15.5~\text{MPa}$.
+  The fuel rod is made of fuel, gap and clad, each of them with a different thermal conductivity, density and specific heat.
+  The vertical channel is $3.865~\text{m}$ long, divided into 40\ elements:
+
+  ```{.c include="relap7-core-channel.geo"}
+  ```
+
+  The RELAP7 manual says that the flow area and the hydraulic diameter of the subchannel "can easily be calculated using a script in RELAP-7"
+  that has to be run from the scripts folder, giving the outer radius $r_o = 4.748~\text{mm}$ of the rod and the pitch $p = 12.6~\text{mm}$ of the lattice.
+  In FeenoX there is no need for an external script, we just write the expressions in the input file:
+
+  $$
+  A = p^2 - \pi r_o^2 \qquad\qquad D_h = \frac{4A}{2\pi r_o}
+  $$
+
+  which give the very same $A=8.79375 \times 10^{-5}~\text{m}^2$ and $D_h = 0.01179~\text{m}$ as the manual.
+
+  The fuel rod is a `HEAT_STRUCTURE` attached to the physical group `channel`, whose `FUEL`, `GAP` and `CLAD` layers are three other materials with constant conductivity\ `k`, density\ `rho_s` and specific heat\ `cp`.
+  The geometry of the rod (radius and widths of each layer and number of radial cells) and its total power `hs_power` go in the channel's `MATERIAL`, alongside the flow properties.
+  The mapping with RELAP7's `CoreChannel` component is:
+
+   * `dim_hs = 2` is FeenoX's default `AXIAL_CONDUCTION` (i.e. radial and axial conduction in the rod),
+   * `power_fraction = '1.0 0.0 0.0'` is FeenoX's only option: the power is uniformly generated in the fuel (because the expression is a constant, we can have expressions of $x$, $y$, $z$ and/or $t$),
+   * `Hw = 5.33e4` is the heat transfer coefficient `h_wall` between the clad and the coolant,
+   * `initial_Ts = 559.15` is the initial solid temperature `T_solid_0(r,x,y,z)`, which is a function of the radius and the space, and
+   * the heated perimeter is the outer clad circumference in both codes.
+
+  As the RELAP7 input does not touch the gravity and the channel goes upwards along $z$, we keep FeenoX's default $g_z = -9.81~\text{m}/\text{s}^2$, which is also RELAP7's default.
+  As in the previous examples, the water starts at rest and we use a variable time step starting from $\Delta t_0 = 1~\text{ms}$ with a second-order BDF method (the original RELAP example uses a fixed $\Delta t = 100~\text{ms}$) up to $t=50~\text{s}$.
+
+  The output shows the mass flow, the coolant temperature at the outlet, the fuel centerline and clad surface temperatures at the outlet height, and the heat transferred from the rod to the coolant, which approaches the generated $77.34~\text{kW}$ as the rod reaches steady state.
+  At the end, the axial profiles of the coolant, clad surface, fuel surface and fuel centerline temperatures are written into a file.
+
+terminal: |
+  $ gmsh -1 relap7-core-channel.geo
+  $ feenox relap-example5-core-channel.fee
+  0	0.0000e+00	5.5915e+02	5.5915e+02	5.5915e+02	0.0000e+00
+  0.001	7.9759e-04	5.5915e+02	5.5927e+02	5.5915e+02	-1.8439e+03
+  0.003	1.0765e-01	5.5915e+02	5.5952e+02	5.5915e+02	-4.2194e+03
+  0.005	3.7688e-01	5.5916e+02	5.5976e+02	5.5915e+02	-3.7961e+03
+  0.009	6.3767e-01	5.5916e+02	5.6025e+02	5.5916e+02	1.2910e+03
+  0.017	2.8017e-01	5.5916e+02	5.6123e+02	5.5918e+02	3.3899e+03
+  0.025	1.5341e-01	5.5915e+02	5.6222e+02	5.5921e+02	-2.0228e+01
+  0.041	3.2322e-01	5.5917e+02	5.6418e+02	5.5930e+02	8.0814e+01
+  0.073	3.1149e-01	5.5920e+02	5.6810e+02	5.5952e+02	2.2503e+03
+  0.137	2.9034e-01	5.5935e+02	5.7595e+02	5.6003e+02	4.1636e+03
+  0.265	2.9703e-01	5.5991e+02	5.9164e+02	5.6117e+02	7.7829e+03
+  0.521	2.9791e-01	5.6184e+02	6.2303e+02	5.6393e+02	1.3290e+04
+  1.033	2.9795e-01	5.6730e+02	6.8547e+02	5.7061e+02	2.1703e+04
+  2.057	2.9633e-01	5.7750e+02	8.0502e+02	5.8274e+02	3.4215e+04
+  4.105	2.9473e-01	5.8923e+02	1.0041e+03	5.9719e+02	5.0566e+04
+  8.201	2.9399e-01	5.9941e+02	1.2497e+03	6.1029e+02	6.7736e+04
+  12.297	2.9373e-01	6.0319e+02	1.3596e+03	6.1527e+02	7.4745e+04
+  17.297	2.9360e-01	6.0472e+02	1.4063e+03	6.1732e+02	7.7623e+04
+  22.297	2.9357e-01	6.0496e+02	1.4149e+03	6.1766e+02	7.8086e+04
+  27.297	2.9358e-01	6.0485e+02	1.4125e+03	6.1752e+02	7.7872e+04
+  32.297	2.9359e-01	6.0471e+02	1.4090e+03	6.1734e+02	7.7610e+04
+  37.297	2.9360e-01	6.0462e+02	1.4066e+03	6.1722e+02	7.7446e+04
+  42.297	2.9360e-01	6.0458e+02	1.4055e+03	6.1717e+02	7.7369e+04
+  47.297	2.9361e-01	6.0456e+02	1.4050e+03	6.1715e+02	7.7341e+04
+  50	2.9361e-01	6.0456e+02	1.4049e+03	6.1714e+02	7.7337e+04
+  $ cat relap-example5-core-channel-profile.dat
+  0	0	0	559.793	572.377	718.695	1360.13
+  0	0	0.3865	564.832	577.416	723.735	1365.17
+  0	0	0.773	569.778	582.362	728.681	1370.12
+  0	0	1.1595	574.624	587.208	733.528	1374.97
+  0	0	1.546	579.363	591.947	738.268	1379.72
+  0	0	1.9325	583.987	596.571	742.892	1384.35
+  0	0	2.319	588.487	601.071	747.393	1388.85
+  0	0	2.7055	592.853	605.437	751.76	1393.23
+  0	0	3.092	597.075	609.66	755.983	1397.45
+  0	0	3.4785	601.141	613.726	760.05	1401.52
+  0	0	3.865	604.56	617.144	763.469	1404.95
+  $
+
+...

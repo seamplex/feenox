@@ -1,0 +1,10 @@
+# Equal-area limit: no reversible pressure or enthalpy jump.
+DEFAULT_ARGUMENT_VALUE 1 1
+PROBLEM thermal_hydraulics MESH relap7-two-pipes.msh
+MATERIAL pipe1 A=2 D_h=1 f=1
+MATERIAL pipe2 A=2 D_h=1 f=1
+MATERIAL connection K=$1
+BC inlet rho=995 v=1
+BC outlet p=95000
+SOLVE_PROBLEM
+PRINT abs(mdot(1,0,0)/1990-1)+abs((p(0,0,0)-p(2,0,0))/(995*(1+$1))-1)+abs(h(2,0,0)-h(0,0,0))/1000

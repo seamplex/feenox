@@ -1,0 +1,12 @@
+PROBLEM thermal_hydraulics DIM 2 MESH thermal-hydraulics-tee.msh
+MATERIAL branch D=0.02 roughness=1e-5
+MATERIAL main D=0.03 roughness=1e-5
+MATERIAL connection K_branch=0.5 K_main=1 A_ref=0.001
+BC in1 mdot=1 T=300
+BC in2 mdot=2 T=350
+BC out p=1e6
+SOLVE_PROBLEM
+branch_area = pi*0.02^2/4
+main_area = pi*0.03^2/4
+kinetic_change = (9/main_area^2-3/branch_area^2)/(2*rho(1,0.5)^2)
+PRINT abs(mdot(3,0.5)-3)+abs(h(3,0.5)-(h(0,0)+2*h(0,1))/3+kinetic_change)/1000

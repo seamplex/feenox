@@ -1,9 +1,7 @@
 # General things to do
 
- * windows build (against my will)
  * `PROGRESS` `ascii_art` `percentage` `norm` 
    - build, KSP, SNES
- * implicit call to `SOLVE_PROBLEM`?
  * for/while loops?
  * use `DMPlex`?
     - to read non-gmsh meshes?
@@ -14,13 +12,6 @@
  * `FIT` to mesh-based functions
  * `FIT` taking into account uncertainties
  * extended integration (as in reduced, full, extended)
- * make GSL optional
-   - rewrite BLAS using ad-hoc routines
-     - profile GSL BLAS vs. manual implementation vs. OpenBLAS
-     - eigen in C++ (optional)
-   - define `fee_matrix` as `gsl_matrix` but allow to change the implementation
-   - wrap all GSL calls inside `#ifdef`
-   - use a large chunk of contiguous memory in the heap to store shape functions, gradients, etc
  * optimize MPI usage
    - variables `mpi_rank`, `mpi_size`,  `memory_total` y `memory_local(rank)`
  * V&V
@@ -182,7 +173,15 @@
  * FVM?
  * allow per-material fission spectrum (it has to be uniform and normalized)
 
+## Thermal hydraulics
 
+ * pseudo TS for steady-state
+   - $t \in [0,1]$
+   - $c_p = 0$ for heat structures
+ * two-phase flow
+   - `FLUID` to choose light or heavy water or something else
+   - `TWO_PHASE_MODEL` keyword to choose the equation of state
+ * DUMP + restart
  
 # V & V
 

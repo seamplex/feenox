@@ -1,0 +1,63 @@
+# RELAP-7 manual example 5: a vertical PWR core subchannel with a single
+# fuel rod (fuel + gap + clad) that generates 77.3 kW
+# initial state: p = 15.5 MPa, T = 559.15 K and v = 0 everywhere
+# inlet:  rho = 753.68 kg/m^3 and v = 4.43 m/s
+# outlet: p = 15.5 MPa
+PROBLEM thermal_hydraulics MESH relap7-core-channel.msh TRANSIENT_SOLVER bdf
+
+# the channel goes along z, which points upwards so we keep
+# the default gravity g_z = -9.81 (RELAP-7's input does not change it either)
+
+end_time = 50    # integrate up to t = 50 s
+dt_0 = 1e-3      # initial dt
+min_dt = 1e-3    # min dt
+max_dt = 5       # max dt
+
+# initial conditions for the fluid and for the solid
+p_0(x,y,z) = 155e5
+T_0(x,y,z) = 559.15
+v_0(x,y,z) = 0
+T_solid_0(r,x,y,z) = 559.15
+
+# a cylindrical fuel rod with gap and clad coupled to the channel
+# with radial and axial conduction (i.e. RELAP-7's dim_hs = 2)
+HEAT_STRUCTURE PIPE channel FUEL fuel GAP gap CLAD clad
+
+# properties of the solid materials
+MATERIAL fuel k=2.5  rho_s=1.032e4 cp=300
+MATERIAL gap  k=0.6  rho_s=1       cp=1
+MATERIAL clad k=21.5 rho_s=6.55e3  cp=350
+
+# no need for an external script to compute the flow area and the hydraulic
+# diameter of a square-lattice subchannel around a rod of outer radius r_o
+pitch = 0.0126                     # lattice pitch
+r_o = 0.004096 + 0.0001 + 0.000552 # fuel radius + gap width + clad width
+A_channel = pitch^2 - pi*r_o^2     # flow area
+D_h_channel = 4*A_channel/(2*pi*r_o)   # hydraulic diameter = 4 * area / wetted perimeter
+
+# the channel has the flow geometry, a fixed friction factor, a fixed
+# heat transfer coefficient, the rod geometry and the total power,
+# which is uniformly distributed in the fuel
+MATERIAL channel {
+  A=A_channel D_h=D_h_channel f=0.01 h_wall=5.33e4
+  fuel_radius=0.004096 gap_width=0.0001 clad_width=0.000552
+  fuel_cells=10 gap_cells=1 clad_cells=2
+  hs_power=77337.69407
+}
+
+BC inlet  rho=753.68 v=4.43
+BC outlet p=155e5
+
+SOLVE_PROBLEM
+
+# write the evolution of the mass flow, the coolant outlet temperature,
+# the fuel centerline and the clad surface temperatures at the outlet
+# and the power transferred from the rod to the coolant
+PRINT t %.4e mdot(0,0,3.865) T(0,0,3.865) T_fuel_center(0,0,3.865) T_clad_surface(0,0,3.865) hs_heat
+WRITE_RESULTS
+
+# at the end, write the axial profiles of the coolant, clad surface,
+# fuel surface and fuel centerline temperatures
+IF done
+  PRINT_FUNCTION T T_clad_surface T_fuel_surface T_fuel_center MIN 0 0 0 MAX 0 0 3.865 NSTEPS 1 1 10 FILE $0-profile.dat
+ENDIF

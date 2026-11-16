@@ -1,0 +1,9 @@
+DEFAULT_ARGUMENT_VALUE 3 "dummy=0"
+PROBLEM thermal_hydraulics MESH relap7-two-pipes.msh
+MATERIAL pipe1 A=2 f=1
+MATERIAL pipe2 A=1 f=1
+MATERIAL $1 $2
+BC inlet rho=995 v=1
+BC outlet p=95000
+$3
+SOLVE_PROBLEM

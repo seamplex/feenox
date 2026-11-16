@@ -642,7 +642,11 @@ int feenox_problem_setup_snes_mechanical(SNES snes) {
   // PETSc 3.19 is buggy and needs TSSetFromOptions already called
   // that one sets the line search to bt and we want to default to basic
   if (ls_type == NULL || (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 19)) {
+#if PETSC_VERSION_GT(3,26,0)    
+    petsc_call(SNESLineSearchSetType(ls, SNESLINESEARCHNONE));
+#else
     petsc_call(SNESLineSearchSetType(ls, SNESLINESEARCHBASIC));
+#endif
   }
   return FEENOX_OK;
 }
