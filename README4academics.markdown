@@ -107,6 +107,7 @@ current version can solve
 - [Modal analysis]
 - [Neutron diffusion]
 - [Neutron S<sub>N</sub>]
+- [Thermal hydraulics]
 
 > **Heads up!** The background of FeenoX’s main author is Nuclear
 > Engineering. Hence,
@@ -156,6 +157,7 @@ solutions].
   [Modal analysis]: https://seamplex.com/feenox/examples/modal.html
   [Neutron diffusion]: https://seamplex.com/feenox/examples/neutron_diffusion.html
   [Neutron S<sub>N</sub>]: https://seamplex.com/feenox/examples/neutron_sn.html
+  [Thermal hydraulics]: https://seamplex.com/feenox/examples/thermal_hydraulics.html
   [diffusion]: https://www.seamplex.com/feenox/examples/neutron_diffusion.html
   [transport]: https://www.seamplex.com/feenox/examples/neutron_sn.html
   [PhD thesis (in Spanish only)]: https://seamplex.com/thesis/html/

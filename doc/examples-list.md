@@ -6,4 +6,5 @@
  - [Modal analysis](https://seamplex.com/feenox/examples/modal.html)
  - [Neutron diffusion](https://seamplex.com/feenox/examples/neutron_diffusion.html)
  - [Neutron S<sub>N</sub>](https://seamplex.com/feenox/examples/neutron_sn.html)
+ - [Thermal hydraulics](https://seamplex.com/feenox/examples/thermal_hydraulics.html)
  

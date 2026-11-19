@@ -155,6 +155,7 @@ FeenoX can solve the following types of problems:
 - [Modal analysis]
 - [Neutron diffusion]
 - [Neutron S<sub>N</sub>]
+- [Thermal hydraulics]
 
 Take the tutorials to learn how to solve those types of problems:
 
@@ -173,6 +174,7 @@ Browse through [the documentation] to dive deeper into the details.
   [Modal analysis]: https://seamplex.com/feenox/examples/modal.html
   [Neutron diffusion]: https://seamplex.com/feenox/examples/neutron_diffusion.html
   [Neutron S<sub>N</sub>]: https://seamplex.com/feenox/examples/neutron_sn.html
+  [Thermal hydraulics]: https://seamplex.com/feenox/examples/thermal_hydraulics.html
   [Setting up your workspace]: https://www.seamplex.com/feenox/doc/tutorials/000-setup
   [Overview: the tensile test case]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test
   [Fun & games: solving mazes with PDES instead of AI]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes

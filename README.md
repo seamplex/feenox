@@ -72,6 +72,8 @@ no. 95, p. 5846, Mar. 2024, doi: [10.21105/joss.05846](https://doi.org/10.21105/
 
 > ### News
 >
+> * New `PROBLEM` type `thermal_hydraulics` to solve [one-dimensional nuclear power plant transients](https://seamplex.com/feenox/examples/thermal_hydraulics.html)
+>
 > * White paper [“Why FeenoX is different”](https://seamplex.com/feenox/doc/whitepaper/)
 >
 > * First non-trivial large-deformation mechanical example: [NAFEMS GNL5 “Large-deformation beam”](https://www.seamplex.com/feenox/examples/mechanical.html#nafems-gnl5-large-deformation-beam)

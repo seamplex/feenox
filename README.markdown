@@ -102,6 +102,9 @@ work]):
 
 > ### News
 >
+> - New `PROBLEM` type `thermal_hydraulics` to solve [one-dimensional
+>   nuclear power plant transients]
+>
 > - White paper [“Why FeenoX is different”]
 >
 > - First non-trivial large-deformation mechanical example: [NAFEMS GNL5
@@ -142,6 +145,7 @@ work]):
   [Academic Professor]: README4academics.markdown
   [cite FeenoX in your work]: doc/FAQ.markdown#how-should-i-cite-feenox
   [10.21105/joss.05846]: https://doi.org/10.21105/joss.05846
+  [one-dimensional nuclear power plant transients]: https://seamplex.com/feenox/examples/thermal_hydraulics.html
   [“Why FeenoX is different”]: https://seamplex.com/feenox/doc/whitepaper/
   [NAFEMS GNL5 “Large-deformation beam”]: https://www.seamplex.com/feenox/examples/mechanical.html#nafems-gnl5-large-deformation-beam
   [Trixie backports]: https://packages.debian.org/trixie-backports/feenox
@@ -162,6 +166,7 @@ work]):
 - [Modal analysis]
 - [Neutron diffusion]
 - [Neutron S<sub>N</sub>]
+- [Thermal hydraulics]
 
   [Basic mathematics]: https://seamplex.com/feenox/examples/basic.html
   [Systems of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
@@ -171,6 +176,7 @@ work]):
   [Modal analysis]: https://seamplex.com/feenox/examples/modal.html
   [Neutron diffusion]: https://seamplex.com/feenox/examples/neutron_diffusion.html
   [Neutron S<sub>N</sub>]: https://seamplex.com/feenox/examples/neutron_sn.html
+  [Thermal hydraulics]: https://seamplex.com/feenox/examples/thermal_hydraulics.html
 
 ### Tutorials
 
