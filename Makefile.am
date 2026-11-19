@@ -397,7 +397,37 @@ DISTCLEANFILES = \
                  ./beam-orthotropic-tet10.vtu \
                  ./beam-orthotropic-tet4.vtu \
                  ./hex8-sparse.vtu \
-                 ./hex8-sparse.vtk
+                 ./hex8-sparse.vtk \
+                 ./relap7-core-startup-AXIAL_CONDUCTION-50-10-1.msh     \
+                 ./relap7-core-verify-AXIAL_CONDUCTION-1-40-0.msh       \
+                 ./relap7-core-energy-AXIAL_CONDUCTION-1-10-0.msh       \
+                 ./relap7-core-verify-AXIAL_CONDUCTION-0-40-0.msh       \
+                 ./relap7-core-startup-NO_AXIAL_CONDUCTION-50-10-1.msh  \
+                 ./relap7-core-verify-NO_AXIAL_CONDUCTION-1-40-0.msh    \
+                 ./relap7-core-energy-NO_AXIAL_CONDUCTION-1-10-0.msh    \
+                 ./relap7-core-verify-NO_AXIAL_CONDUCTION-0-40-0.msh    \
+                 ./tests/thermal-hydraulics-structures.msh              \
+                 ./tests/relap7-pwr.msh                                 \
+                 ./tests/relap7-natural-loop-merged-1.msh               \
+                 ./tests/relap7-natural-loop-merged-0.msh               \
+                 ./tests/relap7-natural-loop-oriented.msh               \
+                 ./tests/relap7-natural-loop.msh                        \
+                 ./tests/relap7-core-channel.msh                        \
+                 ./tests/relap7-heat-exchanger-mismatch.msh             \
+                 ./tests/relap7-heat-exchanger-oriented.msh             \
+                 ./tests/relap7-heat-exchanger-fine.msh                 \
+                 ./tests/relap7-heat-exchanger.msh                      \
+                 ./tests/thermal-hydraulics-pump-invalid.msh            \
+                 ./tests/thermal-hydraulics-pump.msh                    \
+                 ./tests/relap7-pump-loop-oriented.msh                  \
+                 ./tests/relap7-pump-loop.msh                           \
+                 ./tests/relap7-five-pipes.msh                          \
+                 ./tests/thermal-hydraulics-junction-merge.msh          \
+                 ./tests/relap7-two-pipes-oriented.msh                  \
+                 ./tests/relap7-two-pipes-reverse.msh                   \
+                 ./tests/relap7-two-pipes.msh                           \
+                 ./tests/relap7-pipe.msh                                \
+                 ./tests/thermal-hydraulics-tee.msh
 
 all-local:
 	cp -r src/feenox$(EXEEXT) .
