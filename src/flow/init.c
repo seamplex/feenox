@@ -220,10 +220,10 @@ int feenox_initialize(int argc, char **argv) {
   // free argv0
   feenox_free(argv0);
   
-  // turn of GSL error handler
-//  gsl_set_error_handler_off();
-  // TODO: use our own
-  // gsl_set_error_handler(feenox_gsl_handler);
+#ifdef HAVE_GSL
+  // replace GSL's default error handler (which aborts) with ours
+  gsl_set_error_handler(feenox_gsl_handler);
+#endif
 
   signal(SIGINT,  feenox_signal_handler);
   signal(SIGTERM, feenox_signal_handler);

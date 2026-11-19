@@ -115,20 +115,23 @@ void feenox_nan_error(void) {
 }
 
 
+// GSL's default error handler calls abort(), so we install this one at startup
+// to report the error and exit with a non-zero status instead (unless the
+// mask on_gsl_error says otherwise, in which case the caller gets the error code)
 void feenox_gsl_handler(const char *reason, const char *file_ptr, int line, int gsl_errno) {
 
-/*  
-  int on_gsl_error = (int)(feenox_value(feenox_special_var(on_gsl_error)));
+#ifdef HAVE_GSL
+  int on_gsl_error = (feenox_special_var(on_gsl_error) != NULL) ? (int)(feenox_special_var_value(on_gsl_error)) : 0;
 
   if (!(on_gsl_error & ON_ERROR_NO_REPORT)) {
-    feenox_push_error_message("gsl error #%d '%s' in %s", gsl_errno, reason, file_ptr);
+    feenox_push_error_message("GSL error #%d (%s): %s (%s:%d)", gsl_errno, gsl_strerror(gsl_errno), reason, file_ptr, line);
     feenox_pop_errors();
   }
 
   if (!(on_gsl_error & ON_ERROR_NO_QUIT)) {
-    feenox_polite_exit(WASORA_RUNTIME_ERROR);
+    feenox_polite_exit(EXIT_FAILURE);
   }
-*/
+#endif
   return;
 }
 

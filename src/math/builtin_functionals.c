@@ -21,14 +21,26 @@
  */
 #include "feenox.h"
 
+#include <stdarg.h>
+
 #ifdef HAVE_GSL
-// from gsl/roots/root.h
-#define SAFE_FUNC_CALL(f, x, yp) \
-do { \
-  *yp = GSL_FN_EVAL(f,x); \
-  if (!gsl_finite(*yp)) \
-    GSL_ERROR("function value is not finite", GSL_EBADFUNC); \
-} while (0)
+// report an error in a functional honoring the on_gsl_error mask
+static void feenox_functional_error(const char *fmt, ...) {
+  int on_gsl_error = (int)(feenox_special_var_value(on_gsl_error));
+  if (!(on_gsl_error & ON_ERROR_NO_REPORT)) {
+    char buffer[1024];
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(buffer, sizeof(buffer), fmt, ap);
+    va_end(ap);
+    feenox_push_error_message("%s", buffer);
+    feenox_pop_errors();
+  }
+  if (!(on_gsl_error & ON_ERROR_NO_QUIT)) {
+    feenox_polite_exit(EXIT_FAILURE);
+  }
+  return;
+}
 #endif
 
 
@@ -58,6 +70,9 @@ struct builtin_functional_t builtin_functional[N_BUILTIN_FUNCTIONALS] = {
 typedef struct {
   expr_t *expression;
   var_t *variable;
+  int non_finite;       // set if the expression evaluated to inf or nan
+  double x_non_finite;  // first value of the variable where that happened
+  double y_non_finite;
 } gsl_function_arguments_t;
 
 
@@ -85,7 +100,7 @@ double feenox_builtin_derivative(expr_item_t *a, var_t *var_x) {
   double result;
 
   gsl_function function_to_derive;
-  gsl_function_arguments_t function_arguments;
+  gsl_function_arguments_t function_arguments = {0};
 
   // nos acordamos cuanto vale x para despues volver a dejarle ese valor
   x_old = feenox_var_value(var_x);
@@ -175,7 +190,7 @@ double feenox_builtin_integral(expr_item_t *a, var_t *var_x) {
 
   gsl_integration_workspace *w;
   gsl_function function_to_integrate;
-  gsl_function_arguments_t function_arguments;
+  gsl_function_arguments_t function_arguments = {0};
 
   
   // nos acordamos cuanto vale x para despues volver a dejarle ese valor
@@ -205,21 +220,32 @@ double feenox_builtin_integral(expr_item_t *a, var_t *var_x) {
   // TODO: poner en aux para no tener que hacer alloc cada vez
   w = gsl_integration_workspace_alloc(intervals);
 
+  // we handle the errors ourselves to give a better message
+  gsl_error_handler_t *old_handler = gsl_set_error_handler_off();
+  int gsl_status = GSL_SUCCESS;
   if (x_lower < -0.9*feenox_special_var_value(infinite) && x_upper > +0.9*feenox_special_var_value(infinite)) {
-    gsl_integration_qagi(&function_to_integrate, 1e-8, epsrel, intervals, w, &result, &error);
+    gsl_status = gsl_integration_qagi(&function_to_integrate, 1e-8, epsrel, intervals, w, &result, &error);
   } else if (x_lower < -0.9*feenox_special_var_value(infinite)) {
-    gsl_integration_qagil(&function_to_integrate, x_upper, 1e-8, epsrel, intervals, w, &result, &error);
+    gsl_status = gsl_integration_qagil(&function_to_integrate, x_upper, 1e-8, epsrel, intervals, w, &result, &error);
   } else if (x_upper > +0.9*feenox_special_var_value(infinite)) {
-    gsl_integration_qagiu(&function_to_integrate, x_lower, 1e-8, epsrel, intervals, w, &result, &error);
+    gsl_status = gsl_integration_qagiu(&function_to_integrate, x_lower, 1e-8, epsrel, intervals, w, &result, &error);
   } else {
-    gsl_integration_qag(&function_to_integrate, x_lower, x_upper, 1e-8, epsrel, intervals, pointskey, w, &result, &error);
+    gsl_status = gsl_integration_qag(&function_to_integrate, x_lower, x_upper, 1e-8, epsrel, intervals, pointskey, w, &result, &error);
   }
-
+  gsl_set_error_handler(old_handler);
 
   // le volvemos a poner el valor de x que tenia antes
   feenox_var_value(var_x) = x_old;
 
   gsl_integration_workspace_free(w);
+
+  if (function_arguments.non_finite) {
+    feenox_functional_error("the integrand of integral() over [%g,%g] is not finite: it evaluates to %g at %s = %g",
+                            x_lower, x_upper, function_arguments.y_non_finite, var_x->name, function_arguments.x_non_finite);
+  } else if (gsl_status != GSL_SUCCESS) {
+    feenox_functional_error("integral() over [%g,%g] failed: %s (result %g, estimated error %g)",
+                            x_lower, x_upper, gsl_strerror(gsl_status), result, error);
+  }
 
   return result;
 #else
@@ -263,7 +289,7 @@ double feenox_builtin_gauss_kronrod(expr_item_t *a, var_t *var_x) {
   size_t neval;
 
   gsl_function function_to_integrate;
-  gsl_function_arguments_t function_arguments;
+  gsl_function_arguments_t function_arguments = {0};
 
   
   // nos acordamos cuanto vale x para despues volver a dejarle ese valor
@@ -320,7 +346,7 @@ double feenox_builtin_gauss_legendre(expr_item_t *a, var_t *var_x) {
   size_t n;
 
   gsl_function function_to_integrate;
-  gsl_function_arguments_t function_arguments;
+  gsl_function_arguments_t function_arguments = {0};
 
   gsl_integration_glfixed_table *points;
 
@@ -462,7 +488,7 @@ double feenox_builtin_root(expr_item_t *a, var_t *var_x) {
 
   gsl_root_fsolver *s = NULL;
   gsl_function function_to_solve;
-  gsl_function_arguments_t function_arguments;
+  gsl_function_arguments_t function_arguments = {0};
   
   int nocomplain;
   int max_iter = DEFAULT_ROOT_MAX_TER;
@@ -501,6 +527,10 @@ double feenox_builtin_root(expr_item_t *a, var_t *var_x) {
     case 2:
       s = gsl_root_fsolver_alloc(gsl_root_fsolver_bisection);
     break;
+    default:
+      feenox_functional_error("unknown root() method %d, it should be 0 (brent), 1 (falsepos) or 2 (bisection)", (int)feenox_expression_eval(&a->arg[5]));
+      return 0;
+    break;
   }
   
   // un flag que nos indica si tenemos que ser quejosos o no
@@ -513,57 +543,64 @@ double feenox_builtin_root(expr_item_t *a, var_t *var_x) {
   function_to_solve.function = feenox_gsl_function;
   function_to_solve.params = (void *)(&function_arguments);
 
-  // apagamos el handler para mirar el do not straddle y=0 nosotros
-  gsl_set_error_handler_off();
+  // we check the GSL return codes ourselves during the whole root search
+  gsl_error_handler_t *old_handler = gsl_set_error_handler_off();
 
-  // miramos nosotros si el rango atrapa una raiz o no
-  SAFE_FUNC_CALL (&function_to_solve, x_lower, &f_lower);
-  SAFE_FUNC_CALL (&function_to_solve, x_upper, &f_upper);  
-  
-  if ((f_lower < 0.0 && f_upper < 0.0) || (f_lower > 0.0 && f_upper > 0.0)) {
+  // first see if the range brackets a root (and if the function is finite at the ends)
+  f_lower = feenox_gsl_function(x_lower, function_to_solve.params);
+  f_upper = feenox_gsl_function(x_upper, function_to_solve.params);
+
+  if (function_arguments.non_finite) {
+    gsl_set_error_handler(old_handler);
+    gsl_root_fsolver_free(s);
     feenox_var_value(var_x) = x_old;
-    if (nocomplain) {
-      return 0;
-    } else {
-      
-      int on_gsl_error = (int)(feenox_var_value(feenox_special_var(on_gsl_error)));
-
-      if (!(on_gsl_error & ON_ERROR_NO_REPORT)) {
-        feenox_push_error_message("range does not contain a root, f(%g) = %g and f(%g) = %g", x_lower, f_lower, x_upper, f_upper);
-        feenox_pop_errors();
-      }
-
-      if (!(on_gsl_error & ON_ERROR_NO_QUIT)) {
-        feenox_polite_exit(FEENOX_ERROR);
-      }
-    }
+    feenox_functional_error("the function of root() is not finite at the end of the range: f(%g) = %g", function_arguments.x_non_finite, function_arguments.y_non_finite);
+    return function_arguments.y_non_finite;
   }
 
-  gsl_root_fsolver_set(s, &function_to_solve, x_lower, x_upper);
-  
-  // volvemos al poner el handler para lo que sigue
-  gsl_set_error_handler(feenox_gsl_handler);
-  
-  // si no tenemos que ser quejosos entonces sacamos temporalmente
-  // el handler de errores de la GSL
-  if (nocomplain) {
-  } else {
-    gsl_root_fsolver_set(s, &function_to_solve, x_lower, x_upper);
+  if ((f_lower < 0.0 && f_upper < 0.0) || (f_lower > 0.0 && f_upper > 0.0)) {
+    gsl_set_error_handler(old_handler);
+    gsl_root_fsolver_free(s);
+    feenox_var_value(var_x) = x_old;
+    if (!nocomplain) {
+      feenox_functional_error("range does not contain a root, f(%g) = %g and f(%g) = %g", x_lower, f_lower, x_upper, f_upper);
+    }
+    return 0;
+  }
+
+  if ((gsl_status = gsl_root_fsolver_set(s, &function_to_solve, x_lower, x_upper)) != GSL_SUCCESS) {
+    gsl_set_error_handler(old_handler);
+    gsl_root_fsolver_free(s);
+    feenox_var_value(var_x) = x_old;
+    feenox_functional_error("root() could not start in [%g,%g]: %s", x_lower, x_upper, gsl_strerror(gsl_status));
+    return 0;
   }
 
   iter = 0;
   do {
     iter++;
-    gsl_root_fsolver_iterate(s);
+    if ((gsl_status = gsl_root_fsolver_iterate(s)) != GSL_SUCCESS) {
+      break;
+    }
     x = gsl_root_fsolver_root(s);
     x_lower = gsl_root_fsolver_x_lower(s);
     x_upper = gsl_root_fsolver_x_upper(s);
-    gsl_status= gsl_root_test_interval(x_lower, x_upper, epsrel, epsrel);
+    gsl_status = gsl_root_test_interval(x_lower, x_upper, epsrel, epsrel);
   } while (gsl_status == GSL_CONTINUE && iter < max_iter);
 
+  gsl_set_error_handler(old_handler);
   feenox_var_value(var_x) = x_old;
-
   gsl_root_fsolver_free(s);
+
+  if (function_arguments.non_finite) {
+    feenox_functional_error("the function of root() is not finite: f(%g) = %g", function_arguments.x_non_finite, function_arguments.y_non_finite);
+  } else if (gsl_status == GSL_CONTINUE) {
+    if (!nocomplain) {
+      feenox_functional_error("root() did not converge after %d iterations, the last estimate is %g", iter, x);
+    }
+  } else if (gsl_status != GSL_SUCCESS) {
+    feenox_functional_error("root() failed: %s", gsl_strerror(gsl_status));
+  }
 
   return x;
 #else
@@ -626,7 +663,7 @@ double feenox_builtin_func_min(expr_item_t *a, var_t *var_x) {
   }
   
   // these guys are needed for GSL
-  gsl_function_arguments_t function_arguments;
+  gsl_function_arguments_t function_arguments = {0};
   function_arguments.expression = &a->arg[0];
   function_arguments.variable = var_x;
 
@@ -639,7 +676,8 @@ double feenox_builtin_func_min(expr_item_t *a, var_t *var_x) {
 
   // try to find a good initial guess
   double initial_factors[] = {0.5, 0.25, 0.75, 0.125, 1-0.125, 0.0625, 1-0.0625, 0.025, 1-0.025, 0.01, 0.99};
-  gsl_set_error_handler_off();
+  // we check the GSL return codes ourselves during the whole minimization
+  gsl_error_handler_t *old_handler = gsl_set_error_handler_off();
 
   double x = 0;
   int gsl_status = GSL_SUCCESS;
@@ -650,9 +688,10 @@ double feenox_builtin_func_min(expr_item_t *a, var_t *var_x) {
       break;
     }
   }
-  gsl_set_error_handler(feenox_gsl_handler);
 
   if (gsl_status != GSL_SUCCESS) {
+    gsl_set_error_handler(old_handler);
+    gsl_min_fminimizer_free(s);
     feenox_var_value(var_x) = x_old;
     return (feenox_gsl_function(x_lower, function_to_solve.params) < feenox_gsl_function(x_upper, function_to_solve.params)) ?  x_lower : x_upper;
   }
@@ -660,13 +699,18 @@ double feenox_builtin_func_min(expr_item_t *a, var_t *var_x) {
   int iter = 0;
   do {
     iter++;
-    gsl_min_fminimizer_iterate(s);
+    if (gsl_min_fminimizer_iterate(s) != GSL_SUCCESS) {
+      break;
+    }
     x = gsl_min_fminimizer_x_minimum(s);
     x_lower = gsl_min_fminimizer_x_lower(s);
     x_upper = gsl_min_fminimizer_x_upper(s);
-    gsl_status = gsl_min_test_interval(x_lower, x_upper, epsrel, epsrel);
+    // when the bracket collapses to round-off, GSL reports lower > upper
+    // (GSL_EINVAL), which actually means we already converged
+    gsl_status = (x_lower < x_upper) ? gsl_min_test_interval(x_lower, x_upper, epsrel, epsrel) : GSL_SUCCESS;
   } while (gsl_status == GSL_CONTINUE && iter < DEFAULT_ROOT_MAX_TER);
 
+  gsl_set_error_handler(old_handler);
   feenox_var_value(var_x) = x_old;
 
   gsl_min_fminimizer_free(s);
@@ -691,6 +735,11 @@ double feenox_gsl_function(double x, void *params) {
   y = feenox_expression_eval(arguments->expression);
 
   if (gsl_isnan(y) || gsl_isinf(y)) {
+    if (arguments->non_finite == 0) {
+      arguments->non_finite = 1;
+      arguments->x_non_finite = x;
+      arguments->y_non_finite = y;
+    }
     feenox_nan_error();
   }
 
