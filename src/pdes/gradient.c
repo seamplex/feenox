@@ -240,7 +240,7 @@ int feenox_problem_gradient_compute_at_element(element_t *e, mesh_t *mesh) {
           for (unsigned int d = 0; d < feenox.pde.dim; d++) {
             for (unsigned int j_local_prime = 0; j_local_prime < J; j_local_prime++) {
               j_global_prime = e->node[j_local_prime]->index_mesh;
-              gsl_matrix_add_to_element(e->dphidx_node[j], g, d, gsl_matrix_get(B, j_local_prime, d) * mesh->node[j_global_prime].phi[g]);
+              gsl_matrix_add_to_element(e->dphidx_node[j], g, d, gsl_matrix_get(B, d, j_local_prime) * mesh->node[j_global_prime].phi[g]);
             }
           }
         }

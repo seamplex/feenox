@@ -332,9 +332,16 @@ inline double feenox_fem_compute_w_det_at_gauss_integration(element_t *e, unsign
   
   gsl_matrix *J = feenox_fem_compute_J_at_gauss(e, q, integration);
   
-  // TODO: choose to complain about zero or negative?
-  // TODO: choose to take the absolute value or not? put these two as defines
+  // negative determinants are accepted (we take the absolute value) because the
+  // orientation of the elements depends on the mesher, but zero or non-finite
+  // ones would silently fill the matrices with nans
+  // TODO: choose to take the absolute value or not? put it as a define
   double det = feenox_fem_determinant(J);
+  if (det == 0 || !isfinite(det)) {
+    feenox_push_error_message("element %lu has a %s jacobian determinant (%g) at gauss point %u, check the mesh",
+                              (unsigned long)e->tag, (det == 0) ? "zero" : "non-finite", det, q);
+    feenox_runtime_error();
+  }
   (*w)[q] = e->type->gauss[integration].w[q] * fabs(det);
   
   feenox.fem.current_weight_element_tag = e->tag;

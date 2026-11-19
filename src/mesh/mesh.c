@@ -86,6 +86,13 @@ int feenox_instruction_mesh_read(void *arg) {
   unsigned int dim = 0;
   for (size_t j = 0; j < mesh->n_nodes; j++) {
     for (unsigned int m = 0; m < 3; m++) {
+      // some mesh generators can write garbage (e.g. multithreaded gmsh 4.12 writing nan)
+      // so catch it here instead of having nans everywhere afterwards
+      if (!isfinite(mesh->node[j].x[m])) {
+        feenox_push_error_message("node %lu of mesh '%s' has non-finite coordinates (%g, %g, %g)",
+                                  (unsigned long)mesh->node[j].tag, mesh->file->name, mesh->node[j].x[0], mesh->node[j].x[1], mesh->node[j].x[2]);
+        return FEENOX_ERROR;
+      }
       if (scale_factor != 0 || offset[m] != 0) {
         mesh->node[j].x[m] -= offset[m];
         mesh->node[j].x[m] *= scale_factor;

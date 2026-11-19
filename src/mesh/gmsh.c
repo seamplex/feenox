@@ -661,7 +661,7 @@ int feenox_mesh_read_gmsh(mesh_t *mesh) {
             return FEENOX_ERROR;
           }
           if (feenox.mesh.element_types[type].nodes == 0) {
-            feenox_push_error_message("elements of type '%s' are not supported in FeenoX", mesh->element[i].type->name);
+            feenox_push_error_message("elements of type '%s' are not supported in FeenoX", feenox.mesh.element_types[type].name);
             return FEENOX_ERROR;
           }
           mesh->element[i].type = &(feenox.mesh.element_types[type]);
