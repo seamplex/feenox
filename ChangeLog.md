@@ -1,6 +1,11 @@
 # Development (current)
 
- * new `PROBLEM` `thermal_hydraulics` for single-phase 1D RELAP-like plant dynamics
+ * ...
+
+# v1.3 (Nov 2026)
+
+ * general bugfixing
+ * new `PROBLEM` `thermal_hydraulics` for single-phase 1D RELAP-like nuclear power plant dynamics
  * support for Gmsh format version 4.2
  * more robust feenox2ccx converter
  * possibility to compile FeenoX without GNU Scientific Library
