@@ -32,6 +32,7 @@ int feenox_problem_parse_time_init_mechanical(void) {
 #ifdef HAVE_PETSC
   // virtual methods
   feenox.pde.parse_bc = feenox_problem_bc_parse_mechanical;
+  feenox.pde.parse_keyword = feenox_problem_parse_keyword_mechanical;
   feenox.pde.parse_write_results = feenox_problem_parse_write_post_mechanical;
 
   feenox.pde.init_before_run = feenox_problem_init_runtime_mechanical;

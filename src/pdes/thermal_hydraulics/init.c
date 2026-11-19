@@ -30,6 +30,7 @@ int feenox_problem_parse_time_init_thermal_hydraulics(void) {
 #ifdef HAVE_PETSC
   // virtual methods
   feenox.pde.parse_bc = feenox_problem_bc_parse_thermal_hydraulics;
+  feenox.pde.parse_keyword = feenox_problem_parse_keyword_thermal_hydraulics;
   feenox.pde.parse_write_results = feenox_problem_parse_write_post_thermal_hydraulics;
   feenox.pde.init_before_run = feenox_problem_init_runtime_thermal_hydraulics;
   feenox.pde.solve_pre = feenox_problem_solve_pre_thermal_hydraulics;

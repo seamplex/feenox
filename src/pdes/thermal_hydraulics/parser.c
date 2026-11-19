@@ -39,6 +39,24 @@ int feenox_problem_parse_problem_thermal_hydraulics(const char *token) {
   return FEENOX_OK;
 }
 
+int feenox_problem_parse_keyword_thermal_hydraulics(const char *token) {
+
+  if (strcasecmp(token, "HEAT_STRUCTURE") == 0) {
+    feenox_call(feenox_parse_heat_structure());
+    return FEENOX_OK;
+
+  } else if (strcasecmp(token, "PUMP") == 0) {
+    feenox_call(thermal_hydraulics_parse_point(1));
+    return FEENOX_OK;
+
+  } else if (strcasecmp(token, "JUNCTION") == 0) {
+    feenox_call(thermal_hydraulics_parse_point(0));
+    return FEENOX_OK;
+  }
+
+  return FEENOX_UNHANDLED;
+}
+
 int thermal_hydraulics_parse_point(int is_pump) {
   const char *keyword = is_pump ? "PUMP" : "JUNCTION";
   

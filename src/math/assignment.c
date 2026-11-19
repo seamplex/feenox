@@ -20,6 +20,7 @@
  *------------------- ------------  ----    --------  --     -       -         -
  */
 #include "feenox.h"
+#include <ctype.h>
 
 // API
 int feenox_add_assignment(const char *left_hand, const char *right_hand) {
@@ -56,6 +57,24 @@ int feenox_add_assignment(const char *left_hand, const char *right_hand) {
     assignment->initial_transient = 1;
   }
   
+  // the name of the object being assigned cannot contain blanks
+  // (otherwise something like "KEYWORD foo K = 1" with an unknown KEYWORD
+  // would silently define a variable called "KEYWORDfooK")
+  const char *p = left_hand;
+  while (isspace((int)*p)) {
+    p++;
+  }
+  while (*p != '\0' && !isspace((int)*p)) {
+    p++;
+  }
+  while (isspace((int)*p)) {
+    p++;
+  }
+  if (*p != '\0') {
+    feenox_push_error_message("unknown keyword or invalid left-hand side '%s' (note that problem-specific keywords have to come after PROBLEM)", left_hand);
+    return FEENOX_ERROR;
+  }
+
   char *sanitized_lhs = NULL;
   feenox_check_alloc(sanitized_lhs = strdup(left_hand));
   feenox_call(feenox_strip_blanks(sanitized_lhs));

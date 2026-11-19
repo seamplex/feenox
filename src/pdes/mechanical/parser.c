@@ -47,6 +47,16 @@ int feenox_problem_parse_problem_mechanical(const char *token) {
   return FEENOX_OK;
 } 
 
+int feenox_problem_parse_keyword_mechanical(const char *token) {
+
+  if (strcasecmp(token, "LINEARIZE_STRESS") == 0) {
+    feenox_call(feenox_parse_linearize_stress());
+    return FEENOX_OK;
+  }
+
+  return FEENOX_UNHANDLED;
+}
+
 int feenox_problem_parse_write_post_mechanical(mesh_write_t *mesh_write, const char *token) {
 
   if (strcmp(token, "all") == 0) {

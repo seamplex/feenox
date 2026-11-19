@@ -1827,6 +1827,9 @@ struct feenox_t {
     int (*parse_problem)(const char *token);
     int (*parse_write_results)(mesh_write_t *mesh_write, const char *token);
     int (*parse_bc)(bc_data_t *bc_data, const char *lhs, char *rhs);
+    // optional, problem-specific primary keywords: returns FEENOX_OK or FEENOX_ERROR if token
+    // is a keyword the problem understands, or FEENOX_UNHANDLED (without consuming tokens) otherwise
+    int (*parse_keyword)(const char *token);
     
     // init
     int (*init_before_run)(void);

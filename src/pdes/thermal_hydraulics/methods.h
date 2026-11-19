@@ -26,6 +26,7 @@
 extern int feenox_parse_heat_structure(void);
 extern int thermal_hydraulics_parse_point(int);
 extern int feenox_problem_parse_problem_thermal_hydraulics(const char *token);
+extern int feenox_problem_parse_keyword_thermal_hydraulics(const char *token);
 extern int feenox_problem_parse_write_post_thermal_hydraulics(mesh_write_t *mesh_write, const char *token);
 
 // thermal_hydraulics/init.c

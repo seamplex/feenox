@@ -117,6 +117,7 @@ int feenox_parse_line(void) {
 
   char *equal_sign = NULL;
   char *token = NULL;
+  int status = FEENOX_OK;
   
   if ((token = feenox_get_next_token(feenox_parser.line)) != NULL) {
     
@@ -391,23 +392,13 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_solve());
       return FEENOX_OK;
 
-// TODO: move this to a per-physics parser, these lines break the virtual method concept
+// problem-specific primary keywords (e.g. LINEARIZE_STRESS, JUNCTION, etc.)
+// the virtual method is set by PROBLEM, so these keywords have to come after it
+// if the problem does not understand the keyword, we fall through to the assignment parser
+// (which works on full_line so it does not care about the strtok state)
       // -----  -----------------------------------------------------------
-    } else if (strcasecmp(token, "LINEARIZE_STRESS") == 0) {
-      feenox_call(feenox_parse_linearize_stress());
-      return FEENOX_OK;      
-
-    } else if (strcasecmp(token, "HEAT_STRUCTURE") == 0) {
-      feenox_call(feenox_parse_heat_structure());
-      return FEENOX_OK;
-
-    } else if (strcasecmp(token, "PUMP") == 0) {
-      feenox_call(thermal_hydraulics_parse_point(1));
-      return FEENOX_OK;
-
-    } else if (strcasecmp(token, "JUNCTION") == 0) {
-      feenox_call(thermal_hydraulics_parse_point(0));
-      return FEENOX_OK;
+    } else if (feenox.pde.parse_keyword != NULL && (status = feenox.pde.parse_keyword(token)) != FEENOX_UNHANDLED) {
+      return status;
 
 // this should come last because there is no actual keyword apart from the equal sign
 // so if we came down here, then that means that any line containing a '=' that has
@@ -696,7 +687,11 @@ int feenox_parse_line(void) {
 */
       
 
-  feenox_push_error_message("unknown keyword '%s'", feenox_parser.line);
+  if (feenox.pde.parse_keyword == NULL) {
+    feenox_push_error_message("unknown keyword '%s' (note that problem-specific keywords have to come after PROBLEM)", feenox_parser.line);
+  } else {
+    feenox_push_error_message("unknown keyword '%s'", feenox_parser.line);
+  }  
   return FEENOX_ERROR;
 
 }
