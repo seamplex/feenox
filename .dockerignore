@@ -1,0 +1,17 @@
+# keep the image build clean: do not copy the results of a local build
+# (.git is needed by autogen.sh so it is NOT ignored)
+**/*.o
+**/.deps
+**/.dirstamp
+**/*.Po
+feenox
+fee2ccx
+autom4te.cache
+config.log
+config.status
+config.h
+stamp-h1
+test-suite.log
+tests/*.log
+tests/*.trs
+**/*~
