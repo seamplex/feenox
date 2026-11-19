@@ -65,6 +65,7 @@ feenox_SOURCES = \
 ./math/matrix.c \
 ./math/solve.c \
 ./math/vector.c \
+./math/linalg.h \
 ./mesh/init.c \
 ./mesh/geometry.c \
 ./mesh/neighbors.c \
