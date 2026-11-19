@@ -256,7 +256,7 @@ double feenox_builtin_memory(expr_item_t *f) {
 }
 
 ///fn+mpi_memory_local+usage mpi_memory_local([rank])
-///fn+mpi_memory_local+desc Returns the memory usage as reported by PETSc in the give rank, in Gigabytes.
+///fn+mpi_memory_local+desc Returns the memory usage as reported by PETSc in the given rank, in Gigabytes.
 ///fn+mpi_memory_local+desc If no rank is given, each rank returns a local value which should be printed with `PRINTF_ALL`.
 double feenox_builtin_mpi_memory_local(expr_item_t *f) {
 
@@ -281,8 +281,8 @@ double feenox_builtin_mpi_memory_local(expr_item_t *f) {
   
 }
 
-///fn+mpi_memory_local+usage mpi_memory_global()
-///fn+mpi_memory_local+desc Returns the memory global usage as reported by PETSc summing over all ranks, in Gigabytes.
+///fn+mpi_memory_global+usage mpi_memory_global()
+///fn+mpi_memory_global+desc Returns the global memory usage as reported by PETSc summing over all ranks, in Gigabytes.
 double feenox_builtin_mpi_memory_global(expr_item_t *f) {
 
   double memory_local = 0;
@@ -1603,7 +1603,7 @@ double feenox_builtin_max(expr_item_t *f) {
 
 
 ///fn+mark_min+desc Returns the integer index $i$ of the minimum of the arguments\ $x_i$ provided. Currently only maximum of ten arguments can be provided.
-///fn+mark_min+usage mark_max(x1, x2, [...], [x10])
+///fn+mark_min+usage mark_min(x1, x2, [...], [x10])
 ///fn+mark_min+math  i / \min \Big (x_1, x_2, \dots, x_{10} \Big) = x_i
 
 double feenox_builtin_mark_min(expr_item_t *f) {

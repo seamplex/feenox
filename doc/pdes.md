@@ -2,5 +2,6 @@
  * [`thermal`](https://github.com/seamplex/feenox/tree/main/src/pdes/thermal)
  * [`mechanical`](https://github.com/seamplex/feenox/tree/main/src/pdes/mechanical)
  * [`modal`](https://github.com/seamplex/feenox/tree/main/src/pdes/modal)
- * [`neutron_diffusion`](https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_difussion)
+ * [`neutron_diffusion`](https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_diffusion)
  * [`neutron_sn`](https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_sn)
+ * [`thermal_hydraulics`](https://github.com/seamplex/feenox/tree/main/src/pdes/thermal_hydraulics)

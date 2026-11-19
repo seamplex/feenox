@@ -23,7 +23,7 @@
 #include "../../parser/parser.h"
 #include "thermal_hydraulics.h"
 
-///pb_thermal_hydraulics+NONE+description The `thermal_hydraulics` problem does not need any extra keyword to `PROBLEM`.
+// the thermal_hydraulics problem does not need any extra keyword to PROBLEM (see the manual)
 int feenox_problem_parse_problem_thermal_hydraulics(const char *token) {
 
   // TODO: FLUID keyword to choose the equation of state
@@ -63,10 +63,10 @@ int thermal_hydraulics_parse_point(int is_pump) {
 ///kw_thermal_hydraulics+PUMP+usage PUMP
 ///kw_thermal_hydraulics+PUMP+desc Attach an ideal prescribed-head pump to a physical point.
 
-///kw_thermal_hydraulics+JUNCTION+usage JUNCTION [ K=<expr> ] [ K_<pipe_group>=<expr> ... ] [ A_ref=<expr> ]
+///kw_thermal_hydraulics+JUNCTION+usage JUNCTION
 ///kw_thermal_hydraulics+JUNCTION+desc Configure junction losses at shared mesh nodes without a point MATERIAL.
 
-///kw_thermal_hydraulics+PUMP+detail Secondary keywords can appear in any order. POINT, HEAD and DIRECTION are mandatory. The group must contain exactly one point with exactly two incident first-order pipe elements.
+///kw_thermal_hydraulics+PUMP+detail Must appear after `PROBLEM thermal_hydraulics`. Secondary keywords can appear in any order. POINT, HEAD and DIRECTION are mandatory. The group must contain exactly one point with exactly two incident first-order pipe elements.
 ///kw_thermal_hydraulics+PUMP+detail With MERGE, the group may contain several points (typically the suction end and the discharge end of two pipes that do not touch). They are joined into one control volume, as described for JUNCTION.
 ///kw_thermal_hydraulics+PUMP+detail Outward element tangents must have opposite nonzero projections on DIRECTION: negative identifies suction, positive discharge. Direction expressions are evaluated at each solve and need not form a unit vector. Mesh element orientation and pipe materials do not define pump direction.
 ///kw_thermal_hydraulics+PUMP+detail HEAD is finite and nonnegative, in m, and may vary with time. Total-pressure addition is rho*9.80665*HEAD, independently of the problem gravity vector. Hydraulic power is signed suction mass flow times 9.80665*HEAD; reverse flow does not reverse the imposed head.
@@ -74,6 +74,7 @@ int thermal_hydraulics_parse_point(int is_pump) {
 ///kw_thermal_hydraulics+PUMP+detail The nodal pressure is the midpoint reference, not either port pressure. No extra storage volume, efficiency, shaft dynamics or check valve is modeled. Do not combine PUMP with another point component, point material, or p/v/mdot boundary conditions at that node.
 
   
+///kw_thermal_hydraulics+JUNCTION+detail Must appear after `PROBLEM thermal_hydraulics`. The properties `K`, `K_<pipe_group>` and `A_ref` are case-sensitive and are written as `name=value` without spaces (unlike `PUMP`, which takes the separate keyword `A_REF`).
 ///kw_thermal_hydraulics+JUNCTION+detail Uses the same low-Mach point-junction model as the legacy MATERIAL syntax, which remains supported. Omitted K is zero, enabling ideal area transitions. Each point needs at least two incident pipe elements. Multiple points in one group are supported. Do not combine with a material or another point-component declaration on the same node.
 ///kw_thermal_hydraulics+JUNCTION+detail Without MERGE, each point of the group is an independent junction. With MERGE, all the points of the group are joined into a single control volume regardless of their coordinates, so pipe ends connect by topology as in RELAP-7 (e.g. a plenum fed by pipes that end at different locations). Then the merged points together need at least two incident pipe elements, the junction has no elevation (no gravity acts between its points) and the fields at every merged point show the junction state. Boundary conditions cannot be set on merged points.
   
@@ -115,11 +116,11 @@ int thermal_hydraulics_parse_point(int is_pump) {
       for (int side = 0; side < 2; side++) {
         feenox_call(feenox_parser_expression(&point->reverse_loss[side]));
       }
-///kw_thermal_hydraulics+PUMP+usage PUMP [ A_REF <expr> ]
+///kw_thermal_hydraulics+PUMP+usage [ A_REF <expr> ]
     } else if (is_pump && strcasecmp(token, "A_REF") == 0 && !point->has_area) {
       point->has_area = 1;
       feenox_call(feenox_parser_expression(&point->area));
-///kw_thermal_hydraulics+JUNCTION+usage JUNCTION [ K=<expr> ] [ K_<pipe_group>=<expr> ... ] [ A_ref=<expr> ]
+///kw_thermal_hydraulics+JUNCTION+usage [ K=<expr> ] [ K_<pipe_group>=<expr> ... ] [ A_ref=<expr> ]
     } else if (!is_pump && strchr(token, '=') != NULL) {
       char *equal = strchr(token, '=');
       *equal = '\0';
@@ -167,8 +168,8 @@ int thermal_hydraulics_parse_point(int is_pump) {
 
 int feenox_parse_heat_structure(void) {
 
-///kw_thermal_hydraulics+HEAT_STRUCTURE+desc Couple a cylindrical fuel-gap-clad heat structure to a physical pipe group.
-///kw_thermal_hydraulics+HEAT_STRUCTURE+usage HEAT_STRUCTURE PIPE <pipe_group> FUEL <fuel_material> [ GAP <gap_material> ] [ CLAD <clad_material> ] [ AXIAL_CONDUCTION | NO_AXIAL_CONDUCTION ]
+///kw_thermal_hydraulics+HEAT_STRUCTURE+desc Couple a solid heat structure to the fluid: either a cylindrical fuel-gap-clad rod in one pipe group (`PIPE`), or a named two-sided `PLATE` or `TUBE` wall between two pipe groups (`NAME`).
+///kw_thermal_hydraulics+HEAT_STRUCTURE+usage HEAT_STRUCTURE PIPE <pipe_group> FUEL <fuel_material> [ GAP <gap_material> ] [ CLAD <clad_material> ] [ AXIAL_CONDUCTION | NO_AXIAL_CONDUCTION ]@
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail `AXIAL_CONDUCTION` (default) includes radial and axial conduction in this structure. `NO_AXIAL_CONDUCTION` uses independent radial columns. These flags take no parameters and are mutually exclusive.
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail Secondary keywords can appear in any order. `PIPE` and `FUEL` are mandatory; omitted `GAP` and `CLAD` materials each default to `FUEL`. Layer geometry determines whether a gap or clad is present.
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail Declare after `PROBLEM thermal_hydraulics`, before using solid output functions or writing results.
@@ -185,7 +186,7 @@ int feenox_parse_heat_structure(void) {
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail `hs_power` can vary with time but must not depend on space. A positive prescribed `h_wall` in W/(m^2 K) couples cladding to coolant; automatic convection is not yet supported for heat structures.
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail The heated perimeter defaults to the outer cladding circumference; an explicit `P_h` must be positive. Do not combine a heat structure with `T_wall` or `q_wall`.
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail The coolant remains single-phase IF97 region-1 water; boiling and two-phase heat transfer are not modeled.
-///kw_thermal_hydraulics+HEAT_STRUCTURE+usage HEAT_STRUCTURE NAME <name> TYPE <PLATE|TUBE> MATERIAL <solid> THICKNESS <expr> CELLS <n> PRIMARY <group> SECONDARY <group> H_PRIMARY <expr> H_SECONDARY <expr> AXIS <dx> <dy> <dz> [ DEPTH <expr> | INNER_RADIUS <expr> ] [ PERIMETER_PRIMARY <expr> ] [ PERIMETER_SECONDARY <expr> ] [ AXIAL_CONDUCTION | NO_AXIAL_CONDUCTION ]
+///kw_thermal_hydraulics+HEAT_STRUCTURE+usage HEAT_STRUCTURE NAME <name> TYPE <PLATE|TUBE> MATERIAL <solid> THICKNESS <expr> CELLS <n> PRIMARY <group> SECONDARY <group> H_PRIMARY <expr> H_SECONDARY <expr> AXIS <dx> <dy> <dz> { DEPTH <expr> | INNER_RADIUS <expr> } [ PERIMETER_PRIMARY <expr> ] [ PERIMETER_SECONDARY <expr> ] [ AXIAL_CONDUCTION | NO_AXIAL_CONDUCTION ]
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail Named two-sided structures couple hydraulically disconnected straight pipe groups at matching projected stations along AXIS, independent of flow or mesh orientation. Groups must span the same interval with matching axial elements; branched, shared-node and nonmatching meshes are rejected. AXIS need not be normalized.
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail PLATE requires positive DEPTH in m (wall width); TUBE requires positive INNER_RADIUS in m. PRIMARY couples to the first plate surface or inner tube surface; SECONDARY couples to the opposite or outer surface. THICKNESS and CELLS define the transverse wall grid. MATERIAL needs constant positive k, rho_s, cp.
 ///kw_thermal_hydraulics+HEAT_STRUCTURE+detail The wall has insulated axial ends and no internal source. Axial conduction is enabled by default. Geometry is constant. Positive H_PRIMARY/H_SECONDARY in W/(m^2 K) may depend on time, not space. Interface perimeters in m default to DEPTH for plates and the inner/outer circumferences for tubes; explicit overrides do not change wall conduction or storage geometry.
@@ -362,6 +363,12 @@ int feenox_parse_heat_structure(void) {
   
   // we need one for each, not only one for the first one
   if (thermal_hydraulics.fuel_center_function == NULL) {
+///re_thermal_hydraulics+p+description In `WRITE_RESULTS` it can also be selected as `pressure`.
+///re_thermal_hydraulics+T+description In `WRITE_RESULTS` it can also be selected as `temperature`.
+///re_thermal_hydraulics+rho+description In `WRITE_RESULTS` it can also be selected as `density`.
+///re_thermal_hydraulics+h+description In `WRITE_RESULTS` it can also be selected as `enthalpy`.
+///re_thermal_hydraulics+v+description In `WRITE_RESULTS` it can also be selected as `velocity`.
+///re_thermal_hydraulics+mdot+description In `WRITE_RESULTS` it can also be selected as `mass_flow`.
 ///re_thermal_hydraulics+T_fuel_center+description First heat structure's fuel centerline temperature (K), NaN outside its pipe group. Use `T_fuel_center_<pipe_group>` for each structure.
     feenox_call(feenox_problem_define_solution_function("T_fuel_center", &thermal_hydraulics.fuel_center_function, FEENOX_SOLUTION_NOT_GRADIENT));
 ///re_thermal_hydraulics+T_fuel_surface+description First heat structure's fuel outer-surface temperature (K). Use `T_fuel_surface_<pipe_group>` for each structure.

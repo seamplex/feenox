@@ -45,7 +45,7 @@ intro: |
   JUNCTION POINT junction MERGE K_pipe1=5 K_pipe2=7 K_pipe3=11 K_pipe4=13 K_pipe5=17 A_ref=3
   ```
   
-  ![The geometry of the problem converted to a topology in Gmsh. The pipes are not touching (like they did in the previous example) in the topology but they are `MERGE`d in the FeenoX input file because we want to keep them horizonta.](relap-example7-geo.svg)
+  ![The geometry of the problem converted to a topology in Gmsh. The pipes are not touching (like they did in the previous example) in the topology but they are `MERGE`d in the FeenoX input file because we want to keep them horizontal.](relap-example7-geo.svg)
   
 
   RELAP7's `K = '5 7 11 13 17'` gives the local loss coefficients of each port, first the inputs and then the outputs.

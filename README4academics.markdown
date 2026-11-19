@@ -36,6 +36,7 @@ modal
 neutron_diffusion
 neutron_sn
 thermal
+thermal_hydraulics
 $ 
 ```
 
@@ -279,6 +280,7 @@ subdirectories [`src/pdes`], namely
 - [`modal`]
 - [`neutron_diffusion`]
 - [`neutron_sn`]
+- [`thermal_hydraulics`]
 
 Researchers with both knowledge of mathematical theory of finite
 elements and programming skills might, with the aid of [the community],
@@ -351,8 +353,9 @@ further details about how to contribute to the code base.
   [`thermal`]: https://github.com/seamplex/feenox/tree/main/src/pdes/thermal
   [`mechanical`]: https://github.com/seamplex/feenox/tree/main/src/pdes/mechanical
   [`modal`]: https://github.com/seamplex/feenox/tree/main/src/pdes/modal
-  [`neutron_diffusion`]: https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_difussion
+  [`neutron_diffusion`]: https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_diffusion
   [`neutron_sn`]: https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_sn
+  [`thermal_hydraulics`]: https://github.com/seamplex/feenox/tree/main/src/pdes/thermal_hydraulics
   [the community]: https://github.com/seamplex/feenox/discussions
   [FeenoX for hackers]: README4hackers.markdown
   [Alan Kay]: https://en.wikipedia.org/wiki/Alan_Kay

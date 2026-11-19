@@ -45,11 +45,7 @@ int feenox_problem_parse_time_init_thermal_hydraulics(void) {
   // the scalar unknowns live at the nodes
   feenox.mesh.default_field_location = field_location_nodes;
   
-///pr_thermal_hydraulics+DIMENSIONS+detail Pipes are always topologically one-dimensional but they live in a space
-///pr_thermal_hydraulics+DIMENSIONS+detail of one, two or three dimensions. The default is three, so spatial functions such as
-///pr_thermal_hydraulics+DIMENSIONS+detail initial conditions and the solution take $(x,y,z)$ as arguments for any network,
-///pr_thermal_hydraulics+DIMENSIONS+detail including straight pipes along the $x$ axis. Use `DIMENSIONS 1` for functions of $x$ only.
-///pr_thermal_hydraulics+DIMENSIONS+detail The nodes may span fewer coordinates than the given dimension, but not more.
+  // pipes are topologically 1D but live in 1, 2 or 3D space (default 3D, see the manual)
   feenox.pde.embedded_mesh = 1;
   
   // pressure and temperature at the nodes are the primary nodal unknowns
@@ -76,17 +72,10 @@ int feenox_problem_parse_time_init_thermal_hydraulics(void) {
 ///pr_thermal_hydraulics+p_0+description Initial pressure (Pa), as a function of the spatial coordinates.
 ///pr_thermal_hydraulics+v_0+description Initial signed pipe velocity (m/s), evaluated at element centers. Mutually exclusive with `mdot_0`.
 ///pr_thermal_hydraulics+mdot_0+description Initial signed mass flow (kg/s), evaluated at element centers.
-///pr_thermal_hydraulics+T_solid_0+description Initial solid temperature (K), with radius as the first argument followed by the spatial coordinates.
+///pr_thermal_hydraulics+T_solid_0+description Initial solid temperature (K), with the radius (rods and tubes) or the transverse distance (plates) as the first argument followed by the spatial coordinates.
 ///pr_thermal_hydraulics+T_solid_0+description This function initializes every heat structure on its own radial grid.
 ///pr_thermal_hydraulics+T_solid_0+description If absent with prescribed fluid initial conditions, the solid starts at the local initial fluid temperature.
 ///pr_thermal_hydraulics+T_solid_0+description Without any initial fields, a coupled steady state initializes the transient.
-///pr_thermal_hydraulics+T_solid_0+description Transients use PETSc's TS with backward Euler, which damps the acoustic waves, and adaptive time steps by default.
-///pr_thermal_hydraulics+T_solid_0+description The step is multiplied by `dt_factor` (default 2) after a step whose Newton solve took at most `dt_grow_iterations` (default 3) iterations
-///pr_thermal_hydraulics+T_solid_0+description and divided by it after one that took `dt_shrink_iterations` (default 8) or more, within `min_dt` and `max_dt`.
-///pr_thermal_hydraulics+T_solid_0+description A step whose nonlinear solve fails is retried with the step divided by `dt_factor`.
-///pr_thermal_hydraulics+T_solid_0+description Assigning `dt_0` sets the first step only, while assigning `dt` (i.e. `dt = 0.1`) dictates a fixed step.
-///pr_thermal_hydraulics+T_solid_0+description Other schemes can be chosen with `TRANSIENT_SOLVER` (e.g. `bdf`) and local-error control with `TIME_ADAPTATION basic`.
-///pr_thermal_hydraulics+T_solid_0+description Each control volume carries its mass and internal energy as unknowns, so any linear multistep scheme conserves them discretely.
 
 ///va_thermal_hydraulics+g_x+detail The $x$ component of the gravity acceleration vector in m/s^2. Default is zero.
   feenox_check_alloc(thermal_hydraulics.g[0] = feenox_get_or_define_variable_get_ptr("g_x"));
@@ -100,7 +89,7 @@ int feenox_problem_parse_time_init_thermal_hydraulics(void) {
   feenox_var_value(thermal_hydraulics.g[2]) = -9.81;
 
 ///va_thermal_hydraulics+dt_grow_iterations+detail Iteration-based time-step control: the next time step is multiplied by `dt_factor`
-///va_thermal_hydraulics+dt_grow_iterations+detail if the nonlinear solver took at most this number of iterations. Default is 3.
+///va_thermal_hydraulics+dt_grow_iterations+detail if the nonlinear solver took at most this number of iterations. Default is 3. Must be smaller than `dt_shrink_iterations`.
   feenox_check_alloc(thermal_hydraulics.dt_grow_iterations = feenox_get_or_define_variable_get_ptr("dt_grow_iterations"));
   feenox_var_value(thermal_hydraulics.dt_grow_iterations) = 3;
 ///va_thermal_hydraulics+dt_shrink_iterations+detail Iteration-based time-step control: the next time step is divided by `dt_factor`
@@ -108,7 +97,7 @@ int feenox_problem_parse_time_init_thermal_hydraulics(void) {
   feenox_check_alloc(thermal_hydraulics.dt_shrink_iterations = feenox_get_or_define_variable_get_ptr("dt_shrink_iterations"));
   feenox_var_value(thermal_hydraulics.dt_shrink_iterations) = 8;
 ///va_thermal_hydraulics+dt_factor+detail Iteration-based time-step control: factor by which the time step grows or shrinks.
-///va_thermal_hydraulics+dt_factor+detail A step whose nonlinear solve fails is retried with the step divided by this factor. Default is 2.
+///va_thermal_hydraulics+dt_factor+detail A step whose nonlinear solve fails is retried with the step divided by this factor. Default is 2. Must be greater than one.
 ///va_thermal_hydraulics+dt_factor+detail The iteration-based control applies when there is no `TIME_ADAPTATION` and the input does not assign `dt`.
   feenox_check_alloc(thermal_hydraulics.dt_factor = feenox_get_or_define_variable_get_ptr("dt_factor"));
   feenox_var_value(thermal_hydraulics.dt_factor) = 2;
@@ -192,7 +181,7 @@ int feenox_problem_init_runtime_thermal_hydraulics(void) {
 ///pr_thermal_hydraulics+roughness+description Default is zero (i.e. smooth pipe).
   feenox_call(feenox_distribution_init(&thermal_hydraulics.roughness, "roughness"));
 ///pr_thermal_hydraulics+f+description Darcy friction factor\ $f$.
-///pr_thermal_hydraulics+f+description If not given, it is computed with Churchill's correlation as a function of the
+///pr_thermal_hydraulics+f+description If not given (or non-positive), it is computed with Churchill's correlation as a function of the
 ///pr_thermal_hydraulics+f+description Reynolds number and the relative roughness\ $\varepsilon/D_h$.
   feenox_call(feenox_distribution_init(&thermal_hydraulics.f, "f"));
 ///pr_thermal_hydraulics+K+description Non-negative local loss coefficient on a MATERIAL attached to a physical point shared by at least two pipes. Default is zero.
@@ -202,7 +191,7 @@ int feenox_problem_init_runtime_thermal_hydraulics(void) {
 ///pr_thermal_hydraulics+A_ref+description A point material containing `K`, `K_<pipe_group>`, or `A_ref` enables the low-Mach junction model. Use `K=0` for an ideal area transition. Unconfigured shared nodes retain the original common-static-pressure model.
 ///pr_thermal_hydraulics+A_ref+description Junction pressure is a reference static pressure: the common total pressure is `p+M^2/(2*rho*A_j^2)`, with `M=sum(abs(mdot_port))/2` and `A_j=A_ref`, or the smallest attached pipe area if absent.
 ///pr_thermal_hydraulics+A_ref+description Pipe-port pressures subtract the port velocity head and add an incoming or subtract an outgoing local loss. Static pressures on either side need not equal the point pressure.
-///pr_thermal_hydraulics+A_ref+description The junction energy balance includes signed port kinetic-energy fluxes and backward-Euler kinetic-energy storage in its adjacent half elements. The point uses the existing fluid volumes; no extra junction volume, pump, or compressible entropy/Riemann junction model is added.
+///pr_thermal_hydraulics+A_ref+description The junction energy balance includes signed port kinetic-energy fluxes and the kinetic energy stored in its adjacent half elements, which is part of the conserved internal energy and is integrated with the chosen time scheme. The point uses the existing fluid volumes; no extra junction volume or compressible entropy/Riemann junction model is added (see `PUMP` for adding head).
 ///pr_thermal_hydraulics+A_ref+description Point properties are evaluated at the point coordinates before each solve and can depend on time. Do not prescribe p, v, or mdot at an internal junction point. Overlapping configured point groups are rejected.
 ///pr_thermal_hydraulics+A_ref+description The JUNCTION primary keyword configures this same model without a point MATERIAL. A PUMP adds directed head and signed hydraulic power to a two-port point; see those keywords.
 ///pr_thermal_hydraulics+q+description Volumetric power\ $q'''$ (in W/m^3) deposited into the fluid.
@@ -210,12 +199,12 @@ int feenox_problem_init_runtime_thermal_hydraulics(void) {
   feenox_call(feenox_distribution_init(&thermal_hydraulics.q, "q"));
 ///pr_thermal_hydraulics+P_h+description Heated perimeter (in m). Default is $4A/D_h$.
 ///pr_thermal_hydraulics+P_h+description For a circular pipe this is $\pi D$. Set zero for an insulated pipe.
-///pr_thermal_hydraulics+P_h+description For a heat structure, the default is the outer cladding circumference and an explicit value must be positive.
+///pr_thermal_hydraulics+P_h+description For a heat structure, the default is `rod_count` times the outer cladding circumference and an explicit value must be positive.
 ///pr_thermal_hydraulics+P_h+description The default applies separately to each material where `P_h` is absent; an explicit zero is preserved.
   feenox_call(feenox_distribution_init(&thermal_hydraulics.P_h, "P_h"));
 ///pr_thermal_hydraulics+T_wall+description Specified pipe wall temperature (in K).
 ///pr_thermal_hydraulics+T_wall+description Adds $h_{wall} P_h (T_{wall}-T)$ per unit length to the energy equation.
-///pr_thermal_hydraulics+T_wall+description By default, the coefficient follows the TRACE single-phase tube model:
+///pr_thermal_hydraulics+T_wall+description By default, the coefficient follows the RELAP-7/TRACE single-phase tube correlation:
 ///pr_thermal_hydraulics+T_wall+description the maximum of laminar (Nu=4.36), corrected Gnielinski, and natural convection.
 ///pr_thermal_hydraulics+T_wall+description Water conductivity uses IAPWS-2011 with its industrial critical enhancement.
 ///pr_thermal_hydraulics+T_wall+description Wall boiling and wall thermal inertia are not modeled.
@@ -224,6 +213,19 @@ int feenox_problem_init_runtime_thermal_hydraulics(void) {
 ///pr_thermal_hydraulics+T_wall+description Each endpoint control volume receives half the element's wall heat, evaluated at that node's fluid state.
 ///pr_thermal_hydraulics+T_wall+description Inlet `T` or `rho` specifies the entering stream state; the heated inlet control volume can have a different temperature.
   feenox_call(feenox_distribution_init(&thermal_hydraulics.T_wall, "T_wall"));
+///pr_thermal_hydraulics+fuel_radius+description Fuel pellet radius (in m) of a `HEAT_STRUCTURE PIPE` fuel rod, given in the channel material. Mandatory and positive.
+///pr_thermal_hydraulics+fuel_cells+description Number of radial cells in the fuel of a `HEAT_STRUCTURE PIPE` fuel rod. Mandatory positive integer up to 10000.
+///pr_thermal_hydraulics+gap_width+description Width (in m) of the gap of a `HEAT_STRUCTURE PIPE` fuel rod. Default is zero, i.e. no gap.
+///pr_thermal_hydraulics+gap_cells+description Number of radial cells in the gap. Default is one if `gap_width` is positive or zero otherwise.
+///pr_thermal_hydraulics+clad_width+description Width (in m) of the cladding of a `HEAT_STRUCTURE PIPE` fuel rod. Default is zero, i.e. no cladding.
+///pr_thermal_hydraulics+clad_cells+description Number of radial cells in the cladding. Default is one if `clad_width` is positive or zero otherwise.
+///pr_thermal_hydraulics+rod_count+description Number of rods represented by a `HEAT_STRUCTURE PIPE`. Default is one. It may be non-integer to represent an equivalent bundle.
+///pr_thermal_hydraulics+rod_count+description Rod geometry is constant and must not depend on space or time.
+///pr_thermal_hydraulics+hs_power+description Total power (in W) generated in all the rods of a `HEAT_STRUCTURE PIPE`, not power per rod. Mandatory, finite and non-negative.
+///pr_thermal_hydraulics+hs_power+description It is uniformly distributed in the fuel and along the channel. It may depend on time but not on space.
+///pr_thermal_hydraulics+k+description Thermal conductivity (in W/(m K)) of a heat-structure solid material. Must be a constant.
+///pr_thermal_hydraulics+rho_s+description Density (in kg/m^3) of a heat-structure solid material (named `rho_s` so as not to collide with the fluid density `rho`). Must be a constant.
+///pr_thermal_hydraulics+cp+description Specific heat capacity (in J/(kg K)) of a heat-structure solid material. Must be a constant.
 ///pr_thermal_hydraulics+q_wall+description Specified wall heat flux (in W/m^2), positive into the fluid.
 ///pr_thermal_hydraulics+q_wall+description Adds $q_{wall}P_h$ per unit length. Negative values cool the fluid.
 ///pr_thermal_hydraulics+q_wall+description Mutually exclusive with `T_wall` on a given pipe. Default is an adiabatic wall.

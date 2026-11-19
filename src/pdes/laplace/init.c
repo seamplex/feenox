@@ -77,14 +77,14 @@ int feenox_problem_init_runtime_laplace(void) {
   }
 
   // initialize distributions
-///pr_laplace+f+description The right hand side of the equation\ $\nabla^2 \phi=f(\vec{x})$.
+///pr_laplace+f+description The right hand side of the equation\ $-\nabla^2 \phi=f(\vec{x})$.
 ///pr_laplace+f+description If not given, default is zero (i.e. Laplace).
   feenox_call(feenox_distribution_init(&laplace.f, "f"));
   laplace.f.non_uniform = feenox_depends_on_space(laplace.f.dependency_variables);
   laplace.f.non_linear = feenox_depends_on_function(laplace.f.dependency_functions, feenox.pde.solution[0]);  
   
 ///pr_laplace+alpha+description The coefficient of the temporal derivative for the transient
-///pr_laplace+alpha+description equation \ $\alpha \frac{\partial \phi}{\partial t} + \nabla^2 \phi=f(\vec{x})$.
+///pr_laplace+alpha+description equation \ $\alpha \frac{\partial \phi}{\partial t} - \nabla^2 \phi=f(\vec{x})$.
 ///pr_laplace+alpha+description If not given, default is one.
   feenox.pde.has_mass = (feenox_var_value(feenox_special_var(end_time)) > 0 && feenox.pde.transient_type != transient_type_quasistatic);
   if (feenox.pde.has_mass) {

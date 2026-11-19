@@ -140,9 +140,9 @@ int feenox_problem_parse_time_init_mechanical(void) {
 //  feenox_call(feenox_problem_define_solution_function("delta_sigma", &mechanical.delta_sigma, FEENOX_SOLUTION_GRADIENT));
   feenox_call(feenox_problem_define_solution_function("tresca", &mechanical.tresca, FEENOX_SOLUTION_GRADIENT));
 
-///va+ldef+detail Flag that turns the large-deformation formulation on or off.
-///va+ldef+detail It can also be turned on with the `NONLINEAR` keyword in `PROBLEM`
-///va+ldef+detail or with the `--non-linear` command-line option.
+///va_mechanical+ldef+detail Flag that turns the large-deformation formulation on or off.
+///va_mechanical+ldef+detail It can also be turned on with the `NONLINEAR` keyword in `PROBLEM`
+///va_mechanical+ldef+detail or with the `--non-linear` command-line option.
   feenox_check_alloc(mechanical.ldef = feenox_define_variable_get_ptr("ldef"));
 
 //va+ldef+detail Flag that asks FeenoX to check if the deformations are large after
@@ -158,46 +158,46 @@ int feenox_problem_parse_time_init_mechanical(void) {
   mechanical.displ_for_bc[2]= feenox_define_variable_get_ptr("W");
 
   ///va+strain_energy+detail The strain energy stored in the solid, computed as
-///va+strain_energy+detail $1/2 \cdot \vec{u}^T  K \vec{u}$
-///va+strain_energy+detail where $\vec{u}$ is the displacements vector and $K$ is the stiffness matrix.
+///va_mechanical+strain_energy+detail $1/2 \cdot \vec{u}^T  K \vec{u}$
+///va_mechanical+strain_energy+detail where $\vec{u}$ is the displacements vector and $K$ is the stiffness matrix.
   feenox_check_alloc(mechanical.strain_energy = feenox_define_variable_get_ptr("strain_energy"));
 
-///va+displ_max+detail The module of the maximum displacement of the elastic problem.
+///va_mechanical+displ_max+detail The module of the maximum displacement of the elastic problem.
   feenox_check_alloc(mechanical.displ_max = feenox_define_variable_get_ptr("displ_max"));
 
-///va+displ_max_x+detail The\ $x$ coordinate of the maximum displacement of the elastic problem.
+///va_mechanical+displ_max_x+detail The\ $x$ coordinate of the maximum displacement of the elastic problem.
   feenox_check_alloc(mechanical.displ_max_x = feenox_define_variable_get_ptr("displ_max_x"));
-///va+displ_max_y+detail The\ $y$ coordinate of the maximum displacement of the elastic problem.
+///va_mechanical+displ_max_y+detail The\ $y$ coordinate of the maximum displacement of the elastic problem.
   feenox_check_alloc(mechanical.displ_max_y = feenox_define_variable_get_ptr("displ_max_y"));
-///va+displ_max_z+detail The\ $z$ coordinate of the maximum displacement of the elastic problem.
+///va_mechanical+displ_max_z+detail The\ $z$ coordinate of the maximum displacement of the elastic problem.
   feenox_check_alloc(mechanical.displ_max_z = feenox_define_variable_get_ptr("displ_max_z"));
 
-///va+u_at_displ_max+detail The\ $x$ component\ $u$ of the maximum displacement of the elastic problem.
+///va_mechanical+u_at_displ_max+detail The\ $x$ component\ $u$ of the maximum displacement of the elastic problem.
   feenox_check_alloc(mechanical.u_at_displ_max = feenox_define_variable_get_ptr("u_at_displ_max"));
-///va+v_at_displ_max+detail The\ $y$ component\ $v$ of the maximum displacement of the elastic problem.
+///va_mechanical+v_at_displ_max+detail The\ $y$ component\ $v$ of the maximum displacement of the elastic problem.
   feenox_check_alloc(mechanical.v_at_displ_max = feenox_define_variable_get_ptr("v_at_displ_max"));
-///va+w_at_displ_max+detail The\ $z$ component\ $w$ of the maximum displacement of the elastic problem.
+///va_mechanical+w_at_displ_max+detail The\ $z$ component\ $w$ of the maximum displacement of the elastic problem.
   feenox_check_alloc(mechanical.w_at_displ_max = feenox_define_variable_get_ptr("w_at_displ_max"));
   
-///va+sigma_max+detail The maximum von Mises stress\ $\sigma$ of the elastic problem.
+///va_mechanical+sigma_max+detail The maximum von Mises stress\ $\sigma$ of the elastic problem.
   feenox_check_alloc(mechanical.sigma_max = feenox_define_variable_get_ptr("sigma_max"));
 
-///va+delta_sigma_max+detail The uncertainty of the maximum Von Mises stress\ $\sigma$ of the elastic problem.
-///va+delta_sigma_max+detail Not to be confused with the maximum uncertainty of the Von Mises stress.
+///va_mechanical+delta_sigma_max+detail The uncertainty of the maximum Von Mises stress\ $\sigma$ of the elastic problem.
+///va_mechanical+delta_sigma_max+detail Not to be confused with the maximum uncertainty of the Von Mises stress.
   feenox_check_alloc(mechanical.delta_sigma_max = feenox_define_variable_get_ptr("delta_sigma_max"));
   
-///va+sigma_max_x+detail The\ $x$ coordinate of the maximum von Mises stress\ $\sigma$ of the elastic problem.
+///va_mechanical+sigma_max_x+detail The\ $x$ coordinate of the maximum von Mises stress\ $\sigma$ of the elastic problem.
   feenox_check_alloc(mechanical.sigma_max_x = feenox_define_variable_get_ptr("sigma_max_x"));
-///va+sigma_max_y+detail The\ $x$ coordinate of the maximum von Mises stress\ $\sigma$ of the elastic problem.
+///va_mechanical+sigma_max_y+detail The\ $y$ coordinate of the maximum von Mises stress\ $\sigma$ of the elastic problem.
   feenox_check_alloc(mechanical.sigma_max_y = feenox_define_variable_get_ptr("sigma_max_y"));
-///va+sigma_max_z+detail The\ $x$ coordinate of the maximum von Mises stress\ $\sigma$ of the elastic problem.
+///va_mechanical+sigma_max_z+detail The\ $z$ coordinate of the maximum von Mises stress\ $\sigma$ of the elastic problem.
   feenox_check_alloc(mechanical.sigma_max_z = feenox_define_variable_get_ptr("sigma_max_z"));
   
-///va+u_at_sigma_max+detail The\ $x$ component\ $u$ of the displacement where the maximum von Mises stress\ $\sigma$ of the elastic problem is located.
+///va_mechanical+u_at_sigma_max+detail The\ $x$ component\ $u$ of the displacement where the maximum von Mises stress\ $\sigma$ of the elastic problem is located.
   feenox_check_alloc(mechanical.u_at_sigma_max = feenox_define_variable_get_ptr("u_at_sigma_max"));
-///va+v_at_sigma_max+detail The\ $y$ component\ $v$ of the displacement where the maximum von Mises stress\ $\sigma$ of the elastic problem is located.
+///va_mechanical+v_at_sigma_max+detail The\ $y$ component\ $v$ of the displacement where the maximum von Mises stress\ $\sigma$ of the elastic problem is located.
   feenox_check_alloc(mechanical.v_at_sigma_max = feenox_define_variable_get_ptr("v_at_sigma_max"));
-///va+w_at_sigma_max+detail The\ $z$ component\ $w$ of the displacement where the maximum von Mises stress\ $\sigma$ of the elastic problem is located.
+///va_mechanical+w_at_sigma_max+detail The\ $z$ component\ $w$ of the displacement where the maximum von Mises stress\ $\sigma$ of the elastic problem is located.
   feenox_check_alloc(mechanical.w_at_sigma_max = feenox_define_variable_get_ptr("w_at_sigma_max"));
 #endif  
   return FEENOX_OK;

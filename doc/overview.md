@@ -3,11 +3,13 @@ It is to finite elements programs and libraries what Markdown is to Word and TeX
 In particular, it can solve
 
  * dynamical systems defined by a set of user-provided DAEs (such as plant control dynamics for example)
+ * Laplace’s and Poisson’s equations
  * mechanical elasticity
  * heat conduction
  * structural modal analysis
  * neutron diffusion
  * neutron transport
+ * one-dimensional single-phase thermal hydraulics in networks of pipes
 
 FeenoX reads a plain-text input file which contains the problem definition and writes 100%-user defined results in ASCII (through `PRINT` or other user-defined output instructions within the input file). For PDE problems, it needs a reference to at least one [Gmsh](http://gmsh.info/) mesh file for the discretization of the domain. It can write post-processing views in either `.msh`, `.vtu` or `.vtk` formats. 
 

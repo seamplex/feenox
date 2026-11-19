@@ -57,9 +57,9 @@ int feenox_problem_parse_time_init_thermal(void) {
     
   // heat fluxes
 ///re_thermal+qx+description The heat flux field\ $q_x(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial x}$ in the\ $x$ direction. This is a secondary unknown of the problem.  
-///re_thermal+qy+description The heat flux field\ $q_y(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial y}$ in the\ $x$ direction. This is a secondary unknown of the problem.
+///re_thermal+qy+description The heat flux field\ $q_y(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial y}$ in the\ $y$ direction. This is a secondary unknown of the problem.
 ///re_thermal+qy+description Only available for two and three-dimensional problems.  
-///re_thermal+qz+description The heat flux field\ $q_z(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial z}$ in the\ $x$ direction. This is a secondary unknown of the problem.  
+///re_thermal+qz+description The heat flux field\ $q_z(\vec{x}) = -k(\vec{x}) \cdot \frac{\partial T}{\partial z}$ in the\ $z$ direction. This is a secondary unknown of the problem.  
 ///re_thermal+qz+description Only available for three-dimensional problems.
   feenox_call(feenox_problem_define_solution_function("qx", &thermal.qx, FEENOX_SOLUTION_GRADIENT));
   if (feenox.pde.dim > 1) {
@@ -70,11 +70,11 @@ int feenox_problem_parse_time_init_thermal(void) {
   }
 
 ///pr_thermal+T_0+description The initial condition for the temperature in transient problems.
-///pr_thermal+T_0+description If not given, a steady-steady computation at $t=0$ is performed.  
+///pr_thermal+T_0+description If not given, a steady-state computation at $t=0$ is performed.  
 
 ///pr_thermal+T_guess+description The initial guess for the temperature in steady-state problems.
-///pr_thermal+T_guess+description If not given, a uniform distribution equal to the the average
-///pr_thermal+T_guess+description of all the temperature appearing in boundary conditions is used.
+///pr_thermal+T_guess+description If not given, a uniform distribution equal to the average
+///pr_thermal+T_guess+description of all the temperatures appearing in boundary conditions is used.
   
 ///va_thermal+T_max+detail The maximum temperature\ $T_\text{max}$.
   feenox_check_null(thermal.T_max = feenox_define_variable_get_ptr("T_max"));

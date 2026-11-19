@@ -108,63 +108,63 @@ int feenox_problem_parse_time_init_modal(void) {
   }
 
   // ------- modal-related vectors & outputs -----------------------------------  
-///va+M_T+desc A scalar with the total mass\ $m$ computed from the mass matrix\ $M$ as
-///va+M_T+desc 
-///va+M_T+desc \[ M_T = \frac{1}{n_\text{DOFs}} \cdot \vec{1}^T \cdot M \cdot \vec{1} \]
-///va+M_T+desc 
-///va+M_T+desc where $n_\text{DOFs}$ is the number of degrees of freedoms per node.
-///va+M_T+desc Note that this is only approximately equal to the actual mass which is
-///va+M_T+desc the integral of the density $\rho(x,y,z)$ over the problem domain.
+///va_modal+M_T+desc A scalar with the total mass\ $m$ computed from the mass matrix\ $M$ as
+///va_modal+M_T+desc 
+///va_modal+M_T+desc \[ M_T = \frac{1}{n_\text{DOFs}} \cdot \vec{1}^T \cdot M \cdot \vec{1} \]
+///va_modal+M_T+desc 
+///va_modal+M_T+desc where $n_\text{DOFs}$ is the number of degrees of freedom per node.
+///va_modal+M_T+desc Note that this is only approximately equal to the actual mass which is
+///va_modal+M_T+desc the integral of the density $\rho(x,y,z)$ over the problem domain.
   feenox_check_alloc(modal.M_T = feenox_define_variable_get_ptr("M_T"));
 
-///ve+f+desc _Size:_ number of requested modes.
-///ve+f+desc _Elements:_ The frequency $f_i$ of the $i$-th mode, in cycles per unit of time.
+///va_modal+f+desc _Size:_ number of requested modes.
+///va_modal+f+desc _Elements:_ The frequency $f_i$ of the $i$-th mode, in cycles per unit of time.
   feenox_check_alloc(modal.f = feenox_define_vector_get_ptr("f", feenox.pde.nev));
 
-///ve+omega+desc _Size:_ number of requested modes.
-///ve+omega+desc _Elements:_ The angular frequency $\omega_i$ of the $i$-th mode, in radians per unit of time.
+///va_modal+omega+desc _Size:_ number of requested modes.
+///va_modal+omega+desc _Elements:_ The angular frequency $\omega_i$ of the $i$-th mode, in radians per unit of time.
   feenox_check_alloc(modal.omega = feenox_define_vector_get_ptr("omega", feenox.pde.nev));
 
 
-///ve+m+desc _Size:_ number of requested modes.
-///ve+m+desc _Elements:_ The generalized modal mass $m_i$ of the $i$-th mode computed as
-///ve+m+desc
-///ve+m+desc \[ \text{m}_i = \frac{1}{n_\text{DOFs}} \vec{\phi}_i^T \cdot M \cdot \vec{\phi}_i \]
-///va+m+desc 
-///va+m+desc where $n_\text{DOFs}$ is the number of degrees of freedoms per node, $M$ is the mass matrix
-///va+m+desc and $\vec{\phi}_i$ is the $i$-th eigenvector normalized such that the largest element is equal to one.
+///va_modal+m+desc _Size:_ number of requested modes.
+///va_modal+m+desc _Elements:_ The generalized modal mass $m_i$ of the $i$-th mode computed as
+///va_modal+m+desc
+///va_modal+m+desc \[ \text{m}_i = \frac{1}{n_\text{DOFs}} \vec{\phi}_i^T \cdot M \cdot \vec{\phi}_i \]
+///va_modal+m+desc 
+///va_modal+m+desc where $n_\text{DOFs}$ is the number of degrees of freedom per node, $M$ is the mass matrix
+///va_modal+m+desc and $\vec{\phi}_i$ is the $i$-th eigenvector normalized such that the largest element is equal to one.
 
   feenox_check_alloc(modal.m = feenox_define_vector_get_ptr("m", feenox.pde.nev));
 
-///ve+L+desc _Size:_ number of requested modes.
-///ve+L+desc _Elements:_ The excitation factor $L_i$ of the $i$-th mode computed as
-///ve+L+desc
-///ve+L+desc \[ L_i = \frac{1}{n_\text{DOFs}} \cdot \vec{\phi}_i^T \cdot M \cdot \vec{1} \]
-///va+L+desc 
-///va+L+desc where $n_\text{DOFs}$ is the number of degrees of freedoms per node, $M$ is the mass matrix
-///va+L+desc and $\vec{\phi}_i$ is the $i$-th eigenvector normalized such that the largest element is equal to one.
+///va_modal+L+desc _Size:_ number of requested modes.
+///va_modal+L+desc _Elements:_ The excitation factor $L_i$ of the $i$-th mode computed as
+///va_modal+L+desc
+///va_modal+L+desc \[ L_i = \frac{1}{n_\text{DOFs}} \cdot \vec{\phi}_i^T \cdot M \cdot \vec{1} \]
+///va_modal+L+desc 
+///va_modal+L+desc where $n_\text{DOFs}$ is the number of degrees of freedom per node, $M$ is the mass matrix
+///va_modal+L+desc and $\vec{\phi}_i$ is the $i$-th eigenvector normalized such that the largest element is equal to one.
   feenox_check_alloc(modal.L = feenox_define_vector_get_ptr("L", feenox.pde.nev));
 
-///ve+Gamma+desc _Size:_ number of requested modes.
-///ve+Gamma+desc _Elements:_ The participation factor $\Gamma_i$ of the $i$-th mode computed as
-///ve+Gamma+desc
-///ve+Gamma+desc \[ \Gamma_i = \frac{ \vec{\phi}_i^T \cdot M \cdot \vec{1} }{ \vec{\phi}_i^T \cdot M \cdot \vec{\phi}} \]
+///va_modal+Gamma+desc _Size:_ number of requested modes.
+///va_modal+Gamma+desc _Elements:_ The participation factor $\Gamma_i$ of the $i$-th mode computed as
+///va_modal+Gamma+desc
+///va_modal+Gamma+desc \[ \Gamma_i = \frac{ \vec{\phi}_i^T \cdot M \cdot \vec{1} }{ \vec{\phi}_i^T \cdot M \cdot \vec{\phi}_i} \]
   feenox_check_alloc(modal.Gamma = feenox_define_vector_get_ptr("Gamma", feenox.pde.nev));
 
-///ve+mu+desc _Size:_ number of requested modes.
-///ve+mu+desc _Elements:_ The relative effective modal mass $\mu_i$ of the $i$-th mode computed as
-///ve+mu+desc
-///ve+mu+desc \[ \mu_i = \frac{L_i^2}{M_t \cdot n_\text{DOFs} \cdot m_i} \]
-///ve+mu+desc
-///ve+mu+desc Note that $\sum_{i=1}^N m_i = 1$, where $N$ is total number of degrees of freedom ($n_\text{DOFs}$ times the number of nodes).
+///va_modal+mu+desc _Size:_ number of requested modes.
+///va_modal+mu+desc _Elements:_ The relative effective modal mass $\mu_i$ of the $i$-th mode computed as
+///va_modal+mu+desc
+///va_modal+mu+desc \[ \mu_i = \frac{L_i^2}{M_t \cdot n_\text{DOFs} \cdot m_i} \]
+///va_modal+mu+desc
+///va_modal+mu+desc Note that $\sum_{i=1}^N \mu_i = 1$, where $N$ is total number of degrees of freedom ($n_\text{DOFs}$ times the number of nodes).
   feenox_check_alloc(modal.mu = feenox_define_vector_get_ptr("mu", feenox.pde.nev));
 
-///ve+Mu+desc _Size:_ number of requested modes.
-///ve+Mu+desc _Elements:_ The accumulated relative effective modal mass $\Mu_i$ up to the $i$-th mode computed as
-///ve+Mu+desc
-///ve+Mu+desc \[ \Mu_i = \sum_{j=1}^i \mu_i \]
-///ve+Mu+desc
-///ve+Mu+desc Note that $\Mu_N = 1$, where $N$ is total number of degrees of freedom ($n_\text{DOFs}$ times the number of nodes).
+///va_modal+Mu+desc _Size:_ number of requested modes.
+///va_modal+Mu+desc _Elements:_ The accumulated relative effective modal mass $\text{M}_i$ up to the $i$-th mode computed as
+///va_modal+Mu+desc
+///va_modal+Mu+desc \[ \text{M}_i = \sum_{j=1}^i \mu_j \]
+///va_modal+Mu+desc
+///va_modal+Mu+desc Note that $\text{M}_N = 1$, where $N$ is total number of degrees of freedom ($n_\text{DOFs}$ times the number of nodes).
   feenox_check_alloc(modal.Mu = feenox_define_vector_get_ptr("Mu", feenox.pde.nev));
 
   // define eigenvectors (we don't know its size yet)

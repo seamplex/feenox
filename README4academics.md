@@ -25,6 +25,7 @@ modal
 neutron_diffusion
 neutron_sn
 thermal
+thermal_hydraulics
 $ 
 ```
 

@@ -212,8 +212,9 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_printf(0));
       return FEENOX_OK;
       
-///kw+PRINTF+desc Instruction akin to C's `printf` executed locally from all MPI ranks.
-///kw+PRINTF+usage PRINTF_ALL
+///kw+PRINTF_ALL+desc Instruction akin to C's `printf` executed locally from all MPI ranks.
+///kw+PRINTF_ALL+usage PRINTF_ALL format_string [ expr_1 [ expr_2 [ ... ] ] ]
+///kw+PRINTF_ALL+detail Same as `PRINTF` but every MPI rank prints its own output (synchronized and prefixed with `[rank/size host]`) instead of only the first rank.
     } else if (strcasecmp(token, "PRINTF_ALL") == 0) {
       feenox_call(feenox_parse_printf(1));
       return FEENOX_OK;
@@ -1263,7 +1264,7 @@ int feenox_parse_function(void) {
 ///kw+FUNCTION+usage @
 ///kw+FUNCTION+detail  * steffen, always-monotonic splines-like interpolator
 ///kw+FUNCTION+detail @
-///kw+FUNCTION+detail Default interpolation scheme for one-dimensional functions is `DEFAULT_INTERPOLATION`.
+///kw+FUNCTION+detail Default interpolation scheme for one-dimensional functions is `linear`.
 ///kw+FUNCTION+detail @
 ///kw+FUNCTION+detail Available schemes for $n>1$ are:
 ///kw+FUNCTION+detail @
@@ -1291,16 +1292,15 @@ int feenox_parse_function(void) {
 
 ///kw+FUNCTION+detail @
 ///kw+FUNCTION+usage [ SHEPARD_RADIUS <expr> ]
-///kw+FUNCTION+detail The initial radius of points to take into account in `shepard_kd` is given by `SHEPARD_RADIUS`. If no points are found, the radius is double until at least one definition point is found.
-///kw+FUNCTION+detail The radius is doubled until at least one point is found.
-///kw+FUNCTION+detail Default is `DEFAULT_SHEPARD_RADIUS`.
+///kw+FUNCTION+detail The initial radius of points to take into account in `shepard_kd` is given by `SHEPARD_RADIUS`. If no points are found, the radius is doubled until at least one definition point is found.
+///kw+FUNCTION+detail Default is `1.0`.
       } else if (strcasecmp(token, "SHEPARD_RADIUS") == 0) {
 
        feenox_parser_expression(&function->expr_shepard_radius);
 
 ///kw+FUNCTION+usage [ SHEPARD_EXPONENT <expr> ]
 ///kw+FUNCTION+detail The exponent of the `shepard` method is given by `SHEPARD_EXPONENT`.
-///kw+FUNCTION+detail Default is `DEFAULT_SHEPARD_EXPONENT`.
+///kw+FUNCTION+detail Default is `2`.
       } else if (strcasecmp(token, "SHEPARD_EXPONENT") == 0) {
        feenox_parser_expression(&function->expr_shepard_exponent);
        
@@ -1636,10 +1636,10 @@ int feenox_parse_print(void) {
 ///kw+PRINT+detail Objects and string literals can be mixed and given in any order.
 ///kw+PRINT+detail Hashes `#` appearing literal in text strings have to be quoted to prevent the parser to treat them as comments
 ///kw+PRINT+detail within the FeenoX input file and thus ignoring the rest of the line, like `PRINT "\# this is a printed comment"`.
-///kw+PRINT+detail Whenever an argument starts with a porcentage sign `%`, it is treated as a C `printf`-compatible format
+///kw+PRINT+detail Whenever an argument starts with a percentage sign `%`, it is treated as a C `printf`-compatible format
 ///kw+PRINT+detail specifier and all the objects that follow it are printed using the given format until a new format definition is found.
 ///kw+PRINT+detail The objects are treated as double-precision floating point numbers, so only floating point formats should be given.
-///kw+PRINT+detail See the `printf(3)` man page for further details. The default format is `DEFAULT_PRINT_FORMAT`.
+///kw+PRINT+detail See the `printf(3)` man page for further details. The default format is `%g`.
 ///kw+PRINT+detail Matrices, vectors, scalar expressions, format modifiers and string literals can be given in any desired order,
 ///kw+PRINT+detail and are processed from left to right.
 ///kw+PRINT+detail Vectors are printed element-by-element in a single row.
@@ -1684,7 +1684,7 @@ int feenox_parse_print(void) {
 ///kw+PRINT+usage [ SEP <string> ]
 ///kw+PRINT+detail The `SEP` keyword expects a string used to separate printed objects.
 ///kw+PRINT+detail To print objects without any separation in between give an empty string like `SEP ""`.
-///kw+PRINT+detail The default is a tabulator character 'DEFAULT_PRINT_SEPARATOR' character. 
+///kw+PRINT+detail The default is a tabulator character. 
     } else if (strcasecmp(token, "SEP") == 0 || strcasecmp(token, "SEPARATOR") == 0) {
       feenox_call(feenox_parser_string(&print->separator));
       
@@ -1925,7 +1925,7 @@ int feenox_parse_print_function(void) {
         return FEENOX_ERROR;
       }
 
-///kw+PRINT_FUNCTION+usage [ NSTEPs <expr_1> <expr_2> ... <expr_k> ]
+///kw+PRINT_FUNCTION+usage [ NSTEPS <expr_1> <expr_2> ... <expr_k> ]
     } else if (strcasecmp(token, "NSTEPS") == 0) {
 
       if (print_function->first_function == NULL) {
@@ -2030,7 +2030,7 @@ int feenox_parse_print_vector(void) {
 
   char *token = NULL;
   while ((token = feenox_get_next_token(NULL)) != NULL) {
-///kw+PRINT_FUNCTION+usage <vector_1> [ { vector | expr } ... { vector | expr } ]
+///kw+PRINT_VECTOR+usage <vector_1> [ { vector | expr } ... { vector | expr } ]
 
 ///kw+PRINT_VECTOR+detail Each argument should be either a vector or an expression of the integer\ `i`.
 ///kw+PRINT_VECTOR+usage @
@@ -2054,7 +2054,7 @@ int feenox_parse_print_vector(void) {
 ///kw+PRINT_VECTOR+usage [ SEP <string> ]
 ///kw+PRINT_VECTOR+detail The `SEP` keyword expects a string used to separate printed objects.
 ///kw+PRINT_VECTOR+detail To print objects without any separation in between give an empty string like `SEP ""`.
-///kw+PRINT_VECTOR+detail The default is a tabulator character 'DEFAULT_PRINT_SEPARATOR' character. 
+///kw+PRINT_VECTOR+detail The default is a tabulator character. 
     } else if (strcasecmp(token, "SEP") == 0) {
       if (feenox_parser_string(&print_vector->separator) != FEENOX_OK) {
           return FEENOX_ERROR;
@@ -3331,11 +3331,12 @@ int feenox_parse_problem(void) {
       int values[] = {eigen_formulation_lambda, eigen_formulation_omega, 0};
       feenox_call(feenox_parser_keywords_ints(keywords, values, (int *)&feenox.pde.eigen_formulation));
 
+///kw_pde+PROBLEM+usage [ EIGEN_DIRICHLET_ZERO { M | K } ]@
 ///kw_pde+PROBLEM+detail The `EIGEN_DIRICHLET_ZERO` keyword controls which of the matrices has a zero and which one
 ///kw_pde+PROBLEM+detail has a non-zero in the diagonal when setting Dirichlet boundary conditions.
 ///kw_pde+PROBLEM+detail Default is `M`, i.e. matrix $K$ has a non-zero and matrix $M$ has a zero.
 ///kw_pde+PROBLEM+detail This setting, along with `EIGEN_FORMULATION` determines which spectral transforms can
-///kw_pde+PROBLEM+detail a cannot be used: you cannot invert the matrix with the zero in the diagonal.
+///kw_pde+PROBLEM+detail and cannot be used: you cannot invert the matrix with the zero in the diagonal.
     } else if (strcasecmp(token, "EIGEN_DIRICHLET_ZERO") == 0) {
       char *keywords[] = {"M", "K", ""};
       int values[] = {eigen_dirichlet_zero_M, eigen_dirichlet_zero_K, 0};
@@ -3835,15 +3836,12 @@ int feenox_parse_fit(void) {
     } else if (strcasecmp(token, "RANGE_MAX") == 0) {
      feenox_call(feenox_parser_expressions(&fit->range.max, fit->data->n_arguments));
           
-///kw+FIT+usage [ TOL_REL <expr> ]
-///kw+FIT+detail Convergence can be controlled by giving the relative and absolute tolreances with
-///kw+FIT+detail `TOL_REL` (default `DEFAULT_NLIN_FIT_EPSREL`) and `TOL_ABS` (default `DEFAULT_NLIN_FIT_EPSABS`),
-///kw+FIT+detail and with the maximum number of iterations `MAX_ITER` (default DEFAULT_NLIN_FIT_MAX_ITER).
+///kw+FIT+detail Convergence can be controlled with the maximum number of iterations `MAX_ITER` (default 100).
+///kw+FIT+detail The step and gradient tolerances of the nonlinear least-squares solver are fixed to $10^{-8}$.
 /*     
     } else if (strcasecmp(token, "TOL_REL") == 0) {
       feenox_call(feenox_parser_expression(&fit->tol_rel));
 */
-///kw+FIT+usage [ TOL_ABS <expr> ]
 /*     
     } else if (strcasecmp(token, "TOL_ABS") == 0) {
       feenox_call(feenox_parser_expression(&fit->tol_abs));

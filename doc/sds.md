@@ -2015,7 +2015,7 @@ for bc in ${bcs}; do
 done
 ```
 
-The full script can be found in [`tests/mms/thermal2d/2d/run.sh`](https://github.com/seamplex/feenox/blob/main/tests/mms/thermal/2d/run.sh).
+The full script can be found in [`tests/mms/thermal/2d/run.sh`](https://github.com/seamplex/feenox/blob/main/tests/mms/thermal/2d/run.sh).
 
 In the input file above, the instruction [`WRITE_MESH`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_mesh) with an explicit file name was given
 

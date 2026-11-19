@@ -102,14 +102,14 @@ int feenox_initialize(int argc, char **argv) {
 ///help+extra+desc ```
 ///help+extra+desc @
 ///help+extra+desc PETSc and SLEPc options can be passed in `[petsc options]` (or `[options]`) as well, with the
-///help+extra+desc difference that two hyphens have to be used instead of only once. For example,
+///help+extra+desc difference that two hyphens have to be used instead of only one. For example,
 ///help+extra+desc to pass the PETSc option `-ksp_view` the actual FeenoX invocation should be
 ///help+extra+desc @
 ///help+extra+desc ```terminal
 ///help+extra+desc $ feenox input.fee --ksp_view
 ///help+extra+desc ```
 ///help+extra+desc @
-///help+extra+desc For PETSc options that take values, en equal sign has to be used:
+///help+extra+desc For PETSc options that take values, an equal sign has to be used:
 ///help+extra+desc @
 ///help+extra+desc ```terminal
 ///help+extra+desc $ feenox input.fee --mg_levels_pc_type=sor
@@ -376,7 +376,7 @@ int feenox_init_special_objects(void) {
 ///va+dt+detail The initial time step can be set by assigning a non-zero value to `dt_0`.
 ///va+dt+detail Do not set `dt` explicitly in an assignment.
 ///va+dt+detail If you want to have a constant time step set both `min_dt` and `max_dt` to the same value.
-///va+dt+detail Default initial time step is DEFAULT_DT, which is
+///va+dt+detail Default initial time step is $1/16$, which is
 ///va+dt+detail a power of two and round-off errors are thus reduced.
   feenox_special_var(dt) = feenox_get_or_define_variable_get_ptr("dt");
   feenox_special_var_value(dt) = DEFAULT_DT;
@@ -438,13 +438,13 @@ int feenox_init_special_objects(void) {
   feenox_special_var(on_nan) = feenox_get_or_define_variable_get_ptr("on_nan");
 
   
-///va+on_gsl_error+desc This should be set to a mask that indicates how to proceed if an error ir raised in any
+///va+on_gsl_error+desc This should be set to a mask that indicates how to proceed if an error is raised in any
 ///va+on_gsl_error+desc routine of the GNU Scientific Library. 
   feenox_special_var(on_gsl_error) = feenox_get_or_define_variable_get_ptr("on_gsl_error");
 
 
-///va+on_ida_error+desc This should be set to a mask that indicates how to proceed if an error ir raised in any
-///va+on_ida_error+desc routine of the SUNDIALS Library. 
+///va+on_sundials_error+desc This should be set to a mask that indicates how to proceed if an error is raised in any
+///va+on_sundials_error+desc routine of the SUNDIALS Library. 
   feenox_special_var(on_ida_error) = feenox_get_or_define_variable_get_ptr("on_sundials_error");
 
   dummy = feenox_get_or_define_variable_get_ptr("quit");

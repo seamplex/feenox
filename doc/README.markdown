@@ -214,10 +214,10 @@ Github repository.
 ### General tutorials
 
 1.  [Overview: the tensile test case]
-2.  [Fun & games: solving mazes with PDES instead of AI]
+2.  [Fun & games: solving mazes with PDEs instead of AI]
 
   [Overview: the tensile test case]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test
-  [Fun & games: solving mazes with PDES instead of AI]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes
+  [Fun & games: solving mazes with PDEs instead of AI]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes
 
 ### Detailed functionality
 

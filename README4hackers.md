@@ -52,7 +52,7 @@ Unlike these other FEA tools, FeenoX provides...
    and does not need to know nor write the weak form of the Poisson equation in the input file, since the vast majority of [users](README4engineers.md) will not know what a weak form is (even though other "similar" tools ask their users for that).
  
  * a [Git repository](https://github.com/seamplex/feenox) with [GPL sources](https://github.com/seamplex/feenox/tree/main/src) (and [CC-BY SA documentation](https://github.com/seamplex/feenox/tree/main/doc)) where [contributions are welcome](https://www.seamplex.com/feenox/doc/#contributing).
- In particular, each partial differential equation that FeenoX can solve correspondens to one of the subdirectories of `src/pdes` that provide [C entry points that the main mathematical framework calls as function pointer to build the elemental objects](https://seamplex.com/feenox/doc/sds.html#sec:extensibility). The `autogen.sh` step (prior to `./configure` and `make`) detects the directory structure and includes all the subdirectories it finds as available [problem types](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem). They can be queried at runtime with the `--pdes` option:
+ In particular, each partial differential equation that FeenoX can solve corresponds to one of the subdirectories of `src/pdes` that provide [C entry points that the main mathematical framework calls as function pointer to build the elemental objects](https://seamplex.com/feenox/doc/sds.html#sec:extensibility). The `autogen.sh` step (prior to `./configure` and `make`) detects the directory structure and includes all the subdirectories it finds as available [problem types](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem). They can be queried at runtime with the `--pdes` option:
  
     ```terminal
     $ feenox --pdes
@@ -62,11 +62,12 @@ Unlike these other FEA tools, FeenoX provides...
     neutron_diffusion
     neutron_sn
     thermal
+    thermal_hydraulics
     $ 
     ```
    The decision of extensibility through compiled code is, as the choice of making FeenoX a program and not a library, a thoughtful one. See [FeenoX for academics](./README4academics.md) for more details about how the extensibility mechanism works.
 
- * continuous integration (using [Github actions](https://github.com/seamplex/feenox/actions)), an issue tracker (using [Github issues](https://github.com/seamplex/feenox/issues) and a discussion page (using [Github discussions](https://github.com/seamplex/feenox/discussions))
+ * continuous integration (using [Github actions](https://github.com/seamplex/feenox/actions)), an issue tracker (using [Github issues](https://github.com/seamplex/feenox/issues)) and a discussion page (using [Github discussions](https://github.com/seamplex/feenox/discussions))
   
  * a mechanism to [expand command-line arguments as literal strings in the input file](https://www.seamplex.com/feenox/doc/sds.html#sec:run-time-arguments) so as to allow [parametric](https://www.seamplex.com/feenox/doc/sds.html#sec:parametric) (and/or [optimization](https://www.seamplex.com/feenox/doc/sds.html#sec:optimization)) loops. For instance, if an input file `print.fee` looks like
  

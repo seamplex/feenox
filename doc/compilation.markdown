@@ -201,9 +201,9 @@ open source software which is compatible with FeenoX licensing terms
 (GPLv3+). See the documentation of each package for licensing details.
 
   [Debian GNU/Linux]: https://www.debian.org/
-  [SDS]: SDS.md
+  [SDS]: sds.md
   [GNU GSL]: https://www.gnu.org/software/gsl/
-  [SRS]: SRS.md
+  [SRS]: srs.md
   [PETSc]: https://petsc.org/release/
   [SLEPc]: https://slepc.upv.es/
   [LAPACK]: http://www.netlib.org/lapack/
@@ -361,7 +361,7 @@ Note that
   will try to use the default system-wide locations (i.e. the
   `petsc-dev` package).
 
-  [Portable, Extensible Toolkit for Scientific Computation]: (https://petsc.org/)
+  [Portable, Extensible Toolkit for Scientific Computation]: https://petsc.org/
   [`PROBLEM`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#problem
   [NAFEMS LE10 benchmark problem]: https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark
   [documentation]: https://petsc.org/release/install/
@@ -594,7 +594,7 @@ $
 
 ## Test suite
 
-The [`test`] directory contains a set of test cases whose output is
+The [`tests`] directory contains a set of test cases whose output is
 known so that unintended regressions can be detected quickly (see the
 [programming guide] for more information). The test suite ought to be
 run after each modification in FeenoX’s source code. It consists of a
@@ -780,7 +780,7 @@ To illustrate how regressions can be detected, let us add a bug
 deliberately and re-run the test suite.
 
 Edit the source file that contains the shape functions of the
-second-order tetrahedra `src/mesh/tet10.c`, find the function
+second-order tetrahedra `src/mesh/elements/tet10.c`, find the function
 `feenox_mesh_tet10_h()` and randomly change a sign, i.e. replace
 
 ``` c
@@ -797,10 +797,10 @@ Save, recompile, and re-run the test suite to obtain some red:
 
 ``` terminal
 $ git diff src/mesh/
-diff --git a/src/mesh/tet10.c b/src/mesh/tet10.c
+diff --git a/src/mesh/elements/tet10.c b/src/mesh/elements/tet10.c
 index 72bc838..293c290 100644
---- a/src/mesh/tet10.c
-+++ b/src/mesh/tet10.c
+--- a/src/mesh/elements/tet10.c
++++ b/src/mesh/elements/tet10.c
 @@ -227,7 +227,7 @@ double feenox_mesh_tet10_h(int j, double *vec_r) {
        return s*(2*s-1);
        break;
@@ -889,7 +889,7 @@ make: *** [Makefile:1037: check-recursive] Error 1
 $
 ```
 
-  [`test`]: https://github.com/seamplex/feenox/tree/main/tests
+  [`tests`]: https://github.com/seamplex/feenox/tree/main/tests
   [programming guide]: programming.md
 
 ## Installation
@@ -1069,7 +1069,7 @@ export PETSC_ARCH=arch-linux-c-opt
 ``` terminal
 export PETSC_DIR=$PWD
 ./configure --with-debugging=0 --with-openmp=0 --with-x=0 --with-cxx=0 --COPTFLAGS=-O3 --FOPTFLAGS=-O3 
-make PETSC_DIR=/home/ubuntu/reflex-deps/petsc-3.17.2 PETSC_ARCH=arch-linux-c-opt all
+make PETSC_DIR=$PWD PETSC_ARCH=arch-linux-c-opt all
 ```
 
   [general explanation from PETSc’s website]: https://petsc.org/release/install/

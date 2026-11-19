@@ -67,7 +67,7 @@ rm tmp
 echo " - variables"
 ./reference.sh ../src/flow/init.c                    va     > reference-va.md
 ./reference.sh ../src/flow/init.c                    va_dae > reference-dae-va.md
-./reference.sh ../src/flow/init.c                    va_pde > reference-pde-va.md
+./reference.sh ../src/pdes/init.c                    va     > reference-pde-va.md
 echo " - functions"
 ./reference.sh ../src/math/builtin_functions.c       fn > reference-fn.md
 echo " - functionals"
@@ -75,14 +75,14 @@ echo " - functionals"
 echo " - vector functions"
 ./reference.sh ../src/math/builtin_vectorfunctions.c fv > reference-fv.md
 
-for i in laplace thermal mechanical neutron_diffusion neutron_sn; do
+for i in laplace thermal mechanical modal neutron_diffusion neutron_sn thermal_hydraulics; do
   echo " - ${i}"
-  ./reference.sh ../src/pdes/${i}/init.c           pb_${i} > reference-${i}-pb.md
-  ./reference.sh ../src/pdes/${i}/parser.c         kw_${i} > reference-${i}-kw.md
-  ./reference.sh ../src/pdes/${i}/init.c           va_${i} > reference-${i}-va.md
-  ./reference.sh ../src/pdes/${i}/init.c           re_${i} > reference-${i}-re.md
-  ./reference.sh ../src/pdes/${i}/init.c           pr_${i} > reference-${i}-pr.md
-  ./reference.sh ../src/pdes/${i}/bc.c             bc_${i} > reference-${i}-bc.md
+  # tags can live in any source file of the physics directory
+  cat ../src/pdes/${i}/*.c > tmp
+  for t in pb kw va re pr bc; do
+    ./reference.sh tmp ${t}_${i} > reference-${i}-${t}.md
+  done
+  rm tmp
 done
 
 echo "help as markdown definition list"

@@ -23,11 +23,11 @@ git.md
 
 The main target and development environment is [Debian\ GNU/Linux](https://www.debian.org/), although it should be possible to compile FeenoX in any free GNU/Linux variant (and even the in non-free MacOS and/or Windows platforms) running in virtually any hardware platform. FeenoX can run be run either in HPC cloud servers or a Raspberry Pi, and almost everything that sits in the middle.
 
-Following the Unix philosophy discussed in the [SDS](SDS.md), FeenoX re-uses a lot of already-existing high-quality free and open source libraries that implement a wide variety of mathematical operations. This leads to a number of dependencies that FeenoX needs in order to implement certain features.
+Following the Unix philosophy discussed in the [SDS](sds.md), FeenoX re-uses a lot of already-existing high-quality free and open source libraries that implement a wide variety of mathematical operations. This leads to a number of dependencies that FeenoX needs in order to implement certain features.
 
 There is only one dependency that is mandatory, namely [GNU GSL](https://www.gnu.org/software/gsl/) (see\ @sec:gsl), which if it not found then FeenoX cannot be compiled. All other dependencies are optional, meaning that FeenoX can be compiled but its capabilities will be partially reduced.
 
-As per the [SRS](SRS.md), all dependencies have to be available on mainstream GNU/Linux distributions and have to be free and open source software. But they can also be compiled from source in case the package repositories are not available or customized compilation flags are needed (i.e. optimization or debugging settings).
+As per the [SRS](srs.md), all dependencies have to be available on mainstream GNU/Linux distributions and have to be free and open source software. But they can also be compiled from source in case the package repositories are not available or customized compilation flags are needed (i.e. optimization or debugging settings).
 
 In particular, [PETSc](https://petsc.org/release/) (and [SLEPc](https://slepc.upv.es/)) also depend on other mathematical libraries to perform particular operations such as low-level linear algebra operations. These extra dependencies can be either free (such as [LAPACK](http://www.netlib.org/lapack/)) or non-free (such as [Intel’s MKL](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html)), but there is always at least one combination of a working setup that involves only free and open source software which is compatible with FeenoX licensing terms (GPLv3+). See the documentation of each package for licensing details.
 
@@ -104,7 +104,7 @@ or by following the instructions in the documentation.
 
 ### PETSc
 
-The [Portable, Extensible Toolkit for Scientific Computation]((https://petsc.org/)), pronounced PET-see (/ˈpɛt-siː/), is a suite of data structures and routines for the scalable (parallel) solution of scientific applications modeled by partial differential equations. It is used by FeenoX to solve PDEs with the keyword [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem), like the [NAFEMS\ LE10 benchmark problem](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark).
+The [Portable, Extensible Toolkit for Scientific Computation](https://petsc.org/), pronounced PET-see (/ˈpɛt-siː/), is a suite of data structures and routines for the scalable (parallel) solution of scientific applications modeled by partial differential equations. It is used by FeenoX to solve PDEs with the keyword [`PROBLEM`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem), like the [NAFEMS\ LE10 benchmark problem](https://www.seamplex.com/feenox/examples/#nafems-le10-thick-plate-pressure-benchmark).
 
 
 Install either by doing
@@ -304,7 +304,7 @@ $
 
 ## Test suite {#sec:test-suite}
 
-The [`test`](https://github.com/seamplex/feenox/tree/main/tests) directory contains a set of test cases whose output is known so that unintended regressions can be detected quickly (see the [programming guide](programming.md) for more information). The test suite ought to be run after each modification in FeenoX’s source code. It consists of a set of scripts and input files needed to solve dozens of cases. The output of each execution is compared to a reference solution. In case the output does not match the reference, the test suite fails.
+The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory contains a set of test cases whose output is known so that unintended regressions can be detected quickly (see the [programming guide](programming.md) for more information). The test suite ought to be run after each modification in FeenoX’s source code. It consists of a set of scripts and input files needed to solve dozens of cases. The output of each execution is compared to a reference solution. In case the output does not match the reference, the test suite fails.
 
 :::: {.only-in-format .html }
 ```{=html}
@@ -480,7 +480,7 @@ $
 
 To illustrate how regressions can be detected, let us add a bug deliberately and re-run the test suite.
 
-Edit the source file that contains the shape functions of the second-order tetrahedra `src/mesh/tet10.c`, find the function `feenox_mesh_tet10_h()` and randomly change a sign, i.e. replace
+Edit the source file that contains the shape functions of the second-order tetrahedra `src/mesh/elements/tet10.c`, find the function `feenox_mesh_tet10_h()` and randomly change a sign, i.e. replace
 
 ```c
       return t*(2*t-1);
@@ -496,10 +496,10 @@ Save, recompile, and re-run the test suite to obtain some red:
 
 ```terminal
 $ git diff src/mesh/
-diff --git a/src/mesh/tet10.c b/src/mesh/tet10.c
+diff --git a/src/mesh/elements/tet10.c b/src/mesh/elements/tet10.c
 index 72bc838..293c290 100644
---- a/src/mesh/tet10.c
-+++ b/src/mesh/tet10.c
+--- a/src/mesh/elements/tet10.c
++++ b/src/mesh/elements/tet10.c
 @@ -227,7 +227,7 @@ double feenox_mesh_tet10_h(int j, double *vec_r) {
        return s*(2*s-1);
        break;
@@ -756,7 +756,7 @@ export PETSC_ARCH=arch-linux-c-opt
 ```terminal
 export PETSC_DIR=$PWD
 ./configure --with-debugging=0 --with-openmp=0 --with-x=0 --with-cxx=0 --COPTFLAGS=-O3 --FOPTFLAGS=-O3 
-make PETSC_DIR=/home/ubuntu/reflex-deps/petsc-3.17.2 PETSC_ARCH=arch-linux-c-opt all
+make PETSC_DIR=$PWD PETSC_ARCH=arch-linux-c-opt all
 ```
 
 

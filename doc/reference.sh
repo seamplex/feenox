@@ -222,14 +222,15 @@ EOF
   
   
   # examples
-  examples=$(find ../tests ../examples -type f -name "*.fee" | xargs grep ${kw} | cut -d: -f1 | sort | uniq)
+  # only tracked files, otherwise the links to github are dead
+  examples=$(git ls-files ../tests ../examples | grep '\.fee$' | xargs grep -l -w -- ${kw} | sort | uniq)
   if [ -n "${examples}" ]; then
     echo ":::::::: {.only-in-format .html}"
     echo "## Examples of usage {.unnumbered .unlisted}"
     echo 
     for i in ${examples}; do
-      lineno=$(grep -n ${kw} ${i} | head -n1 | cut -d: -f1)
-      echo " * [$(basename ${i}):${lineno}]($(echo ${i} | sed 's_.._https://github.com/seamplex/feenox/tree/main/_')#L${lineno})"
+      lineno=$(grep -n -w -- ${kw} ${i} | head -n1 | cut -d: -f1)
+      echo " * [$(basename ${i}):${lineno}]($(echo ${i} | sed 's_^\.\./_https://github.com/seamplex/feenox/blob/main/_')#L${lineno})"
     done
     echo "::::::::"
     echo

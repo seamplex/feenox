@@ -135,7 +135,7 @@ double feenox_builtin_derivative(expr_item_t *a, var_t *var_x) {
 ///fu+integral+desc quadrature subinterval. Based on an estimation of the error committed,
 ///fu+integral+desc one or more of these subintervals may be split to repeat
 ///fu+integral+desc the numerical integration algorithm with a refined division.
-///fu+integral+desc The fifth optional argument $\epsilon$ is is a relative tolerance
+///fu+integral+desc The fifth optional argument $\epsilon$ is a relative tolerance
 ///fu+integral+desc used to check for convergence. It corresponds to GSL's `epsrel` 
 ///fu+integral+desc parameter (`epsabs` is set to zero). 
 ///fu+integral+desc The sixth optional argument $1\leq k \le 6$ is an integer key that

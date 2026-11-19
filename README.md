@@ -130,8 +130,8 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
         - [`2d`](https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/2d)
         - [`3d`](https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/3d)
       - [`mechanical`](https://github.com/seamplex/feenox/tree/main/tests/mms/mechanical)
-        - [`sdef`](https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/sdef)
-        - [`ldef`](https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/ldef)
+        - [`sdef`](https://github.com/seamplex/feenox/tree/main/tests/mms/mechanical/sdef)
+        - [`ldef`](https://github.com/seamplex/feenox/tree/main/tests/mms/mechanical/ldef)
     - [`nafems`](https://github.com/seamplex/feenox/tree/main/tests/nafems)
       - [`le10`](https://github.com/seamplex/feenox/tree/main/tests/nafems/le10)
  
@@ -162,7 +162,7 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
    - [rule of separation](https://seamplex.com/feenox/doc/sds.html#sec:separation)
    - [rule of silence](https://seamplex.com/feenox/doc/sds.html#sec:silence)
    - [rule of economy](https://seamplex.com/feenox/doc/sds.html#sec:economy)
- * Each PDE (i.e. from Laplace downward in the list of examples) [is implemented in a subdirectory](https://seamplex.com/feenox/doc/sds.html#sec:extensibility) within [`src/pde`](https://github.com/seamplex/feenox/tree/main/src/pdes) of the source tree
+ * Each PDE (i.e. from Laplace downward in the list of examples) [is implemented in a subdirectory](https://seamplex.com/feenox/doc/sds.html#sec:extensibility) within [`src/pdes`](https://github.com/seamplex/feenox/tree/main/src/pdes) of the source tree
    - any subdirectory can be removed if a particular PDE is not needed
    - any subdirectory can be used as a template to add a new PDE to the capabilities
  * [Space](https://github.com/seamplex/feenox/blob/main/tests/thermal-two-squares-material-explicit-space.fee),

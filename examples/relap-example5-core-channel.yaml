@@ -33,7 +33,7 @@ intro: |
   The mapping with RELAP7's `CoreChannel` component is:
 
    * `dim_hs = 2` is FeenoX's default `AXIAL_CONDUCTION` (i.e. radial and axial conduction in the rod),
-   * `power_fraction = '1.0 0.0 0.0'` is FeenoX's only option: the power is uniformly generated in the fuel (because the expression is a constant, we can have expressions of $x$, $y$, $z$ and/or $t$),
+   * `power_fraction = '1.0 0.0 0.0'` is FeenoX's only option: the power is uniformly generated in the fuel and along the channel (`hs_power` may depend on time\ $t$ but not on space),
    * `Hw = 5.33e4` is the heat transfer coefficient `h_wall` between the clad and the coolant,
    * `initial_Ts = 559.15` is the initial solid temperature `T_solid_0(r,x,y,z)`, which is a function of the radius and the space, and
    * the heated perimeter is the outer clad circumference in both codes.

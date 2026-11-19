@@ -11,7 +11,7 @@ intro: |
   This adds a heat flux $h_\text{wall} P_h (T_\text{wall}-T)$ per unit length to the energy equation, where
 
    * $P_h$ is the heated perimeter, and
-   * the heat transfer coefficient $h_\text{wall}$ follows the TRACE single-phase tube model, namely the maximum of laminar ($\text{Nu}=4.36$), corrected Gnielinski and natural convection, with the water conductivity from IAPWS-2011.
+   * the heat transfer coefficient $h_\text{wall}$ follows the RELAP-7/TRACE single-phase tube correlation, namely the maximum of laminar ($\text{Nu}=4.36$), corrected Gnielinski and natural convection, with the water conductivity from IAPWS-2011.
 
   Both can be given with the `P_h` and `h_wall` material properties.
   FeenoX's default heated perimeter is $4A/D_h$, but RELAP-7 assumes the circumference $2\sqrt{\pi A}$ of a circle with area\ $A$.

@@ -112,7 +112,7 @@ int feenox_problem_parse_time_init(void) {
 
 ///va+ksp_atol+name ksp_atol
 ///va+ksp_atol+detail Absolute tolerance of the iterative linear solver, as passed to PETSc’s
-///va+ksp_atol+detail [`KSPSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html)
+///va+ksp_atol+detail [`KSPSetTolerances`](https://petsc.org/release/manualpages/KSP/KSPSetTolerances/)
   feenox.pde.vars.ksp_atol = feenox_define_variable_get_ptr("ksp_atol");
   // TODO: set to PETSC_DEFAULT?
 ///va+ksp_atol+detail Default `1e-50`.
@@ -121,7 +121,7 @@ int feenox_problem_parse_time_init(void) {
 ///va+ksp_rtol+name ksp_rtol
 ///va+ksp_rtol+detail Relative tolerance of the iterative linear solver,
 ///va+ksp_rtol+detail as passed to PETSc’s
-///va+ksp_rtol+detail [`KSPSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html).
+///va+ksp_rtol+detail [`KSPSetTolerances`](https://petsc.org/release/manualpages/KSP/KSPSetTolerances/).
 feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
 ///va+ksp_rtol+detail Default `1e-6`.
   feenox_var_value(feenox.pde.vars.ksp_rtol) = 1e-6;    // PETSc is 1e-5
@@ -129,7 +129,7 @@ feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
 ///va+ksp_divtol+name ksp_divtol
 ///va+ksp_divtol+detail Divergence tolerance of the iterative linear solver,
 ///va+ksp_divtol+detail as passed to PETSc’s
-///va+ksp_divtol+detail [`KSPSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html).
+///va+ksp_divtol+detail [`KSPSetTolerances`](https://petsc.org/release/manualpages/KSP/KSPSetTolerances/).
   feenox.pde.vars.ksp_divtol = feenox_define_variable_get_ptr("ksp_divtol");
 ///va+ksp_divtol+detail Default `1e+4`.  
   feenox_var_value(feenox.pde.vars.ksp_divtol) = 1e+4;  // same as PETSc
@@ -137,7 +137,7 @@ feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
 ///va+ksp_max_it+name ksp_max_it
 ///va+ksp_max_it+detail Number of maximum iterations of the iterative linear solver before diverging,
 ///va+ksp_max_it+detail as passed to PETSc’s
-///va+ksp_max_it+detail [`KSPSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/KSP/KSPSetTolerances.html).
+///va+ksp_max_it+detail [`KSPSetTolerances`](https://petsc.org/release/manualpages/KSP/KSPSetTolerances/).
   feenox.pde.vars.ksp_max_it = feenox_define_variable_get_ptr("ksp_max_it");
 ///va+ksp_max_it+detail Default `10,000`.
   feenox_var_value(feenox.pde.vars.ksp_max_it) = 10000;   // same as PETSc
@@ -145,7 +145,7 @@ feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
 
 ///va+snes_atol+name snes_atol
 ///va+snes_atol+detail Absolute tolerance of the non-linear solver, as passed to PETSc’s
-///va+snes_atol+detail [`SNESSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESSetTolerances.html)
+///va+snes_atol+detail [`SNESSetTolerances`](https://petsc.org/release/manualpages/SNES/SNESSetTolerances/)
   feenox.pde.vars.snes_atol = feenox_define_variable_get_ptr("snes_atol");
 ///va+snes_atol+detail Default `1e-50`.
   feenox_var_value(feenox.pde.vars.snes_atol) = 1e-50;   // same as PETSc
@@ -153,23 +153,23 @@ feenox.pde.vars.ksp_rtol = feenox_define_variable_get_ptr("ksp_rtol");
 ///va+snes_rtol+name snes_rtol
 ///va+snes_rtol+detail Relative tolerance of the non-linear solver,
 ///va+snes_rtol+detail as passed to PETSc’s
-///va+snes_rtol+detail [`SNESSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESSetTolerances.html).
+///va+snes_rtol+detail [`SNESSetTolerances`](https://petsc.org/release/manualpages/SNES/SNESSetTolerances/).
 feenox.pde.vars.snes_rtol = feenox_define_variable_get_ptr("snes_rtol");
-///va+feenox_snes_rtol+detail Default `1e-8`.
+///va+snes_rtol+detail Default `1e-8`.
   feenox_var_value(feenox.pde.vars.snes_rtol) = 1e-8;    // same as PETSc
 
 ///va+snes_stol+name snes_stol
 ///va+snes_stol+detail Convergence tolerance of the non-linear solver in terms of the norm of the change in the solution between steps,
 ///va+snes_stol+detail as passed to PETSc’s
-///va+snes_stol+detail [`SNESSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESSetTolerances.html).
+///va+snes_stol+detail [`SNESSetTolerances`](https://petsc.org/release/manualpages/SNES/SNESSetTolerances/).
   feenox.pde.vars.snes_stol = feenox_define_variable_get_ptr("snes_stol");
 ///va+snes_stol+detail Default `1e-8`.  
   feenox_var_value(feenox.pde.vars.snes_stol) = 1e-8;  // same as PETSc
 
 ///va+snes_max_it+name snes_max_it
-///va+snes_max_itdetail Number of maximum iterations of the non-linear solver before diverging,
+///va+snes_max_it+detail Number of maximum iterations of the non-linear solver before diverging,
 ///va+snes_max_it+detail as passed to PETSc’s
-///va+snes_max_it+detail [`SNESSetTolerances`](https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESSetTolerances.html).
+///va+snes_max_it+detail [`SNESSetTolerances`](https://petsc.org/release/manualpages/SNES/SNESSetTolerances/).
   feenox.pde.vars.snes_max_it = feenox_define_variable_get_ptr("snes_max_it");
 ///va+snes_max_it+detail Default `50`.
   feenox_var_value(feenox.pde.vars.snes_max_it) = 50;   // same as PETSc
@@ -178,36 +178,36 @@ feenox.pde.vars.snes_rtol = feenox_define_variable_get_ptr("snes_rtol");
   
 ///va+ts_atol+name ts_atol
 ///va+ts_atol+detail Absolute tolerance of the transient solver, as passed to PETSc’s
-///va+ts_atol+detail [`TSSetTolerances`](https://petsc.org/release/docs/manualpages/TS/TSSetTolerances.html)
+///va+ts_atol+detail [`TSSetTolerances`](https://petsc.org/release/manualpages/TS/TSSetTolerances/)
   feenox.pde.vars.ts_atol = feenox_define_variable_get_ptr("ts_atol");
-///va+ts_rtol+detail Default `1e-4`.
+///va+ts_atol+detail Default `1e-4`.
   feenox_var_value(feenox.pde.vars.ts_atol) = 1e-4;   // same as PETSc
  
 ///va+ts_rtol+name ts_rtol
 ///va+ts_rtol+detail Relative tolerance of the transient solver, as passed to PETSc’s
-///va+ts_rtol+detail [`TSSetTolerances`](https://petsc.org/release/docs/manualpages/TS/TSSetTolerances.html).
+///va+ts_rtol+detail [`TSSetTolerances`](https://petsc.org/release/manualpages/TS/TSSetTolerances/).
 feenox.pde.vars.ts_rtol = feenox_define_variable_get_ptr("ts_rtol");
 ///va+ts_rtol+detail Default `1e-4`.
   feenox_var_value(feenox.pde.vars.ts_rtol) = 1e-4;    // same as PETSc
   
 ///va+eps_tol+name eps_tol
 ///va+eps_tol+detail Tolerance (relative to the matrix norms) of the eigen solver,
-///va+ksp_rtol+detail as passed to SLEPc’s
-///va+ksp_rtol+detail [`EPSSetTolerances`](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/EPSSetTolerances.html).
+///va+eps_tol+detail as passed to SLEPc’s
+///va+eps_tol+detail [`EPSSetTolerances`](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/EPSSetTolerances.html).
 feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
-///va+ksp_rtol+detail Default `1e-8`.
+///va+eps_tol+detail Default `1e-8`.
   feenox_var_value(feenox.pde.vars.eps_tol) = 1e-8;    // same as SLEPc
   
 ///va+eps_max_it+name eps_max_it
-///va+eps_max_it Number of maximum iterations allowed in the eigen solver,
+///va+eps_max_it+detail Number of maximum iterations allowed in the eigen solver,
 ///va+eps_max_it+detail as passed to SLEPc’s
-///va+ksp_rtol+detail [`EPSSetTolerances`](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/EPSSetTolerances.html).
+///va+eps_max_it+detail [`EPSSetTolerances`](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/EPSSetTolerances.html).
   feenox.pde.vars.eps_max_it = feenox_define_variable_get_ptr("eps_max_it");
-///va+snes_max_it+detail Default is a solver-dependent reasonable value`.
+///va+eps_max_it+detail Default is a solver-dependent reasonable value.
   feenox_var_value(feenox.pde.vars.eps_max_it) = PETSC_DEFAULT;
 
 ///va+eps_st_sigma+name eps_st_sigma
-///va+eps_st_sigma Shift $\sigma$ associated with the spectral transformation. 
+///va+eps_st_sigma+detail Shift $\sigma$ associated with the spectral transformation. 
 ///va+eps_st_sigma+detail as passed to SLEPc’s
 ///va+eps_st_sigma+detail [`STSetShift`](https://slepc.upv.es/documentation/current/docs/manualpages/ST/STSetShift.html).
   feenox.pde.vars.eps_st_sigma = feenox_define_variable_get_ptr("eps_st_sigma");
@@ -215,7 +215,7 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
   feenox_var_value(feenox.pde.vars.eps_st_sigma) = 0;
   
 ///va+eps_st_nu+name eps_st_nu
-///va+eps_st_nu Value $\nu$ of the anti-shift for the Cayley spectral transformation
+///va+eps_st_nu+detail Value $\nu$ of the anti-shift for the Cayley spectral transformation
 ///va+eps_st_nu+detail as passed to SLEPc’s
 ///va+eps_st_nu+detail [`STCayleySetAntishift`](https://slepc.upv.es/documentation/current/docs/manualpages/ST/STCayleySetAntishift.html).
   feenox.pde.vars.eps_st_nu = feenox_define_variable_get_ptr("eps_st_nu");
@@ -223,7 +223,7 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
   feenox_var_value(feenox.pde.vars.eps_st_nu) = 0;
 
 ///va+mumps_cntl_1+name mumps_cntl_1
-///va+mumps_cntl_1 MUMPS cntl value with the offset 1, relative threshold for numerical pivoting
+///va+mumps_cntl_1+detail MUMPS cntl value with the offset 1, relative threshold for numerical pivoting
 ///va+mumps_cntl_1+detail It forms a trade-off between preserving sparsity and ensuring numerical stability during
 ///va+mumps_cntl_1+detail the factorization. In general, a larger value of `CNTL(1)` increases fill-in but leads to
 ///va+mumps_cntl_1+detail a more accurate factorization.
@@ -232,33 +232,33 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
   feenox_var_value(feenox.pde.vars.mumps_cntl_1) = 1e-3;
   
 ///va+mumps_icntl_14+name mumps_icntl_14
-///va+mumps_icntl_14 MUMPS icntl value with the offset 14, relaxation value for the internal array.
+///va+mumps_icntl_14+detail MUMPS icntl value with the offset 14, relaxation value for the internal array.
 ///va+mumps_icntl_14+detail For some complex problems this value needs to be set. See MUMPS manual for details.
   feenox.pde.vars.mumps_icntl_14 = feenox_define_variable_get_ptr("mumps_icntl_14");
 ///va+mumps_icntl_14+detail Default is zero, which means use MUMPS default.
   feenox_var_value(feenox.pde.vars.mumps_icntl_14) = 0;
 
 ///va+mumps_icntl_24+name mumps_icntl_24
-///va+mumps_icntl_24 MUMPS icntl value with the offset 24, flag to detect null pivot rows.
+///va+mumps_icntl_24+detail MUMPS icntl value with the offset 24, flag to detect null pivot rows.
 ///va+mumps_icntl_24+detail For most problems, it is ok to leave this flag as true (default).
 ///va+mumps_icntl_24+detail For very particular problems, it might be needed to turn it off.
   feenox.pde.vars.mumps_icntl_24 = feenox_define_variable_get_ptr("mumps_icntl_24");
-///va+mumps_icntl_14+detail Default is true, which asks MUMPS to detect (and handle) null pivot rows.
+///va+mumps_icntl_24+detail Default is true, which asks MUMPS to detect (and handle) null pivot rows.
   feenox_var_value(feenox.pde.vars.mumps_icntl_24) = 1;
   
 ///va+gamg_threshold+name gamg_threshold
-///va+gamg_threshold Relative threshold to use for dropping edges in aggregation graph when using GAMG.
+///va+gamg_threshold+detail Relative threshold to use for dropping edges in aggregation graph when using GAMG.
 ///va+gamg_threshold+detail See `PCGAMGSetThreshold()` in the PETSc documentation for further details.
   feenox.pde.vars.gamg_threshold = feenox_define_variable_get_ptr("gamg_threshold");
 ///va+gamg_threshold+detail Default is zero (note that PETSc's default is -1).
   feenox_var_value(feenox.pde.vars.gamg_threshold) = 0;
 
-///va+penalty_weight+name feenox_penalty_weight
+///va+penalty_weight+name penalty_weight
 ///va+penalty_weight+detail The weight\ $w$ used when setting multi-freedom boundary conditions.
 ///va+penalty_weight+detail Higher values mean better precision in the constrain but worsen
 ///va+penalty_weight+detail the matrix condition number. 
   feenox.pde.vars.penalty_weight = feenox_define_variable_get_ptr("penalty_weight");
-///va+feenox_penalty_weight+detail Default is `1e8`.
+///va+penalty_weight+detail Default is `1e8`.
   feenox_var_value(feenox.pde.vars.penalty_weight) = 1e8;  
   
 ///va+nodes_rough+name nodes_rough
@@ -266,7 +266,7 @@ feenox.pde.vars.eps_tol = feenox_define_variable_get_ptr("eps_tol");
   feenox.pde.vars.nodes_rough = feenox_define_variable_get_ptr("nodes_rough");
 
 ///va+total_dofs+name total_dofs
-///va+total_dogs+detail The total number of degrees of freedom of the PDE being solved for.
+///va+total_dofs+detail The total number of degrees of freedom of the PDE being solved for.
   feenox.pde.vars.total_dofs = feenox_define_variable_get_ptr("total_dofs");
   
 ///va+memory_available+name memory_available

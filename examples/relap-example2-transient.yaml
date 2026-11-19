@@ -6,7 +6,7 @@ intro: |
   The second example from the RELAP7 manual uses the same pipe as [example 1](#relap7-example-1-a-simple-pipe-flow-problem),
   but now
 
-   1. the problem is a transient from $t=0$ to $t=10~\text{s}$, with a varaible time-stepping scheme starting from $\Delta t_0 = 1~\text{ms}$ using a second-order BDF method (the original RELAP example uses fixed $\Delta t$),
+   1. the problem is a transient from $t=0$ to $t=10~\text{s}$, with a variable time-stepping scheme starting from $\Delta t_0 = 1~\text{ms}$ using a second-order BDF method (the original RELAP example uses fixed $\Delta t$),
    2. the water starts at rest with $p=15.51~\text{MPa}$ and $T=559.15~\text{K}$ everywhere, and
    3. the Darcy friction factor is not computed from a correlation but given as a function of time that rises linearly from $f=0.01$ at $t=0$ to $f=0.02$ at $t=50~\text{ms}$ and stays constant afterwards.
 

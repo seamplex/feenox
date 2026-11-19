@@ -31,6 +31,7 @@ int feenox_problem_bc_parse_thermal_hydraulics(bc_data_t *bc_data, const char *l
 ///bc_thermal_hydraulics+p+description Fixed pressure (in Pa) at the node, usually an outlet.
 ///bc_thermal_hydraulics+p+description If fluid enters through this node, it does so with the temperature given by `T`
 ///bc_thermal_hydraulics+p+description (or the node's temperature if `T` is not given).
+///bc_thermal_hydraulics+p+description Steady-state problems need at least one `p` or `p0` boundary condition. It cannot be combined with `v` or `mdot` at the same node.
   if (strcmp(lhs, "p") == 0) {
     bc_data->type_phys = BC_TYPE_TH_PRESSURE;
 
@@ -51,6 +52,7 @@ int feenox_problem_bc_parse_thermal_hydraulics(bc_data_t *bc_data, const char *l
     
 ///bc_thermal_hydraulics+T+usage T=<expr>
 ///bc_thermal_hydraulics+T+description Temperature (in K) of the fluid that enters the domain through the node.
+///bc_thermal_hydraulics+T+description At least one `T`, `rho` or `T0` is needed, unless the problem is a transient with an initial condition `T_0`. It cannot be combined with `rho` at the same node.
   } else if (strcmp(lhs, "T") == 0) {
     bc_data->type_phys = BC_TYPE_TH_TEMPERATURE;
     
@@ -63,13 +65,13 @@ int feenox_problem_bc_parse_thermal_hydraulics(bc_data_t *bc_data, const char *l
 ///bc_thermal_hydraulics+v+usage v=<expr>
 ///bc_thermal_hydraulics+v+description Velocity (in m/s) of the fluid entering the domain through the node.
 ///bc_thermal_hydraulics+v+description The mass flow is $\dot{m} = \rho \cdot v \cdot A$, where $A$ is the area of the adjacent pipe.
-///bc_thermal_hydraulics+v+description Negative values mean the fluid leaves the domain.
+///bc_thermal_hydraulics+v+description Negative values mean the fluid leaves the domain. It cannot be combined with `mdot` or `p` at the same node.
   } else if (strcmp(lhs, "v") == 0) {
     bc_data->type_phys = BC_TYPE_TH_VELOCITY;
 
 ///bc_thermal_hydraulics+mdot+usage mdot=<expr>
 ///bc_thermal_hydraulics+mdot+description Mass flow (in kg/s) entering the domain through the node.
-///bc_thermal_hydraulics+mdot+description Negative values mean the fluid leaves the domain.
+///bc_thermal_hydraulics+mdot+description Negative values mean the fluid leaves the domain. It cannot be combined with `v` or `p` at the same node.
   } else if (strcmp(lhs, "mdot") == 0) {
     bc_data->type_phys = BC_TYPE_TH_MASS_FLOW;
     

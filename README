@@ -182,12 +182,12 @@ Tutorials
 
 0.  Setting up your workspace
 1.  Overview: the tensile test case
-2.  Fun & games: solving mazes with PDES instead of AI
+2.  Fun & games: solving mazes with PDEs instead of AI
 3.  Heat conduction
 
   [2]: https://www.seamplex.com/feenox/doc/tutorials/000-setup
   [Overview: the tensile test case]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test
-  [Fun & games: solving mazes with PDES instead of AI]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes
+  [Fun & games: solving mazes with PDEs instead of AI]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes
   [3]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal
 
 Tests
@@ -216,8 +216,8 @@ The tests directory in the repository has hundreds of
   [2d]: https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/2d
   [3d]: https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/3d
   [mechanical]: https://github.com/seamplex/feenox/tree/main/tests/mms/mechanical
-  [sdef]: https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/sdef
-  [ldef]: https://github.com/seamplex/feenox/tree/main/tests/mms/thermal/ldef
+  [sdef]: https://github.com/seamplex/feenox/tree/main/tests/mms/mechanical/sdef
+  [ldef]: https://github.com/seamplex/feenox/tree/main/tests/mms/mechanical/ldef
   [nafems]: https://github.com/seamplex/feenox/tree/main/tests/nafems
   [le10]: https://github.com/seamplex/feenox/tree/main/tests/nafems/le10
 
@@ -257,7 +257,7 @@ Capabilities
   - rule of silence
   - rule of economy
 - Each PDE (i.e. from Laplace downward in the list of examples) is
-  implemented in a subdirectory within src/pde of the source tree
+  implemented in a subdirectory within src/pdes of the source tree
   - any subdirectory can be removed if a particular PDE is not needed
   - any subdirectory can be used as a template to add a new PDE to the
     capabilities

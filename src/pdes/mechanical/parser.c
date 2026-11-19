@@ -246,9 +246,9 @@ int feenox_parse_linearize_stress(void) {
             
 ///kw_mechanical+LINEARIZE_STRESS+usage [ FILE <file> ]
 ///kw_mechanical+LINEARIZE_STRESS+detail If the `FILE` keyword is given, the total, membrane and membrane plus bending
-///kw_mechanical+LINEARIZE_STRESS++detail stresses are written as a function of a scalar $t \in [0,1]$.
-///kw_mechanical+LINEARIZE_STRESS++detail Moreover, the individual elements of the membrane and bending stress tensors are written
-///kw_mechanical+LINEARIZE_STRESS++detail within comments (i.e. lines starting with the hash symbol `#`).
+///kw_mechanical+LINEARIZE_STRESS+detail stresses are written as a function of a scalar $t \in [0,1]$.
+///kw_mechanical+LINEARIZE_STRESS+detail Moreover, the individual elements of the membrane and bending stress tensors are written
+///kw_mechanical+LINEARIZE_STRESS+detail within comments (i.e. lines starting with the hash symbol `#`).
 //TODO: decir como se plotea y como se hace un PDF
       
     } else if (strcasecmp(token, "FILE") == 0) {

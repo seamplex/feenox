@@ -148,7 +148,7 @@ Take the tutorials to learn how to solve those types of problems:
 
 0.  Setting up your workspace
 1.  Overview: the tensile test case
-2.  Fun & games: solving mazes with PDES instead of AI
+2.  Fun & games: solving mazes with PDEs instead of AI
 3.  Heat conduction
 
 Browse through the documentation to dive deeper into the details.
@@ -164,7 +164,7 @@ Browse through the documentation to dive deeper into the details.
   [Thermal hydraulics]: https://seamplex.com/feenox/examples/thermal_hydraulics.html
   [Setting up your workspace]: https://www.seamplex.com/feenox/doc/tutorials/000-setup
   [Overview: the tensile test case]: https://www.seamplex.com/feenox/doc/tutorials/110-tensile-test
-  [Fun & games: solving mazes with PDES instead of AI]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes
+  [Fun & games: solving mazes with PDEs instead of AI]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes
   [2]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal
   [the documentation]: https://seamplex.com/feenox/doc/
 

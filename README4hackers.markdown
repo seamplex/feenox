@@ -118,8 +118,8 @@ Unlike these other FEA tools, FeenoX provides…
 
 - a [Git repository] with [GPL sources] (and [CC-BY SA documentation])
   where [contributions are welcome]. In particular, each partial
-  differential equation that FeenoX can solve correspondens to one of
-  the subdirectories of `src/pdes` that provide [C entry points that the
+  differential equation that FeenoX can solve corresponds to one of the
+  subdirectories of `src/pdes` that provide [C entry points that the
   main mathematical framework calls as function pointer to build the
   elemental objects]. The `autogen.sh` step (prior to `./configure` and
   `make`) detects the directory structure and includes all the
@@ -134,6 +134,7 @@ Unlike these other FEA tools, FeenoX provides…
   neutron_diffusion
   neutron_sn
   thermal
+  thermal_hydraulics
   $ 
   ```
 
@@ -143,7 +144,7 @@ Unlike these other FEA tools, FeenoX provides…
   extensibility mechanism works.
 
 - continuous integration (using [Github actions]), an issue tracker
-  (using [Github issues] and a discussion page (using [Github
+  (using [Github issues]) and a discussion page (using [Github
   discussions])
 
 - a mechanism to [expand command-line arguments as literal strings in
