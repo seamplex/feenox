@@ -1,8 +1,9 @@
 Mesh.Algorithm = 6;
-Mesh.Algorithm3D = 10;
-// HXT is multithreaded and the resulting mesh depends on the number of threads,
-// gmsh 4.12 even writes nodes with nan coordinates now and then (as in GitHub's runners),
-// so force a single thread to get a reproducible mesh regardless of the number of cores
+// do not use HXT (Mesh.Algorithm3D = 10): combined with HighOrderOptimize,
+// gmsh 4.12 (the one in GitHub's Ubuntu runners) sometimes writes nodes with nan coordinates
+Mesh.Algorithm3D = 1;
+// the meshing (in particular the optimization) depends on the number of threads,
+// so use only one to get the same mesh regardless of the number of cores
 General.NumThreads = 1;
 Mesh.MeshSizeMax = R/16;
 Mesh.ElementOrder = 2;
