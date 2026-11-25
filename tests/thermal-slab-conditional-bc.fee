@@ -1,0 +1,17 @@
+# Activate a Dirichlet condition on the left during the first static step,
+# then deactivate it and activate a different Dirichlet condition on the right.
+PROBLEM thermal MESH slab-1d-0.1m.msh DIMENSIONS 1
+
+static_steps = 2
+
+k = 1
+q = 0
+L = 0.1
+BC left  (2-step_static)=>T=1
+BC right (step_static-1)=>T=2
+
+SOLVE_PROBLEM
+
+IF done
+  PRINT (abs(T(0)-2)<1e-5)&(abs(T(L)-2)<1e-5)
+ENDIF
