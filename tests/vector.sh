@@ -15,6 +15,9 @@ exitifwrong $?
 answer vector_init.fee "1 2 3 4"
 exitifwrong $?
 
+answer matrix_assignment.fee "11 5 21 22 0 3"
+exitifwrong $?
+
 answerdiff fibo_vector.fee
 exitifwrong $?
 

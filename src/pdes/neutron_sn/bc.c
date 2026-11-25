@@ -24,6 +24,11 @@
 
 int feenox_problem_bc_parse_neutron_sn(bc_data_t *bc_data, const char *lhs, char *rhs) {
 
+///bc_neutron_sn+vacuum+usage vacuum
+///bc_neutron_sn+vacuum+desc Set the angular flux for every inward-pointing discrete ordinate to zero.
+///bc_neutron_sn+vacuum+detail This is the zero-incoming-flux condition. `null` is retained as a diffusion-compatible alias.
+///bc_neutron_sn+null+usage null
+///bc_neutron_sn+null+desc Alias for `vacuum`.
   // TODO: should this be the default BC?
   if (strcmp(lhs, "vacuum") == 0 || strcmp(lhs, "null") == 0) {
     // "null" is supported for compatibility with diffusion
@@ -31,6 +36,11 @@ int feenox_problem_bc_parse_neutron_sn(bc_data_t *bc_data, const char *lhs, char
     bc_data->set_essential = feenox_problem_bc_set_neutron_sn_vacuum;
     bc_data->dof = -1;
 
+///bc_neutron_sn+mirror+usage mirror
+///bc_neutron_sn+mirror+desc Reflect incoming discrete ordinates onto the outgoing direction at a symmetry boundary.
+///bc_neutron_sn+mirror+detail The reflected direction must belong to the selected S_N quadrature. `symmetry` is an alias.
+///bc_neutron_sn+symmetry+usage symmetry
+///bc_neutron_sn+symmetry+desc Alias for `mirror`.
   } else if (strcmp(lhs, "mirror") == 0 || strcmp(lhs, "symmetry") == 0) {
     bc_data->type_math = bc_type_math_dirichlet;
     bc_data->dof = -1;

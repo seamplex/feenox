@@ -43,7 +43,7 @@ for kw in ${kws}; do
   
   echo "::: {.fst-italic .body-blue}"
   echo
-  grep "///${tag}+${kw}+desc" ${src} | cut -d" " -f2-
+  grep -F "///${tag}+${kw}+desc" ${src} | cut -d" " -f2-
   echo ":::"
   echo
   echo  
@@ -223,13 +223,26 @@ EOF
   
   # examples
   # only tracked files, otherwise the links to github are dead
-  examples=$(git ls-files ../tests ../examples | grep '\.fee$' | xargs grep -l -w -- ${kw} | sort | uniq)
+  if [[ "${tag}" == bc_* ]]; then
+    # boundary-condition keys are short (u, t, 0, ...) so look only at BC lines of the same PROBLEM
+    pde=${tag#bc_}
+    kwre=$(printf '%s' "${kw}" | sed 's/[][\.*^$+?(){}|/]/\\&/g')
+    pattern="^[[:space:]]*(BC|BOUNDARY_CONDITION)[[:space:]](.*[[:space:]\"]|.*=>)?${kwre}(=|[[:space:]\"]|$)"
+    examples=$(git ls-files ../tests ../examples | grep '\.fee$' | xargs grep -l -i -E "^[[:space:]]*PROBLEM[[:space:]]+${pde}([[:space:]]|$)" | xargs -r grep -l -E -- "${pattern}" | sort | uniq)
+  else
+    pattern=""
+    examples=$(git ls-files ../tests ../examples | grep '\.fee$' | xargs grep -l -w -- ${kw} | sort | uniq)
+  fi
   if [ -n "${examples}" ]; then
     echo ":::::::: {.only-in-format .html}"
     echo "## Examples of usage {.unnumbered .unlisted}"
     echo 
     for i in ${examples}; do
-      lineno=$(grep -n -w -- ${kw} ${i} | head -n1 | cut -d: -f1)
+      if [ -n "${pattern}" ]; then
+        lineno=$(grep -n -E -- "${pattern}" ${i} | head -n1 | cut -d: -f1)
+      else
+        lineno=$(grep -n -w -- ${kw} ${i} | head -n1 | cut -d: -f1)
+      fi
       echo " * [$(basename ${i}):${lineno}]($(echo ${i} | sed 's_^\.\./_https://github.com/seamplex/feenox/blob/main/_')#L${lineno})"
     done
     echo "::::::::"

@@ -72,6 +72,11 @@ tutorials/detailed.md
 tutorials/physics.md
 ```
 
+# Writing FeenoX input files
+
+```{.include shift-heading-level-by=1}
+input-syntax.md
+```
 
 # Description
 
@@ -259,6 +264,12 @@ Set [`PROBLEM`](#problem) to `modal` to compute the natural frequencies and osci
 i.e. the generalized eigenvalue problem $K \vec{\phi} = \omega^2 M \vec{\phi}$.
 The number of modes is given by `MODES` in [`PROBLEM`](#problem).
 
+### Modal boundary conditions
+
+```{.include shift-heading-level-by=3}
+reference-modal-bc.md
+```
+
 ### Modal variables
 
 ```{.include shift-heading-level-by=3}
@@ -270,6 +281,12 @@ reference-modal-va.md
 
 Set [`PROBLEM`](#problem) to `neutron_diffusion` to solve the multi-group core-level neutron diffusion equation
 with a finite-element formulation.
+
+### Neutron diffusion boundary conditions
+
+```{.include shift-heading-level-by=3}
+reference-neutron_diffusion-bc.md
+```
 
 ### Neutron diffusion results
 

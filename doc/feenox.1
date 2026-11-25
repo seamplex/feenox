@@ -848,13 +848,19 @@ all times.
 .SS PDE\-RELATED KEYWORDS
 .SS \f[CR]BC\f[R]
 .PP
-Define a boundary condition to be applied to faces, edges and/or
-vertices.
+Define a boundary condition on one or more physical groups of a mesh.
 .IP
 .EX
 BC <name> [ MESH <name> ] [ GROUP <name_1>  GROUP <name_2> ... ] [ <bc_data1> <bc_data2> ... ] [ GROUPS <name_1>  <name_2> ... ]  
 .EE
 .PP
+The line has to appear after both \f[CR]MESH\f[R] (or a
+\f[CR]PROBLEM\f[R] with an inline \f[CR]MESH\f[R]) and
+\f[CR]PROBLEM\f[R].
+The top\-level keywords are case\-insensitive, but each
+problem\-specific \f[CR]<bc_data>\f[R] key is case\-sensitive and must
+use exactly the spelling listed in the corresponding PDE
+boundary\-condition reference.
 If the name of the boundary condition matches a physical group in the
 mesh, and neither \f[CR]GROUP\f[R] nor \f[CR]GROUPS\f[R] are given, it
 is automatically linked to that physical group.
@@ -863,12 +869,26 @@ given with \f[CR]MESH\f[R].
 If the boundary condition applies to more than one physical group in the
 mesh, they can be added using as many \f[CR]GROUP\f[R] keywords as
 needed.
-Each \f[CR]<bc_data>\f[R] argument is a single string whose meaning
-depends on the type of problem being solved.
+Each \f[CR]<bc_data>\f[R] argument is a single token (possibly quoted)
+whose meaning depends on the type of problem being solved.
 For instance \f[CR]T=150*sin(x/pi)\f[R] prescribes the temperature to
 depend on space as the provided expression in a thermal problem and
 \f[CR]fixed\f[R] fixes the displacements in all the directions in a
 mechanical or modal problem.
+Several data tokens can be combined on one line (for example
+\f[CR]h=10 Tref=300\f[R]).
+To include whitespace in an expression, quote the whole datum, for
+example \f[CR]BC loaded \(dqtx=load(t + 1)\(dq\f[R].
+Spaces around \f[CR]=\f[R] in a quoted datum are accepted.
+A token can be conditional: \f[CR]<condition>=>key=<expr>\f[R] or
+\f[CR]<condition>=>key\f[R].
+This controls whether the datum is active; use the \f[CR]if()\f[R]
+functional when only its numerical value should change.
+Continue a long instruction with a trailing backslash or place the
+continued part inside braces.
+The condition is an ordinary expression; the expression lexer does not
+support the compound comparison operators \f[CR]<=\f[R] and
+\f[CR]>=\f[R].
 See the particular section on boundary conditions for further details.
 If the keyword \f[CR]GROUPS\f[R] is given, then the rest of the tokens
 are parsed as group names where the boundary condition is applied.
@@ -976,7 +996,7 @@ the mandatory keyword \f[CR]RESULT\f[R].
 If the variable does not exist, it is created.
 .SS \f[CR]MATERIAL\f[R]
 .PP
-Define a material its and properties to be used in volumes.
+Define a material and the problem\-specific properties assigned to it.
 .IP
 .EX
 MATERIAL <name> [ MESH <name> ] [ LABEL <name_1>  [ LABEL <name_2> [ ... ] ] ] 
@@ -1146,6 +1166,9 @@ The mesh can be given directly with the \f[CR]MESH\f[R] keyword in the
 explicit \f[CR]READ_MESH\f[R] instruction.
 If non\-trivial arguments are needed (e.g.\ \f[CR]SCALE\f[R] or fields),
 use a separate \f[CR]READ_MESH\f[R] instruction instead.
+PDE features require a FeenoX build with PETSc.
+Eigenvalue problems additionally require SLEPc and particular solver
+types depend on the libraries available to the build.
 The number of spatial dimensions of the problem needs to be given either
 as \f[CR]1d\f[R], \f[CR]2d\f[R], \f[CR]3d\f[R] or after the keyword
 \f[CR]DIM\f[R].

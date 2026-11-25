@@ -33,6 +33,9 @@ exitifwrong $?
 answerzero thermal-slab-transient.fee 1e-4
 exitifwrong $?
 
+answer thermal-slab-conditional-bc.fee "1"
+exitifwrong $?
+
 answerzero thermal-slab-uniform-source.fee
 exitifwrong $?
 

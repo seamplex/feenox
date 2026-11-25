@@ -24,7 +24,13 @@
 
 int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, char *rhs) {
 
-  // TODO: document BCs with triple comments
+///bc_modal+fixed+usage fixed
+///bc_modal+fixed+desc Fix every modal displacement component to zero.
+///bc_modal+u+usage u=0
+///bc_modal+u+desc Constrain the $x$ modal displacement to zero.
+///bc_modal+u+detail `u_x` is an alias. Modal boundary conditions are homogeneous: only zero is accepted on the right-hand side.
+///bc_modal+u_x+usage u_x=0
+///bc_modal+u_x+desc Alias for `u`.
   if (strcmp(lhs, "fixed") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
@@ -39,6 +45,11 @@ int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, char *rhs
     bc_data->dof = 0;
     modal.has_dirichlet_bcs = 1;
     
+///bc_modal+v+usage v=0
+///bc_modal+v+desc Constrain the $y$ modal displacement to zero.
+///bc_modal+v+detail `u_y` is an alias. This component is available only in two- or three-dimensional problems.
+///bc_modal+u_y+usage u_y=0
+///bc_modal+u_y+desc Alias for `v`.
   } else if (strcmp(lhs, "v") == 0 || strcmp(lhs, "u_y") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
@@ -50,6 +61,11 @@ int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, char *rhs
       return FEENOX_ERROR;
     }
 
+///bc_modal+w+usage w=0
+///bc_modal+w+desc Constrain the $z$ modal displacement to zero.
+///bc_modal+w+detail `u_z` is an alias. This component is available only in three-dimensional problems.
+///bc_modal+u_z+usage u_z=0
+///bc_modal+u_z+desc Alias for `w`.
   } else if (strcmp(lhs, "w") == 0 || strcmp(lhs, "u_z") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
@@ -61,17 +77,28 @@ int feenox_problem_bc_parse_modal(bc_data_t *bc_data, const char *lhs, char *rhs
       return FEENOX_ERROR;
     }
     
+///bc_modal+symmetry+usage symmetry
+///bc_modal+symmetry+desc Constrain modal displacement normal to the selected boundary to zero.
+///bc_modal+symmetry+detail Tangential motion remains free. `tangential` is an alias.
+///bc_modal+tangential+usage tangential
+///bc_modal+tangential+desc Alias for `symmetry`.
   } else if (strcmp(lhs, "symmetry") == 0 || strcmp(lhs, "tangential") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_TANGENTIAL_SYMMETRY;
     bc_data->type_math = bc_type_math_multifreedom;
     bc_data->set_essential = feenox_problem_bc_set_modal_symmetry;
     
+///bc_modal+radial+usage radial
+///bc_modal+radial+desc Allow only modal displacement radial to the selected physical group's center of gravity.
+///bc_modal+radial+detail Tangential modal motion is constrained.
   } else if (strcmp(lhs, "radial") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_RADIAL_SYMMETRY;
     bc_data->type_math = bc_type_math_multifreedom;
     bc_data->set_essential = feenox_problem_bc_set_modal_radial;
     // TODO: x0, y0 and z0
     
+///bc_modal+0+usage 0=<expr(u,v,w,x,y,z)>
+///bc_modal+0+desc Impose a homogeneous linear multi-freedom modal constraint $g(u,v,w,x,y,z)=0$.
+///bc_modal+0+detail FeenoX linearizes the supplied expression with respect to the displacement components. The modal constraint itself must be homogeneous.
   } else if (strcmp(lhs, "0") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_MULTIDOF_EXPRESSION;
     bc_data->type_math = bc_type_math_multifreedom;

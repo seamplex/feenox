@@ -27,19 +27,31 @@
 // note that h=a and Tref=b are handled by two bc_datas but linked together through next
 int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, char *rhs) {
 
-  // TODO: document BCs with triple comments
+///bc_thermal+T+usage T=<expr>
+///bc_thermal+T+desc Prescribe temperature (a Dirichlet boundary condition).
+///bc_thermal+T+detail The spelling is case-sensitive: use uppercase `T`. The expression has the same temperature units as the problem and can depend on space or time, but not on `T`.
   if (strcmp(lhs, "T") == 0) {
     // temperature
     bc_data->type_phys = BC_TYPE_THERMAL_TEMPERATURE;
     bc_data->type_math = bc_type_math_dirichlet;
     bc_data->set_essential = feenox_problem_bc_set_thermal_temperature;
 
+///bc_thermal+q+usage q=<expr>
+///bc_thermal+q+desc Prescribe the boundary heat flux per unit area (a Neumann boundary condition).
+///bc_thermal+q+detail Positive `q` is heat entering the domain, according to the convention used in the weak form. `q''` is an exact alias for `q`; use `adiabatic` or `q=0` for an insulated boundary.
+///bc_thermal+q''+usage q''=<expr>
+///bc_thermal+q''+desc Alias for `q`.
+///bc_thermal+adiabatic+usage adiabatic
+///bc_thermal+adiabatic+desc Prescribe zero outward heat flux.
   } else if (strcmp(lhs, "q''") == 0 || strcmp(lhs, "q") == 0 || strcmp(lhs, "adiabatic") == 0) {
     // heat flux
     bc_data->type_phys = BC_TYPE_THERMAL_HEATFLUX;
     bc_data->type_math = bc_type_math_neumann;
     bc_data->set_natural = feenox_problem_bc_set_thermal_heatflux;
 
+///bc_thermal+h+usage h=<expr> Tref=<expr>
+///bc_thermal+h+desc Set the convection coefficient for a Robin boundary condition.
+///bc_thermal+h+detail `h` and a reference-temperature key must occur in the same `BC` instruction. The imposed flux is $h(T_\mathrm{ref}-T)$, with `h` in consistent heat-transfer units.
   } else if (strcmp(lhs, "h") == 0) {
     // heat flux
     bc_data->type_phys = BC_TYPE_THERMAL_CONVECTION_COEFFICIENT;
@@ -47,6 +59,15 @@ int feenox_problem_bc_parse_thermal(bc_data_t *bc_data, const char *lhs, char *r
     bc_data->set_natural = feenox_problem_bc_set_thermal_convection;
     bc_data->fills_matrix = 1;
 
+///bc_thermal+Tref+usage Tref=<expr>
+///bc_thermal+Tref+desc Set the reference temperature paired with `h`.
+///bc_thermal+Tref+detail `T_ref`, `Tinf`, and `T_inf` are exact aliases. Put `Tref` (or one of its aliases) on the same `BC` line as `h`.
+///bc_thermal+T_ref+usage T_ref=<expr>
+///bc_thermal+T_ref+desc Alias for `Tref`.
+///bc_thermal+Tinf+usage Tinf=<expr>
+///bc_thermal+Tinf+desc Alias for `Tref`.
+///bc_thermal+T_inf+usage T_inf=<expr>
+///bc_thermal+T_inf+desc Alias for `Tref`.
   } else if (strcmp(lhs, "Tref") == 0 || strcmp(lhs, "T_ref") == 0 ||
              strcmp(lhs, "Tinf") == 0 || strcmp(lhs, "T_inf") == 0) {
     // heat flux

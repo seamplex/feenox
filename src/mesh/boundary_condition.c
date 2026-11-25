@@ -105,15 +105,18 @@ bc_data_t *feenox_add_bc_data_get_ptr(bc_t *bc, const char *string) {
   feenox_check_alloc_null(bc_data = calloc(1, sizeof(bc_data_t)));
   feenox_check_alloc_null(bc_data->string = strdup(string));
   
+  // parse a copy so bc_data->string keeps the original text for error messages
+  char *buffer = NULL;
+  feenox_check_alloc_null(buffer = strdup(string));
   
   // see if there is a "=>" that implies that the BC has a condition
   char *lhs = NULL;
-  if ((lhs = strstr(bc_data->string, "=>")) != NULL) {
+  if ((lhs = strstr(buffer, "=>")) != NULL) {
     *lhs = '\0';
     lhs += 2;
-    feenox_call_null(feenox_expression_parse(&bc_data->condition, bc_data->string));
+    feenox_call_null(feenox_expression_parse(&bc_data->condition, buffer));
   } else {
-    lhs = bc_data->string;
+    lhs = buffer;
   }
       
   // if there is an equal sign there is an expression, otherwise not
@@ -123,15 +126,12 @@ bc_data_t *feenox_add_bc_data_get_ptr(bc_t *bc, const char *string) {
     *equal_sign = '\0';
     rhs = equal_sign+1;
   }
+  feenox_call_null(feenox_strip_blanks(lhs));
   
   // we now call the problem-specific function that understands
   // what the string means and fill in the other bc_data fields
   feenox_call_null(feenox.pde.parse_bc(bc_data, lhs, rhs));
-  
-  // restore the equal sign so we can keep the original string just in case
-  if (equal_sign != NULL) {
-    *equal_sign = '=';
-  }
+  feenox_free(buffer);
   
   // bc_datums is a doubly-linked list because the data can be related to
   // each other, like h and Tref in a convection BC

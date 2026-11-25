@@ -45,6 +45,7 @@ As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.h
     
 ## Other documents
  
+ * [Writing FeenoX input files](https://www.seamplex.com/feenox/doc/feenox-manual.html#writing-feenox-input-files), including explicit rules for generated `.fee` files
  * [Unix manpage](https://www.seamplex.com/feenox/doc/feenox.1.html) (accessible with `man feenox` after (global) installation with `sudo make install`)
  * [Frequently Asked Questions](./FAQ.md) [PDF](https://www.seamplex.com/feenox/doc/FAQ.pdf)
  * [Compilation Guide](./compilation.md) [PDF](https://www.seamplex.com/feenox/doc/compilation.pdf)
@@ -72,7 +73,7 @@ As per the [GNU Coding Standards](https://www.gnu.org/prep/standards/standards.h
 
 The Markdown sources are in the [`doc`](https://github.com/seamplex/feenox/tree/main/doc):
 
- * [`feenox-manual`](https://github.com/seamplex/feenox/blob/main/doc/feenox-desc.md)
+ * [`feenox-manual`](https://github.com/seamplex/feenox/blob/main/doc/feenox-manual.md)
  * [`feenox-desc`](https://github.com/seamplex/feenox/blob/main/doc/feenox-desc.md)
  * [`srs`](https://github.com/seamplex/feenox/blob/main/doc/srs.md)
  * [`sds`](https://github.com/seamplex/feenox/blob/main/doc/sds.md)

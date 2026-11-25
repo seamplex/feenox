@@ -23,7 +23,13 @@
 #include "mechanical.h"
 
 int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char *rhs) {
-  // TODO: document BCs with triple comments
+///bc_mechanical+fixed+usage fixed
+///bc_mechanical+fixed+desc Fix every displacement component to zero.
+///bc_mechanical+u+usage u=<expr>
+///bc_mechanical+u+desc Prescribe the $x$ displacement (Dirichlet).
+///bc_mechanical+u+detail `u_x` is an alias. Use `u=0` to constrain the component to zero.
+///bc_mechanical+u_x+usage u_x=<expr>
+///bc_mechanical+u_x+desc Alias for `u`.
   if (strcmp(lhs, "fixed") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
@@ -36,6 +42,11 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char
     bc_data->set_essential = feenox_problem_bc_set_mechanical_displacement;
     bc_data->dof = 0;
     
+///bc_mechanical+v+usage v=<expr>
+///bc_mechanical+v+desc Prescribe the $y$ displacement (Dirichlet).
+///bc_mechanical+v+detail `u_y` is an alias. This component is available only in two- or three-dimensional problems.
+///bc_mechanical+u_y+usage u_y=<expr>
+///bc_mechanical+u_y+desc Alias for `v`.
   } else if ((strcmp(lhs, "v") == 0 || strcmp(lhs, "u_y") == 0) && strcmp(rhs, "") != 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
@@ -46,6 +57,11 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char
       return FEENOX_ERROR;
     }
 
+///bc_mechanical+w+usage w=<expr>
+///bc_mechanical+w+desc Prescribe the $z$ displacement (Dirichlet).
+///bc_mechanical+w+detail `u_z` is an alias. This component is available only in three-dimensional problems.
+///bc_mechanical+u_z+usage u_z=<expr>
+///bc_mechanical+u_z+desc Alias for `w`.
   } else if ((strcmp(lhs, "w") == 0 || strcmp(lhs, "u_z") == 0) && strcmp(rhs, "") != 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_DISPLACEMENT;
     bc_data->type_math = bc_type_math_dirichlet;
@@ -56,16 +72,34 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char
       return FEENOX_ERROR;
     }
 
+///bc_mechanical+p+usage p=<expr>
+///bc_mechanical+p+desc Apply a normal compressive pressure to a surface.
+///bc_mechanical+p+detail Positive values act opposite to the outward normal. `compression` and `pressure` are aliases. Pressure is applied as force per unit area in consistent units.
+///bc_mechanical+compression+usage compression=<expr>
+///bc_mechanical+compression+desc Alias for `p`.
+///bc_mechanical+pressure+usage pressure=<expr>
+///bc_mechanical+pressure+desc Alias for `p`.
   } else if (strcmp(lhs, "p") == 0 || strcmp(lhs, "compression") == 0 || strcmp(lhs, "pressure") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_PRESSURE_COMPRESSION;
     bc_data->type_math = bc_type_math_neumann;
     bc_data->set_natural = feenox_problem_bc_set_mechanical_compression;
 
+///bc_mechanical+t+usage t=<expr>
+///bc_mechanical+t+desc Apply a normal tensile traction to a surface.
+///bc_mechanical+t+detail Positive values act in the outward-normal direction. `tension` is an alias.
+///bc_mechanical+tension+usage tension=<expr>
+///bc_mechanical+tension+desc Alias for `t`.
   } else if (strcmp(lhs, "t") == 0 || strcmp(lhs, "tension") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_PRESSURE_TENSION;
     bc_data->type_math = bc_type_math_neumann;
     bc_data->set_natural = feenox_problem_bc_set_mechanical_tension;
 
+///bc_mechanical+tx+usage tx=<expr>
+///bc_mechanical+tx+desc Prescribe a global $x$ traction component on a surface, in force per unit area.
+///bc_mechanical+ty+usage ty=<expr>
+///bc_mechanical+ty+desc Prescribe a global $y$ traction component on a surface, in force per unit area.
+///bc_mechanical+tz+usage tz=<expr>
+///bc_mechanical+tz+desc Prescribe a global $z$ traction component on a surface, in force per unit area.
   } else if (strcmp(lhs, "tx") == 0 || strcmp(lhs, "ty") == 0 || strcmp(lhs, "tz") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_TRACTION;
     bc_data->type_math = bc_type_math_neumann;
@@ -78,6 +112,13 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char
       bc_data->dof = 2;
     }
 
+///bc_mechanical+Fx+usage Fx=<expr>
+///bc_mechanical+Fx+desc Apply a resultant force in the global $x$ direction.
+///bc_mechanical+Fx+detail The resultant is distributed over the selected physical group by its measure. `Fy` and `Fz` apply the other Cartesian components.
+///bc_mechanical+Fy+usage Fy=<expr>
+///bc_mechanical+Fy+desc Apply a resultant force in the global $y$ direction.
+///bc_mechanical+Fz+usage Fz=<expr>
+///bc_mechanical+Fz+desc Apply a resultant force in the global $z$ direction.
   } else if (strcmp(lhs, "Fx") == 0 || strcmp(lhs, "Fy") == 0 || strcmp(lhs, "Fz") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_FORCE;
     bc_data->type_math = bc_type_math_neumann;
@@ -90,17 +131,28 @@ int feenox_problem_bc_parse_mechanical(bc_data_t *bc_data, const char *lhs, char
       bc_data->dof = 2;
     }
 
+///bc_mechanical+symmetry+usage symmetry
+///bc_mechanical+symmetry+desc Constrain displacement normal to the selected boundary to zero.
+///bc_mechanical+symmetry+detail The outward-normal displacement is removed while tangential motion remains free. `tangential` is an alias. For curved or non-axis-aligned boundaries this is a multi-freedom constraint.
+///bc_mechanical+tangential+usage tangential
+///bc_mechanical+tangential+desc Alias for `symmetry`: allow only displacement tangent to the boundary.
   } else if (strcmp(lhs, "symmetry") == 0 || strcmp(lhs, "tangential") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_TANGENTIAL_SYMMETRY;
     bc_data->type_math = bc_type_math_multifreedom;
     bc_data->set_essential = feenox_problem_bc_set_mechanical_symmetry;
     
+///bc_mechanical+radial+usage radial
+///bc_mechanical+radial+desc Allow only displacement radial to the selected physical group's center of gravity.
+///bc_mechanical+radial+detail Tangential displacement is constrained. Combine with `symmetry`/`tangential` only when both radial and tangential constraints are intended.
   } else if (strcmp(lhs, "radial") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_RADIAL_SYMMETRY;
     bc_data->type_math = bc_type_math_multifreedom;
     bc_data->set_essential = feenox_problem_bc_set_mechanical_radial;
     // TODO: x0, y0 and z0
     
+///bc_mechanical+0+usage 0=<expr(u,v,w,x,y,z)>
+///bc_mechanical+0+desc Impose a homogeneous linear multi-freedom displacement constraint $g(u,v,w,x,y,z)=0$.
+///bc_mechanical+0+detail FeenoX linearizes the supplied expression with respect to the displacement components. Non-homogeneous right-hand sides are not supported by this form.
   } else if (strcmp(lhs, "0") == 0) {
     bc_data->type_phys = BC_TYPE_MECHANICAL_MULTIDOF_EXPRESSION;
     bc_data->type_math = bc_type_math_multifreedom;

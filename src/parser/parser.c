@@ -326,15 +326,18 @@ int feenox_parse_line(void) {
       feenox_call(feenox_parse_physical_group());
       return FEENOX_OK;
 
-///kw_pde+MATERIAL+desc Define a material its and properties to be used in volumes.
+///kw_pde+MATERIAL+desc Define a material and the problem-specific properties assigned to it.
 ///kw_pde+MATERIAL+usage MATERIAL
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "MATERIAL") == 0) {
       feenox_call(feenox_parse_material());
       return FEENOX_OK;
 
-///kw_pde+BC+desc Define a boundary condition to be applied to faces, edges and/or vertices.
+///kw_pde+BC+desc Define a boundary condition on one or more physical groups of a mesh.
 ///kw_pde+BC+usage BC
+///kw_pde+BC+detail The line has to appear after both `MESH` (or a `PROBLEM` with an inline `MESH`) and `PROBLEM`.
+///kw_pde+BC+detail The top-level keywords are case-insensitive, but each problem-specific `<bc_data>` key is case-sensitive and
+///kw_pde+BC+detail must use exactly the spelling listed in the corresponding PDE boundary-condition reference.
       // -----  -----------------------------------------------------------
     } else if (strcasecmp(token, "BC") == 0 || strcasecmp(token, "BOUNDARY_CONDITION") == 0) {
       feenox_call(feenox_parse_bc());
@@ -2983,11 +2986,20 @@ int feenox_parse_bc(void) {
       
     } else {
 ///kw_pde+BC+usage [ <bc_data1> <bc_data2> ... ]
-///kw_pde+BC+detail Each `<bc_data>` argument is a single string whose meaning depends on the type
+///kw_pde+BC+detail Each `<bc_data>` argument is a single token (possibly quoted) whose meaning depends on the type
 ///kw_pde+BC+detail of problem being solved. For instance `T=150*sin(x/pi)` prescribes the
 ///kw_pde+BC+detail temperature to depend on space as the provided expression in a
 ///kw_pde+BC+detail thermal problem and `fixed` fixes the displacements in all the directions
-///kw_pde+BC+detail in a mechanical or modal problem. 
+///kw_pde+BC+detail in a mechanical or modal problem. Several data tokens can be combined on one line
+///kw_pde+BC+detail (for example `h=10 Tref=300`). To include whitespace in an expression, quote the
+///kw_pde+BC+detail whole datum, for example `BC loaded "tx=load(t + 1)"`. Spaces around `=` in a quoted
+///kw_pde+BC+detail datum are accepted.
+///kw_pde+BC+detail A token can be conditional: `<condition>=>key=<expr>` or `<condition>=>key`.
+///kw_pde+BC+detail This controls whether the datum is active; use the `if()` functional when only its
+///kw_pde+BC+detail numerical value should change. Continue a long instruction with a trailing backslash
+///kw_pde+BC+detail or place the continued part inside braces.
+///kw_pde+BC+detail The condition is an ordinary expression; the expression lexer does not support the
+///kw_pde+BC+detail compound comparison operators `<=` and `>=`.
 ///kw_pde+BC+detail See the particular section on boundary conditions for further details.
       
       if (feenox_add_bc_data_get_ptr(bc, token) == NULL) {
@@ -3130,6 +3142,8 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+detail or can be given later (or before) with an explicit `READ_MESH` instruction.
 ///kw_pde+PROBLEM+detail If non-trivial arguments are needed (e.g. `SCALE` or fields), use a separate
 ///kw_pde+PROBLEM+detail `READ_MESH` instruction instead.
+///kw_pde+PROBLEM+detail PDE features require a FeenoX build with PETSc. Eigenvalue problems additionally
+///kw_pde+PROBLEM+detail require SLEPc and particular solver types depend on the libraries available to the build.
     if (strcasecmp(token, "MESH") == 0) {
       feenox_check_alloc(mesh = calloc(1, sizeof(mesh_t)));
       feenox_call(feenox_parser_file(&mesh->file));

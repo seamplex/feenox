@@ -25,15 +25,17 @@
 int feenox_problem_bc_parse_laplace(bc_data_t *bc_data, const char *lhs, char *rhs) {
 
 ///bc_laplace+phi+usage phi=<expr>
-///bc_laplace+phi+description Dirichlet essential boundary condition in which the value of\ $\phi$ is prescribed.   
+///bc_laplace+phi+desc Dirichlet essential boundary condition in which the value of\ $\phi$ is prescribed.
+///bc_laplace+phi+detail The expression can depend on space and time, but not on the unknown $\phi$.
   if (strcmp(lhs, "phi") == 0) {
     bc_data->type_math = bc_type_math_dirichlet;
     bc_data->set_essential = feenox_problem_bc_set_laplace_phi;
 
 ///bc_laplace+phi'+usage phi'=<expr>
-///bc_laplace+phi'+description Neumann natural boundary condition in which the value of the normal outward derivative\ $\frac{\partial \phi}{\partial n}$ is prescribed.     
+///bc_laplace+phi'+desc Prescribe the outward normal derivative\ $\frac{\partial \phi}{\partial n}$.
 ///bc_laplace+dphidn+usage dphidn=<expr>
-///bc_laplace+dphidn+description Alias for `phi'`.     
+///bc_laplace+dphidn+desc Alias for `phi'`.
+///bc_laplace+dphidn+detail Positive values prescribe a derivative in the outward normal direction.
   } else if (strcmp(lhs, "phi'") == 0 || strcmp(lhs, "dphidn") == 0) {
     bc_data->type_math = bc_type_math_neumann;
     bc_data->set_natural = feenox_problem_bc_set_laplace_derivative;

@@ -25,6 +25,12 @@
 
 int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lhs, char *rhs) {
 
+///bc_neutron_diffusion+null+usage null
+///bc_neutron_diffusion+null+desc Set the scalar flux to zero in every energy group.
+///bc_neutron_diffusion+symmetry+usage symmetry
+///bc_neutron_diffusion+symmetry+desc Set the outgoing normal neutron current to zero in every energy group.
+///bc_neutron_diffusion+mirror+usage mirror
+///bc_neutron_diffusion+mirror+desc Alias for `symmetry`.
   if (strcmp(lhs, "null") == 0) {
     bc_data->type_math = bc_type_math_dirichlet;
     bc_data->dof = -1;
@@ -34,6 +40,9 @@ int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lh
     bc_data->type_math = bc_type_math_neumann;
     bc_data->dof = -1;
 
+///bc_neutron_diffusion+vacuum+usage vacuum [ | vacuum=<expr> ]
+///bc_neutron_diffusion+vacuum+desc Apply a vacuum (Marshak) Robin boundary condition in every energy group.
+///bc_neutron_diffusion+vacuum+detail The dimensionless coefficient is 0.5 when omitted. Supplying an expression replaces that coefficient, for example `vacuum=0.4692`.
   } else if (strcmp(lhs, "vacuum") == 0) {
     bc_data->type_math = bc_type_math_robin;
     
@@ -41,6 +50,9 @@ int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lh
     bc_data->fills_matrix = 1;
     bc_data->dof = -1;
 
+///bc_neutron_diffusion+phi<group>+usage phi<group>=<expr>
+///bc_neutron_diffusion+phi<group>+desc Prescribe the scalar flux for one energy group (Dirichlet).
+///bc_neutron_diffusion+phi<group>+detail Groups are numbered from 1 through the number of groups; for example `phi1=1` fixes group 1 and leaves the other groups unconstrained.
   } else if (strncmp(lhs, "phi", 3) == 0) {
     bc_data->type_math = bc_type_math_dirichlet;
     int dof = 0;
@@ -55,6 +67,9 @@ int feenox_problem_bc_parse_neutron_diffusion(bc_data_t *bc_data, const char *lh
     bc_data->dof = dof-1;
     bc_data->set_essential = feenox_problem_bc_set_neutron_diffusion_flux;
 
+///bc_neutron_diffusion+J<group>+usage J<group>=<expr>
+///bc_neutron_diffusion+J<group>+desc Prescribe the incoming normal neutron current for one energy group (Neumann).
+///bc_neutron_diffusion+J<group>+detail Groups are numbered from 1 through the number of groups; for example `J2=0` sets the current for group 2.
   } else if (strncmp(lhs, "J", 1) == 0) {
     bc_data->type_math = bc_type_math_neumann;
     int dof = 0;

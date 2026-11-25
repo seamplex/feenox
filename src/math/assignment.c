@@ -276,7 +276,20 @@ int feenox_instruction_assignment_vector(void *arg) {
 }
 
 int feenox_instruction_assignment_matrix(void *arg) {
-//  assignment_t *assignment = (assignment_t *)arg;
+  assignment_t *assignment = (assignment_t *)arg;
+
+  int i_min, i_max, j_min, j_max;
+  feenox_call(feenox_get_assignment_array_boundaries(assignment, &i_min, &i_max, &j_min, &j_max));
+
+  size_t row = 0;
+  size_t col = 0;
+  for (int i = i_min; i < i_max; i++) {
+    for (int j = j_min; j < j_max; j++) {
+      feenox_call(feenox_get_assignment_rowcol(assignment, i, j, &row, &col));
+      feenox_call(feenox_assign_single(assignment, row, col));
+    }
+  }
+
   return FEENOX_OK;  
 }
 

@@ -70,6 +70,11 @@ tutorials/detailed.md
 tutorials/physics.md
 ```
 
+# Writing FeenoX input files
+
+```{.include shift-heading-level-by=1}
+input-syntax.md
+```
 
 # Description
 

@@ -28,50 +28,50 @@ int feenox_problem_bc_parse_thermal_hydraulics(bc_data_t *bc_data, const char *l
   // a single BC can have several data, i.e. BC inlet rho=753.632 v=4.43
   
 ///bc_thermal_hydraulics+p+usage p=<expr>
-///bc_thermal_hydraulics+p+description Fixed pressure (in Pa) at the node, usually an outlet.
-///bc_thermal_hydraulics+p+description If fluid enters through this node, it does so with the temperature given by `T`
-///bc_thermal_hydraulics+p+description (or the node's temperature if `T` is not given).
-///bc_thermal_hydraulics+p+description Steady-state problems need at least one `p` or `p0` boundary condition. It cannot be combined with `v` or `mdot` at the same node.
+///bc_thermal_hydraulics+p+desc Fixed pressure (in Pa) at the node, usually an outlet.
+///bc_thermal_hydraulics+p+detail If fluid enters through this node, it does so with the temperature given by `T`
+///bc_thermal_hydraulics+p+detail (or the node's temperature if `T` is not given).
+///bc_thermal_hydraulics+p+detail Steady-state problems need at least one `p` or `p0` boundary condition. It cannot be combined with `v` or `mdot` at the same node.
   if (strcmp(lhs, "p") == 0) {
     bc_data->type_phys = BC_TYPE_TH_PRESSURE;
 
 ///bc_thermal_hydraulics+p0+usage p0=<expr>
-///bc_thermal_hydraulics+p0+description Reservoir stagnation pressure (in Pa), required together with `T0` at a pipe endpoint.
-///bc_thermal_hydraulics+p0+description Uses the low-Mach relation $p + \rho v^2/2 = p_0$, with the local pipe density and velocity.
-///bc_thermal_hydraulics+p0+description Cannot be combined with `p`, `T`, `rho`, `v`, or `mdot` at the same node.
+///bc_thermal_hydraulics+p0+desc Reservoir stagnation pressure (in Pa), required together with `T0` at a pipe endpoint.
+///bc_thermal_hydraulics+p0+detail Uses the low-Mach relation $p + \rho v^2/2 = p_0$, with the local pipe density and velocity.
+///bc_thermal_hydraulics+p0+detail Cannot be combined with `p`, `T`, `rho`, `v`, or `mdot` at the same node.
   } else if (strcmp(lhs, "p0") == 0) {
     bc_data->type_phys = BC_TYPE_TH_STAGNATION_PRESSURE;
 
 ///bc_thermal_hydraulics+T0+usage T0=<expr>
-///bc_thermal_hydraulics+T0+description Reservoir stagnation temperature (in K), required together with `p0` at a pipe endpoint.
-///bc_thermal_hydraulics+T0+description Incoming fluid has static enthalpy $h(p_0,T_0)-v^2/2$, using the local pipe density to compute velocity.
-///bc_thermal_hydraulics+T0+description The boundary stream density is evaluated at the reservoir state $\rho(p_0,T_0)$.
-///bc_thermal_hydraulics+T0+description No reservoir enthalpy is imposed when the flow leaves the domain.
+///bc_thermal_hydraulics+T0+desc Reservoir stagnation temperature (in K), required together with `p0` at a pipe endpoint.
+///bc_thermal_hydraulics+T0+detail Incoming fluid has static enthalpy $h(p_0,T_0)-v^2/2$, using the local pipe density to compute velocity.
+///bc_thermal_hydraulics+T0+detail The boundary stream density is evaluated at the reservoir state $\rho(p_0,T_0)$.
+///bc_thermal_hydraulics+T0+detail No reservoir enthalpy is imposed when the flow leaves the domain.
   } else if (strcmp(lhs, "T0") == 0) {
     bc_data->type_phys = BC_TYPE_TH_STAGNATION_TEMPERATURE;
     
 ///bc_thermal_hydraulics+T+usage T=<expr>
-///bc_thermal_hydraulics+T+description Temperature (in K) of the fluid that enters the domain through the node.
-///bc_thermal_hydraulics+T+description At least one `T`, `rho` or `T0` is needed, unless the problem is a transient with an initial condition `T_0`. It cannot be combined with `rho` at the same node.
+///bc_thermal_hydraulics+T+desc Temperature (in K) of the fluid that enters the domain through the node.
+///bc_thermal_hydraulics+T+detail At least one `T`, `rho` or `T0` is needed, unless the problem is a transient with an initial condition `T_0`. It cannot be combined with `rho` or `p0` at the same node, and is normally paired with `v`, `mdot`, or `p`.
   } else if (strcmp(lhs, "T") == 0) {
     bc_data->type_phys = BC_TYPE_TH_TEMPERATURE;
     
 ///bc_thermal_hydraulics+rho+usage rho=<expr>
-///bc_thermal_hydraulics+rho+description Density (in kg/m^3) of the fluid that enters the domain through the node.
-///bc_thermal_hydraulics+rho+description The temperature is computed from the density and the node's pressure.
+///bc_thermal_hydraulics+rho+desc Density (in kg/m^3) of the fluid that enters the domain through the node.
+///bc_thermal_hydraulics+rho+detail The temperature is computed from the density and the node's pressure. It cannot be combined with `T`, `T0`, or `p0` at the same node.
   } else if (strcmp(lhs, "rho") == 0) {
     bc_data->type_phys = BC_TYPE_TH_DENSITY;
 
 ///bc_thermal_hydraulics+v+usage v=<expr>
-///bc_thermal_hydraulics+v+description Velocity (in m/s) of the fluid entering the domain through the node.
-///bc_thermal_hydraulics+v+description The mass flow is $\dot{m} = \rho \cdot v \cdot A$, where $A$ is the area of the adjacent pipe.
-///bc_thermal_hydraulics+v+description Negative values mean the fluid leaves the domain. It cannot be combined with `mdot` or `p` at the same node.
+///bc_thermal_hydraulics+v+desc Velocity (in m/s) of the fluid entering the domain through the node.
+///bc_thermal_hydraulics+v+detail The mass flow is $\dot{m} = \rho \cdot v \cdot A$, where $A$ is the area of the adjacent pipe.
+///bc_thermal_hydraulics+v+detail Negative values mean the fluid leaves the domain. It cannot be combined with `mdot`, `p`, or `p0` at the same node.
   } else if (strcmp(lhs, "v") == 0) {
     bc_data->type_phys = BC_TYPE_TH_VELOCITY;
 
 ///bc_thermal_hydraulics+mdot+usage mdot=<expr>
-///bc_thermal_hydraulics+mdot+description Mass flow (in kg/s) entering the domain through the node.
-///bc_thermal_hydraulics+mdot+description Negative values mean the fluid leaves the domain. It cannot be combined with `v` or `p` at the same node.
+///bc_thermal_hydraulics+mdot+desc Mass flow (in kg/s) entering the domain through the node.
+///bc_thermal_hydraulics+mdot+detail Negative values mean the fluid leaves the domain. It cannot be combined with `v`, `p`, or `p0` at the same node.
   } else if (strcmp(lhs, "mdot") == 0) {
     bc_data->type_phys = BC_TYPE_TH_MASS_FLOW;
     

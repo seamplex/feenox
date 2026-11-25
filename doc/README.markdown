@@ -95,6 +95,8 @@ reference.
 
 ## Other documents
 
+- [Writing FeenoX input files], including explicit rules for generated
+  `.fee` files
 - [Unix manpage] (accessible with `man feenox` after (global)
   installation with `sudo make install`)
 - [Frequently Asked Questions][] [PDF]
@@ -102,6 +104,7 @@ reference.
 - [Programming Guide][] [PDF][7]
 - [History][] [PDF][8]
 
+  [Writing FeenoX input files]: https://www.seamplex.com/feenox/doc/feenox-manual.html#writing-feenox-input-files
   [Unix manpage]: https://www.seamplex.com/feenox/doc/feenox.1.html
   [Frequently Asked Questions]: FAQ.markdown
   [PDF]: https://www.seamplex.com/feenox/doc/FAQ.pdf
@@ -148,7 +151,7 @@ reference.
 The Markdown sources are in the [`doc`][]:
 
 - [`feenox-manual`]
-- [`feenox-desc`][`feenox-manual`]
+- [`feenox-desc`]
 - [`srs`]
 - [`sds`]
 - [`FAQ`]
@@ -160,14 +163,15 @@ The Markdown sources are in the [`doc`][]:
 They are compiled by running the [`make.sh`] script.
 
   [`doc`]: https://github.com/seamplex/feenox/tree/main/doc
-  [`feenox-manual`]: https/github.com/seamplex/feenox/blob/main/doc/feenox-desc.markdown
-  [`srs`]: https/github.com/seamplex/feenox/blob/main/doc/srs.markdown
-  [`sds`]: https/github.com/seamplex/feenox/blob/main/doc/sds.markdown
-  [`FAQ`]: https/github.com/seamplex/feenox/blob/main/doc/FAQ.markdown
-  [`feenox.1`]: https/github.com/seamplex/feenox/blob/main/doc/feenox.1.markdown
-  [`history`]: https/github.com/seamplex/feenox/blob/main/doc/history.markdown
-  [`compilation`]: https/github.com/seamplex/feenox/blob/main/doc/compilation.markdown
-  [`programming`]: https/github.com/seamplex/feenox/blob/main/doc/programming.markdown
+  [`feenox-manual`]: https://github.com/seamplex/feenox/blob/main/doc/feenox-manual.markdown
+  [`feenox-desc`]: https://github.com/seamplex/feenox/blob/main/doc/feenox-desc.markdown
+  [`srs`]: https://github.com/seamplex/feenox/blob/main/doc/srs.markdown
+  [`sds`]: https://github.com/seamplex/feenox/blob/main/doc/sds.markdown
+  [`FAQ`]: https://github.com/seamplex/feenox/blob/main/doc/FAQ.markdown
+  [`feenox.1`]: https://github.com/seamplex/feenox/blob/main/doc/feenox.1.markdown
+  [`history`]: https://github.com/seamplex/feenox/blob/main/doc/history.markdown
+  [`compilation`]: https://github.com/seamplex/feenox/blob/main/doc/compilation.markdown
+  [`programming`]: https://github.com/seamplex/feenox/blob/main/doc/programming.markdown
   [`make.sh`]: https://github.com/seamplex/feenox/blob/main/doc/make.sh
 
 # Hands on
