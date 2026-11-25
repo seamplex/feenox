@@ -1,6 +1,8 @@
 # Development (current)
 
  * ...
+ * minor bugfixing
+ * updated documentation for PDE problems (boundary conditions, results, etc.)
 
 # v1.3 (Nov 2026)
 
