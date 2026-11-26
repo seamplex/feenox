@@ -32,7 +32,7 @@ const char factorseparators[] = "&|=!<>+-*/^,()[] \t\n";
 //extern const char operators[];
 //extern const char factorseparators[];
 
-char *feenox_ends_in_zero(const char *name) {
+char *feenox_ends_in_zero(char *name) {
 
   char *dummy = NULL;
   if (((dummy = strstr(name, "_0")) != NULL) && (isblank(dummy[2]) || dummy[2] == '\0')) {
@@ -43,7 +43,7 @@ char *feenox_ends_in_zero(const char *name) {
   
 }
 
-char *feenox_ends_in_init(const char *name) {
+char *feenox_ends_in_init(char *name) {
 
   char *dummy = NULL;
   if (((dummy = strstr(name, "_init")) != NULL) && (isblank(dummy[5]) || dummy[5] == '\0' || dummy[5] == '[')) {
@@ -54,7 +54,7 @@ char *feenox_ends_in_init(const char *name) {
 }
 
 
-char *feenox_ends_in_dot(const char *name) {
+char *feenox_ends_in_dot(char *name) {
 
   char *dummy;
 
@@ -171,7 +171,7 @@ int feenox_expression_parse(expr_t *expr, const char *orig_string) {
   feenox_check_alloc(expr->string = strdup(string_copy));
   
   char *string = string_copy;
-  char *oper = NULL;
+  const char *oper = NULL;
   char last_op = '(';  // initially it is like we start with an opening parenthesis
   size_t level = 1;
   expr_item_t *item;

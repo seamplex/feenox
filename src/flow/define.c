@@ -1,7 +1,7 @@
 /*------------ -------------- -------- --- ----- ---   --       -            -
  *  feenox definition functions
  *
- *  Copyright (C) 2009--2022 Jeremy Theler
+ *  Copyright (C) 2009--2026 Jeremy Theler
  *
  *  This file is part of feenox.
  *
@@ -178,18 +178,24 @@ int feenox_define_alias(const char *new_name, const char *existing_object, const
 int feenox_define_vector(const char *name, const char *size) {
 
   vector_t *vector;
+  char *normalized_name;
   char *dummy;
   
   // since there are names which can come from physical names or some other weird places
   // we replace spaces with underscores
-  while ((dummy = strchr(name, ' ')) != NULL) {
+  feenox_check_alloc(normalized_name = strdup(name));
+  while ((dummy = strchr(normalized_name, ' ')) != NULL) {
     *dummy = '_';
   }
 
-  feenox_call(feenox_check_name(name));
+  if (feenox_check_name(normalized_name) != FEENOX_OK) {
+    feenox_free(normalized_name);
+    return FEENOX_ERROR;
+  }
 
   feenox_check_alloc(vector = calloc(1, sizeof(vector_t)));
-  feenox_check_alloc(vector->name = strdup(name));
+  feenox_check_alloc(vector->name = strdup(normalized_name));
+  feenox_free(normalized_name);
   feenox_call(feenox_expression_parse(&vector->size_expr, size));
 
   HASH_ADD_KEYPTR(hh, feenox.vectors, vector->name, strlen(vector->name), vector);
@@ -397,7 +403,7 @@ var_t *feenox_get_or_define_variable_get_ptr(const char *name) {
   
 // check if an object name is valid and is available for further usage
 int feenox_check_name(const char *name) {
-  char *s;
+  const char *s;
   
   var_t *var;
   vector_t *vector;

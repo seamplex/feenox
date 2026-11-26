@@ -2141,8 +2141,8 @@ void feenox_finalize(void);
 
 // parser.c
 extern int feenox_parse_main_input_file(const char *filepath);
-extern char *feenox_ends_in_init(const char *name);
-extern char *feenox_ends_in_zero(const char *name);
+extern char *feenox_ends_in_init(char *name);
+extern char *feenox_ends_in_zero(char *name);
 extern int feenox_count_arguments(char *string, size_t *);
 extern int feenox_read_arguments(char *string, int n_arguments, char ***arg, size_t *n_chars);
 
@@ -2241,7 +2241,7 @@ extern physical_group_t *feenox_get_physical_group_ptr(const char *name, mesh_t 
 
 
 // assignment.c
-extern int feenox_add_assignment(const char *left_hand, const char *right_hand);
+extern int feenox_add_assignment(char *left_hand, const char *right_hand);
 extern int feenox_assign_single(assignment_t *assignment, unsigned int row, unsigned int col);
 extern int feenox_instruction_assignment_scalar(void *arg);
 extern int feenox_instruction_assignment_vector(void *arg);

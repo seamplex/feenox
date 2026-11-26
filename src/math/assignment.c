@@ -23,7 +23,7 @@
 #include <ctype.h>
 
 // API
-int feenox_add_assignment(const char *left_hand, const char *right_hand) {
+int feenox_add_assignment(char *left_hand, const char *right_hand) {
   
   assignment_t *assignment = NULL;
   feenox_check_alloc(assignment = calloc(1, sizeof(assignment_t)));

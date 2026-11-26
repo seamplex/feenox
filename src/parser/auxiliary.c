@@ -724,7 +724,7 @@ int feenox_strip_blanks(char *string) {
 // this function parses a string like "f(x,y,z)"
 // it creates the function and sets the arguments
 // it returns the name of the function in name which should be freed
-int feenox_add_function_from_string(const char *string, char **name) {
+int feenox_add_function_from_string(char *string, char **name) {
     
   char *dummy_openpar = strchr(string, '(');
   if (dummy_openpar == NULL) {
