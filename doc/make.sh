@@ -88,6 +88,9 @@ done
 echo "help as markdown definition list"
 ./help-md.sh > help.md
 
+echo "agent skill for LLMs (SKILL.md + one file per reference entry)"
+./skill.sh
+
 echo "help as a raw txt (which is used in feenox -h)"
 ./help-txt.sh usage   ../src/flow/init.c > help-usage.txt
 ./help-options-txt.sh ../src/flow/init.c > help-options-base.txt

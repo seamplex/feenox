@@ -1,0 +1,15 @@
+PROBLEM mechanical MESH two-cubes.msh
+
+E_soft = 1e3
+nu_soft = 0.2
+E_hard = 200e3
+nu_hard = 0.3
+
+BC left  fixed
+BC right Fx=1000
+
+SOLVE_PROBLEM
+
+# sigma_max and its location are the nodal maximum of the von Mises stress
+FIND_EXTREMA sigma MAX s X_MAX x_s Y_MAX y_s Z_MAX z_s NODES
+PRINT abs(sigma_max-s)+abs(sigma_max_x-x_s)+abs(sigma_max_y-y_s)+abs(sigma_max_z-z_s)

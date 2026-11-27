@@ -1,0 +1,13 @@
+PROBLEM mechanical MESH two-cubes.msh
+
+# each property of each group can be either a variable or a function
+E_soft = 1e3
+nu_soft(x,y,z) = 0.2
+ 
+E_hard(x,y,z) = 200e3
+nu_hard = 0.3
+
+BC left  fixed
+BC right Fx=1000
+
+PRINT %.1f sigma(0,0,0)

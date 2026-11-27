@@ -229,6 +229,11 @@ EOF
     kwre=$(printf '%s' "${kw}" | sed 's/[][\.*^$+?(){}|/]/\\&/g')
     pattern="^[[:space:]]*(BC|BOUNDARY_CONDITION)[[:space:]](.*[[:space:]\"]|.*=>)?${kwre}(=|[[:space:]\"]|$)"
     examples=$(git ls-files ../tests ../examples | grep '\.fee$' | xargs grep -l -i -E "^[[:space:]]*PROBLEM[[:space:]]+${pde}([[:space:]]|$)" | xargs -r grep -l -E -- "${pattern}" | sort | uniq)
+  elif [[ "${tag}" =~ ^(re|va|pr|kw)_(.+)$ ]]; then
+    # names of a particular problem (sigma, u, k, ...) only in inputs of that PROBLEM
+    pde=${BASH_REMATCH[2]}
+    pattern=""
+    examples=$(git ls-files ../tests ../examples | grep '\.fee$' | xargs grep -l -i -E "^[[:space:]]*PROBLEM[[:space:]]+${pde}([[:space:]]|$)" | xargs -r grep -l -w -- ${kw} | sort | uniq)
   else
     pattern=""
     examples=$(git ls-files ../tests ../examples | grep '\.fee$' | xargs grep -l -w -- ${kw} | sort | uniq)

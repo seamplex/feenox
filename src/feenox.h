@@ -2590,9 +2590,8 @@ extern int feenox_distribution_init(distribution_t *, const char *name);
 extern double feenox_distribution_eval(distribution_t *, const double *x, material_t *material);
 extern double feenox_distribution_eval_property(distribution_t *, const double *x, material_t *material);
 extern double feenox_distribution_eval_function_global(distribution_t *, const double *x, material_t *material);
-extern double feenox_distribution_eval_function_local(distribution_t *, const double *x, material_t *material);
+extern double feenox_distribution_eval_local(distribution_t *, const double *x, material_t *material);
 extern double feenox_distribution_eval_variable_global(distribution_t *, const double *x, material_t *material);
-extern double feenox_distribution_eval_variable_local(distribution_t *, const double *x, material_t *material);
 
 extern int feenox_pull_dependencies_variables_function(var_ll_t **to, function_t *function);
 extern int feenox_pull_dependencies_functions_function(function_ll_t **to, function_t *function);

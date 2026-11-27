@@ -101,7 +101,9 @@ int feenox_problem_parse_time_init_mechanical(void) {
   }
   
   // TODO: custom names
-  // TODO: document
+///re_mechanical+u+description The displacement field\ $u(\vec{x})$ in the\ $x$ direction. This is a primary unknown of the problem.
+///re_mechanical+v+description The displacement field\ $v(\vec{x})$ in the\ $y$ direction. This is a primary unknown of the problem.
+///re_mechanical+w+description The displacement field\ $w(\vec{x})$ in the\ $z$ direction. This is a primary unknown of the problem. Only available for three-dimensional problems.
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("u"));
   if (feenox.pde.dofs > 1) {
@@ -112,7 +114,12 @@ int feenox_problem_parse_time_init_mechanical(void) {
   }
   
   // ------- elasticity-related outputs -----------------------------------  
-  // TODO: document
+///re_mechanical+exx+description The normal strain\ $\epsilon_{xx} = \partial u/\partial x$ (in large deformation, the corresponding component of the Green-Lagrange strain tensor). This is a secondary unknown of the problem.
+///re_mechanical+eyy+description The normal strain\ $\epsilon_{yy} = \partial v/\partial y$. This is a secondary unknown of the problem.
+///re_mechanical+exy+description The shear strain\ $\epsilon_{xy} = \frac{1}{2} \left( \partial u/\partial y + \partial v/\partial x \right)$, i.e. the tensor component (half the engineering shear strain\ $\gamma_{xy}$). This is a secondary unknown of the problem.
+///re_mechanical+ezz+description The normal strain\ $\epsilon_{zz} = \partial w/\partial z$. Only available for three-dimensional problems.
+///re_mechanical+eyz+description The shear strain\ $\epsilon_{yz}$ (tensor component, half of\ $\gamma_{yz}$). Only available for three-dimensional problems.
+///re_mechanical+ezx+description The shear strain\ $\epsilon_{zx}$ (tensor component, half of\ $\gamma_{zx}$). Only available for three-dimensional problems.
   feenox_call(feenox_problem_define_solution_function("exx", &mechanical.exx, FEENOX_SOLUTION_GRADIENT));
   feenox_call(feenox_problem_define_solution_function("eyy", &mechanical.eyy, FEENOX_SOLUTION_GRADIENT));
   feenox_call(feenox_problem_define_solution_function("exy", &mechanical.exy, FEENOX_SOLUTION_GRADIENT));
@@ -123,6 +130,12 @@ int feenox_problem_parse_time_init_mechanical(void) {
     feenox_call(feenox_problem_define_solution_function("ezx", &mechanical.ezx, FEENOX_SOLUTION_GRADIENT));
   }
 
+///re_mechanical+sigmax+description The normal stress\ $\sigma_x(\vec{x})$ in the\ $x$ direction. This is a secondary unknown of the problem.
+///re_mechanical+sigmay+description The normal stress\ $\sigma_y(\vec{x})$ in the\ $y$ direction. This is a secondary unknown of the problem.
+///re_mechanical+tauxy+description The shear stress\ $\tau_{xy}(\vec{x})$. This is a secondary unknown of the problem.
+///re_mechanical+sigmaz+description The normal stress\ $\sigma_z(\vec{x})$ in the\ $z$ direction. Only available for three-dimensional problems.
+///re_mechanical+tauyz+description The shear stress\ $\tau_{yz}(\vec{x})$. Only available for three-dimensional problems.
+///re_mechanical+tauzx+description The shear stress\ $\tau_{zx}(\vec{x})$. Only available for three-dimensional problems.
   feenox_call(feenox_problem_define_solution_function("sigmax", &mechanical.sigmax, FEENOX_SOLUTION_GRADIENT));
   feenox_call(feenox_problem_define_solution_function("sigmay", &mechanical.sigmay, FEENOX_SOLUTION_GRADIENT));
   feenox_call(feenox_problem_define_solution_function("tauxy", &mechanical.tauxy, FEENOX_SOLUTION_GRADIENT));
@@ -133,6 +146,11 @@ int feenox_problem_parse_time_init_mechanical(void) {
     feenox_call(feenox_problem_define_solution_function("tauzx", &mechanical.tauzx, FEENOX_SOLUTION_GRADIENT));
   }
 
+///re_mechanical+sigma1+description The maximum principal stress\ $\sigma_1(\vec{x})$, with\ $\sigma_1 \geq \sigma_2 \geq \sigma_3$.
+///re_mechanical+sigma2+description The intermediate principal stress\ $\sigma_2(\vec{x})$.
+///re_mechanical+sigma3+description The minimum principal stress\ $\sigma_3(\vec{x})$.
+///re_mechanical+sigma+description The von Mises stress\ $\sigma(\vec{x}) = \sqrt{\frac{1}{2} \left[ (\sigma_1-\sigma_2)^2 + (\sigma_2-\sigma_3)^2 + (\sigma_3-\sigma_1)^2 \right]}$. Its maximum over the nodes is already available in the variable `sigma_max` (and its location in `sigma_max_x`, `sigma_max_y`, `sigma_max_z`), so there is no need to look for it with `FIND_EXTREMA`.
+///re_mechanical+tresca+description The Tresca stress\ $\sigma_1 - \sigma_3$ (twice the maximum shear stress).
   feenox_call(feenox_problem_define_solution_function("sigma1", &mechanical.sigma1, FEENOX_SOLUTION_GRADIENT));
   feenox_call(feenox_problem_define_solution_function("sigma2", &mechanical.sigma2, FEENOX_SOLUTION_GRADIENT));
   feenox_call(feenox_problem_define_solution_function("sigma3", &mechanical.sigma3, FEENOX_SOLUTION_GRADIENT));
@@ -162,7 +180,7 @@ int feenox_problem_parse_time_init_mechanical(void) {
 ///va_mechanical+strain_energy+detail where $\vec{u}$ is the displacements vector and $K$ is the stiffness matrix.
   feenox_check_alloc(mechanical.strain_energy = feenox_define_variable_get_ptr("strain_energy"));
 
-///va_mechanical+displ_max+detail The module of the maximum displacement of the elastic problem.
+///va_mechanical+displ_max+detail The module of the maximum displacement of the elastic problem, taken over the nodes.
   feenox_check_alloc(mechanical.displ_max = feenox_define_variable_get_ptr("displ_max"));
 
 ///va_mechanical+displ_max_x+detail The\ $x$ coordinate of the maximum displacement of the elastic problem.
@@ -179,7 +197,9 @@ int feenox_problem_parse_time_init_mechanical(void) {
 ///va_mechanical+w_at_displ_max+detail The\ $z$ component\ $w$ of the maximum displacement of the elastic problem.
   feenox_check_alloc(mechanical.w_at_displ_max = feenox_define_variable_get_ptr("w_at_displ_max"));
   
-///va_mechanical+sigma_max+detail The maximum von Mises stress\ $\sigma$ of the elastic problem.
+///va_mechanical+sigma_max+detail The maximum von Mises stress\ $\sigma$ of the elastic problem, taken over the nodes.
+///va_mechanical+sigma_max+detail It is the same as `FIND_EXTREMA sigma MAX sigma_max NODES`
+///va_mechanical+sigma_max+detail (without `NODES`, `FIND_EXTREMA` also looks at the cells and the Gauss points).
   feenox_check_alloc(mechanical.sigma_max = feenox_define_variable_get_ptr("sigma_max"));
 
 ///va_mechanical+delta_sigma_max+detail The uncertainty of the maximum Von Mises stress\ $\sigma$ of the elastic problem.

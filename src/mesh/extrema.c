@@ -52,7 +52,13 @@ int feenox_instruction_mesh_find_extrema(void *arg) {
   physical_group_t *physical_group = mesh_find_extrema->physical_group;
   function_t *function = mesh_find_extrema->function;
   expr_t *expr = &mesh_find_extrema->expr;
-  
+
+  // implicit SOLVE_PROBLEM: a result function (T, sigma, ...) has no values
+  // until the problem is solved, and the OVER branch reads them directly
+  if (function != NULL && function->is_solution && feenox.pde.problem_solved == 0) {
+    feenox_call(feenox_instruction_solve_problem(NULL));
+  }
+
   double val = 0;
   if (physical_group == NULL) {
     if (function != NULL) {

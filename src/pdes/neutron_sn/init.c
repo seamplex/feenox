@@ -86,7 +86,7 @@ int feenox_problem_parse_time_init_neutron_sn(void) {
   
   // the angular fluxes psi
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
-  // TODO: document from comments
+///re_neutron_sn+psi1.1+description The angular flux\ $\psi_{mg}(\vec{x})$ of group\ $g$ in direction\ $m$, named `psi<g>.<m>`: `psi1.1` is the first group and the first direction, `psi2.3` the second group and the third direction. These are the primary unknowns of the problem.
   // NOTE: it is more natural to put first the group and then the direction
   //       while in the doc we use $\psi_{mg}$
   for (unsigned int g = 0; g < neutron_sn.groups; g++) {
@@ -96,7 +96,7 @@ int feenox_problem_parse_time_init_neutron_sn(void) {
   }
 
   // the scalar fluxes phi
-  // TODO: document
+///re_neutron_sn+phi1+description The scalar flux\ $\phi_g(\vec{x})$ of each group, the weighted sum of the angular fluxes over all directions: `phi1` for the first group, `phi2` for the second one, etc. With a single group, it is `phi1` (there is no `phi`).
   // TODO: for one group make an alias between phi1 and phi
   feenox_check_alloc(neutron_sn.phi = calloc(neutron_sn.groups, sizeof(function_t *)));
   for (unsigned int g = 0; g < neutron_sn.groups; g++) {

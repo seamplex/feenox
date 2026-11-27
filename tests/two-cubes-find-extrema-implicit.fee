@@ -1,0 +1,14 @@
+PROBLEM mechanical MESH two-cubes.msh
+
+E_soft = 1e3
+nu_soft = 0.2
+E_hard = 200e3
+nu_hard = 0.3
+
+BC left  fixed
+BC right Fx=1000
+
+# no SOLVE_PROBLEM: FIND_EXTREMA OVER a physical group has to trigger it
+FIND_EXTREMA sigma OVER soft MAX s_soft NODES
+FIND_EXTREMA sigma OVER hard MAX s_hard NODES
+PRINT max(s_soft,s_hard)-sigma_max

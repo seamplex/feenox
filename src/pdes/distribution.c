@@ -75,56 +75,68 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     return FEENOX_OK;
   }
 
-  // try one function for each volume
+  // try one function or one variable for each volume, named <property>_<group>:
+  // each group can use either one (e.g. k_mat1 = 1 and k_mat2(x,y,z) = 1+x)
   int full = 1;
+  int any_variable = 0;
   non_uniform = 0;
   n_volumes = 0;
   physical_group_t *physical_group = NULL;
   int i = 0;
   for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
     if (physical_group->dimension == feenox_distribution_bulk_dim()) {
-      char *function_name = NULL;
-      feenox_check_minusone(asprintf(&function_name, "%s_%s", name, physical_group->name));
-      function_t *function = NULL;
-      if ((function = feenox_get_function_ptr(function_name)) != NULL) {
+      char *local_name = NULL;
+      feenox_check_minusone(asprintf(&local_name, "%s_%s", name, physical_group->name));
+      function_t *function = feenox_get_function_ptr(local_name);
+      var_t *variable = (function == NULL) ? feenox_get_variable_ptr(local_name) : NULL;
+      feenox_free(local_name);
+
+      if (function != NULL) {
         if (function->n_arguments != feenox.pde.dim) {
           feenox_push_error_message("function '%s' should have %d arguments instead of %d to be used as a distribution", function->name, feenox.pde.dim, function->n_arguments);
           return FEENOX_ERROR;
         }
-
         if (this->function == NULL) {
           this->function = function;
         }
-
-        // if there's no explicit material we create one
-        if (physical_group->material == NULL) {
-          physical_group->material = feenox_define_material_get_ptr(physical_group->name, feenox.pde.mesh);
-        }  
-        
         feenox_call(feenox_pull_dependencies_variables_function(&this->dependency_variables, function));
         feenox_call(feenox_pull_dependencies_functions_function(&this->dependency_functions, function));
-        
-        non_uniform = (n_volumes++ > 0) || (feenox_depends_on_space(this->dependency_variables));
-        this->defined_per_group[i] = 1;            
-        this->defined = 1;
-
+      } else if (variable != NULL) {
+        if (this->variable == NULL) {
+          this->variable = variable;
+        }
+        any_variable = 1;
       } else {
         full = 0;
+        i++;
+        continue;
       }
-      feenox_free(function_name);
+
+      // if there's no explicit material we create one
+      if (physical_group->material == NULL) {
+        physical_group->material = feenox_define_material_get_ptr(physical_group->name, feenox.pde.mesh);
+      }
+
+      // if there are many volumes, we are not uniform
+      non_uniform = (n_volumes++ > 0) || (feenox_depends_on_space(this->dependency_variables));
+      this->defined_per_group[i] = 1;
+      this->defined = 1;
     }
     i++;
   }
-  
-  if (this->function) {
+
+  if (this->defined) {
     this->full = full;
     this->non_uniform = non_uniform;
-    this->eval = feenox_distribution_eval_function_local;
-    this->constant = (feenox_depends_on_time(this->dependency_variables) == 0);
+    this->eval = feenox_distribution_eval_local;
+    // a variable might be re-assigned in time so we cannot tell it is constant
+    this->constant = (any_variable == 0) && (feenox_depends_on_time(this->dependency_variables) == 0);
+    // the cache has to point to the per-group functions and variables, not the global ones
+    this->function = NULL;
+    this->variable = NULL;
     return FEENOX_OK;
   }
-  
-  
+
   // try a single function
   if ((this->function = feenox_get_function_ptr(name)) != NULL) {
     if (this->function->n_arguments != feenox.pde.dim) {
@@ -146,48 +158,6 @@ int feenox_distribution_init(distribution_t *this, const char *name) {
     
     return FEENOX_OK;
   }
-  
-  // try one variable for each volume
-  full = 1;
-  non_uniform = 0;
-  n_volumes = 0;
-  physical_group = NULL;
-  i = 0;
-  for (physical_group = feenox.pde.mesh->physical_groups; physical_group != NULL; physical_group = physical_group->hh.next) {
-    if (physical_group->dimension == feenox_distribution_bulk_dim()) {
-      char *var_name = NULL;
-      feenox_check_minusone(asprintf(&var_name, "%s_%s", name, physical_group->name));
-      var_t *variable = NULL;
-      if ((variable = feenox_get_variable_ptr(var_name)) != NULL) {
-        if (this->variable == NULL) {
-          this->variable = variable;
-        }
-        
-        // if there's no explicit material we create one
-        if (physical_group->material == NULL) {
-          physical_group->material = feenox_define_material_get_ptr(physical_group->name, feenox.pde.mesh);
-        }
-        
-        // if there are many volumes, we are not uniform
-        non_uniform = (n_volumes++ > 0);
-        this->defined_per_group[i] = 1;
-        this->defined = 1;
-
-      } else {
-        full = 0;
-      }
-      feenox_free(var_name);
-    }  
-    i++;
-  }
-  
-  if (this->variable) {
-    this->full = full;
-    this->non_uniform = non_uniform;
-    this->eval = feenox_distribution_eval_variable_local;
-    return FEENOX_OK;
-  }
-  
   
   // try a single global variable
   if ((this->variable = feenox_get_variable_ptr(name)) != NULL) {
@@ -223,53 +193,35 @@ double feenox_distribution_eval_function_global(distribution_t *this, const doub
   return this->value;
 }
 
-double feenox_distribution_eval_variable_local(distribution_t *this, const double *x, material_t *material) {
-  
+// per-group distribution: a function <property>_<group> if there is one, otherwise a variable
+double feenox_distribution_eval_local(distribution_t *this, const double *x, material_t *material) {
+
   if (material == NULL) {
     this->value = 0;
     return this->value;
   }
-  
+
   if (material != this->last_material) {
-    char *var_name = NULL;
-    feenox_check_minusone(asprintf(&var_name, "%s_%s", this->name, material->name));
-    if ((this->variable = feenox_get_variable_ptr(var_name)) == NULL) {
-      feenox_push_error_message("cannot find variable '%s'", var_name);
+    char *local_name = NULL;
+    feenox_check_minusone(asprintf(&local_name, "%s_%s", this->name, material->name));
+    if ((this->function = feenox_get_function_ptr(local_name)) != NULL) {
+      this->variable = NULL;
+      this->expr = &this->function->algebraic_expression;
+    } else if ((this->variable = feenox_get_variable_ptr(local_name)) != NULL) {
+      // a variable does not depend on anything, e.g. its derivative wrt the solution is zero
+      this->expr = NULL;
+    } else {
+      feenox_push_error_message("cannot find either a function or a variable named '%s'", local_name);
       feenox_runtime_error();
     }
     this->last_material = material;
-    feenox_free(var_name);
+    feenox_free(local_name);
   }
-  
-  this->value = feenox_var_value(this->variable);
+
+  this->value = (this->function != NULL) ? feenox_function_eval(this->function, x) : feenox_var_value(this->variable);
   return this->value;
 }
 
-
-double feenox_distribution_eval_function_local(distribution_t *this, const double *x, material_t *material) {
-  
-  if (material == NULL) {
-    this->value = 0;
-    return this->value;
-  }
-  
-  if (material != this->last_material) {
-    char *function_name = NULL;
-    feenox_check_minusone(asprintf(&function_name, "%s_%s", this->name, material->name));
-    if ((this->function = feenox_get_function_ptr(function_name)) == NULL) {
-      feenox_push_error_message("cannot find function '%s'", function_name);
-      feenox_runtime_error();
-    }
-    this->last_material = material;
-    this->expr = &this->function->algebraic_expression;
-    feenox_free(function_name);
-  }
-  
-  this->value = feenox_function_eval(this->function, x);
-  return this->value;
-}
-
-  
 double feenox_distribution_eval_property(distribution_t *this, const double *x, material_t *material) {
 
   if (material == NULL) {

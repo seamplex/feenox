@@ -77,7 +77,8 @@ int feenox_problem_solve_post_mechanical(void) {
     
     if (uses_sigma_max) {
       if (feenox_vector_get(mechanical.sigma->vector_value, j) > sigma_max) {
-        feenox_var_value(mechanical.sigma_max) = feenox_vector_get(mechanical.sigma->vector_value, j);
+        sigma_max = feenox_vector_get(mechanical.sigma->vector_value, j);
+        feenox_var_value(mechanical.sigma_max) = sigma_max;
         // TODO: not cache friendly!
         feenox_var_value(mechanical.sigma_max_x) = feenox_vector_get(feenox.pde.solution[0]->vector_argument[0], j);
         feenox_var_value(mechanical.sigma_max_y) = feenox_vector_get(feenox.pde.solution[0]->vector_argument[1], j);

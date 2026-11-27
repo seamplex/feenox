@@ -93,6 +93,9 @@ int feenox_problem_parse_time_init_modal(void) {
   }
   
   // TODO: custom names
+///re_modal+u1+description The displacement field of each mode in the\ $x$ direction: `u1` for the first mode, `u2` for the second one, etc., up to the number of requested modes. Their frequencies are in the vector `f`.
+///re_modal+v1+description The displacement field of each mode in the\ $y$ direction: `v1`, `v2`, etc.
+///re_modal+w1+description The displacement field of each mode in the\ $z$ direction: `w1`, `w2`, etc. Only available for three-dimensional problems.
   feenox_check_alloc(feenox.pde.unknown_name = calloc(feenox.pde.dofs, sizeof(char *)));
   feenox_check_alloc(feenox.pde.unknown_name[0] = strdup("u"));
   if (feenox.pde.dofs > 1) {
