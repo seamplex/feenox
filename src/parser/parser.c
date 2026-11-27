@@ -3124,6 +3124,7 @@ int feenox_parse_problem(void) {
 #ifdef HAVE_PETSC
   mesh_t *mesh = NULL;
   char *token = NULL;
+  int limit_threads = 1;
   
   // this way we can allow setting PC or KSP etc. with subsequent PROBLEMs
   if (feenox.pde.parse_problem == NULL) {
@@ -3190,6 +3191,26 @@ int feenox_parse_problem(void) {
     } else if (strcasecmp(token, "PROGRESS") == 0 || strcasecmp(token, "PROGRESS_ASCII") == 0) {
       feenox.pde.progress_ascii = PETSC_TRUE;
 
+///kw_pde+PROBLEM+usage [ LIMIT_THREADS | DO_NOT_LIMIT_THREADS ]
+///kw_pde+PROBLEM+usage @
+///kw_pde+PROBLEM+detail More often than not, some PETSc dependencies try to be “smart” and launch
+///kw_pde+PROBLEM+detail OpenMP threads while believing it is a good idea.
+///kw_pde+PROBLEM+detail In the HPC world, the way to scale things up in parallel is MPI, not OpenMP.
+///kw_pde+PROBLEM+detail So these “smart” tricks end up causing more harm than good.
+///kw_pde+PROBLEM+detail This is the case for OpenBLAS as configured and installed in Debian's PETSc,
+///kw_pde+PROBLEM+detail which is what the [FeenoX Debian package](https://packages.debian.org/sid/feenox) uses.
+///kw_pde+PROBLEM+detail By default (`LIMIT_THREADS`), FeenoX asks already-loaded OpenBLAS and OpenMP
+///kw_pde+PROBLEM+detail runtimes to use one thread, when their runtime APIs can be found.
+///kw_pde+PROBLEM+detail Explicit `OMP_NUM_THREADS`, `OMP_THREAD_LIMIT`, `OPENBLAS_NUM_THREADS`,
+///kw_pde+PROBLEM+detail `OPENBLAS_DEFAULT_NUM_THREADS` and `GOTO_NUM_THREADS` settings take precedence.
+///kw_pde+PROBLEM+detail An explicit OpenMP setting also leaves OpenBLAS unchanged, since it can use
+///kw_pde+PROBLEM+detail `OMP_NUM_THREADS` as a fallback. With OpenMP-backed OpenBLAS, an explicit OpenBLAS
+///kw_pde+PROBLEM+detail setting also leaves the shared OpenMP runtime unchanged; the same applies if
+///kw_pde+PROBLEM+detail the OpenBLAS threading implementation cannot be identified.
+///kw_pde+PROBLEM+detail `DO_NOT_LIMIT_THREADS` leaves both runtimes unchanged.
+    } else if (strcasecmp(token, "LIMIT_THREADS") == 0 || strcasecmp(token, "DO_NOT_LIMIT_THREADS") == 0) {
+      limit_threads = (strcasecmp(token, "LIMIT_THREADS") == 0);
+
 ///kw_pde+PROBLEM+usage [ DO_NOT_DETECT_HANGING_NODES
     } else if (strcasecmp(token, "DO_NOT_DETECT_HANGING_NODES") == 0) {
       feenox.pde.hanging_nodes = hanging_nodes_nothing;
@@ -3243,7 +3264,7 @@ int feenox_parse_problem(void) {
 ///kw_pde+PROBLEM+detail  * `QUASISTATIC` solves the problem with TS (with optional time adaptation) but without any inertia (mass) effects.
 ///kw_pde+PROBLEM+detail  * `QUASISTATIC_DUMB` just solves one KSP (or SNES) after the other without any TS nor automatic time adaptation.
 ///kw_pde+PROBLEM+detail @
-     ///kw_pde+PROBLEM+usage [ TRANSIENT |
+///kw_pde+PROBLEM+usage [ TRANSIENT |
     } else if (strcasecmp(token, "TRANSIENT") == 0) {
       feenox.pde.transient_type = transient_type_transient;
 ///kw_pde+PROBLEM+usage QUASISTATIC |
@@ -3388,6 +3409,13 @@ int feenox_parse_problem(void) {
     }
   }
   
+  if (feenox.pde.thread_policy_set == PETSC_FALSE) {
+    if (limit_threads) {
+      feenox_problem_limit_threads();
+    }
+    feenox.pde.thread_policy_set = PETSC_TRUE;
+  }
+
   if (feenox.pde.petscinit_called == PETSC_FALSE) {
     if (mesh != NULL) {
       feenox.mesh.mesh_main = mesh;

@@ -72,6 +72,13 @@ AC_CHECK_FUNCS([getrusage],[],[])
 # check for asprintf
 AC_CHECK_FUNCS([asprintf],[],[])
 
+# Optional runtime control of already-loaded OpenMP and OpenBLAS libraries
+AC_CHECK_HEADER([dlfcn.h], [
+  AC_SEARCH_LIBS([dlsym], [dl],
+    [AC_DEFINE([HAVE_DLSYM], [1], [Define if dlsym is available])],
+    [AC_MSG_WARN([dlsym unavailable; default thread limiting will be disabled])])
+], [AC_MSG_WARN([dlfcn.h unavailable; default thread limiting will be disabled])])
+
 # check for feenox_likely
 AX_GCC_BUILTIN(__builtin_expect)
 

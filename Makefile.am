@@ -48,6 +48,7 @@ TESTS_general = \
         tests/materials.sh \
         tests/moment-of-inertia.sh \
         tests/petsc_options.sh \
+        tests/thread-policy.sh \
         tests/point-kinetics.sh \
         tests/print.sh \
         tests/read.sh \

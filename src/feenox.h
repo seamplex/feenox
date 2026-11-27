@@ -1964,6 +1964,7 @@ struct feenox_t {
     PetscBool pre_allocate;        // preallocate? only works for petsc >= 3.19
     PetscBool allow_new_nonzeros;  // flag to set MAT_NEW_NONZERO_ALLOCATION_ERR to false, needed in some rare cases
     PetscBool petscinit_called;    // flag
+    PetscBool thread_policy_set;
 
     // stuff for mpi parallelization
     PetscInt nodes_local, size_local;
@@ -2461,6 +2462,7 @@ extern int feenox_mesh_count_element_volumetric_neighbors(element_t *e)  __attri
 
 // init.c
 extern int feenox_problem_parse_time_init(void);
+extern void feenox_problem_limit_threads(void);
 extern int feenox_problem_init_runtime_general(void);
 extern int feenox_problem_define_solutions(void);
 extern int feenox_problem_define_solution_function(const char *name, function_t **function, int is_gradient);

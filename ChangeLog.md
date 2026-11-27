@@ -1,6 +1,8 @@
 # Development (current)
 
  * ...
+ * keywords `LIMIT_THREADS` (default) / `DO_NOT_LIMIT_THREADS`
+ * override `OMP_NUM_THREADS` to one so OpenBLAS does not launch unnecessary threads ()
  * minor bugfixing
  * updated documentation for PDE problems (boundary conditions, results, etc.)
 

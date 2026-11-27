@@ -25,6 +25,32 @@
 #include <unistd.h>   // for sysconf
 #include <stdlib.h>   // for setenv
 
+#if defined(HAVE_PETSC) && defined(HAVE_DLSYM)
+#include <dlfcn.h>
+#endif
+
+void feenox_problem_limit_threads(void) {
+#if defined(HAVE_PETSC) && defined(HAVE_DLSYM)
+  void (*set_openblas_threads)(int) = (void (*)(int))dlsym(RTLD_DEFAULT, "openblas_set_num_threads");
+  int (*get_openblas_parallel)(void) = (int (*)(void))dlsym(RTLD_DEFAULT, "openblas_get_parallel");
+  void (*set_omp_threads)(int) = (void (*)(int))dlsym(RTLD_DEFAULT, "omp_set_num_threads");
+  int omp_requested = getenv("OMP_NUM_THREADS") != NULL || getenv("OMP_THREAD_LIMIT") != NULL;
+  int blas_requested = getenv("OPENBLAS_NUM_THREADS") != NULL ||
+                       getenv("OPENBLAS_DEFAULT_NUM_THREADS") != NULL ||
+                       getenv("GOTO_NUM_THREADS") != NULL;
+  int blas_parallel = get_openblas_parallel != NULL ? get_openblas_parallel() : -1;
+
+  if (set_openblas_threads != NULL && !blas_requested && !omp_requested) {
+    set_openblas_threads(1);
+  }
+  // An OpenMP-backed OpenBLAS may share this runtime; do not override its explicit setting.
+  if (set_omp_threads != NULL && !omp_requested &&
+      (!blas_requested || blas_parallel == 0 || blas_parallel == 1)) {
+    set_omp_threads(1);
+  }
+#endif
+}
+
 int feenox_problem_parse_time_init(void) {
 
 #ifdef HAVE_PETSC
