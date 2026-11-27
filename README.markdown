@@ -70,16 +70,16 @@ Note that
   formats][Gmsh’s format `.msh`]
 
 Each of these items has a lot of design and usage implications,
-thoroughly discussed in the [Software Design Specification], ranging
-from integrating FeenoX as a back end for different front ends with a
-reasonably low effort (e.g. [SunCAE]), down to suitability for
-interaction with Large Language Models. As a reference, the reader is
-encouraged to compare the above input syntax with any other FEA solver
-and then consider how to ask ChatGPT & friends for help to create an
-input file from scratch. Good luck detecting hallucinations. Or how to
-write a Graphical User Interface that would need to create something the
-solver can read. Plus, it can be simply installed (even in WSL2) by
-doing
+thoroughly discussed in the [Software Design
+Specification][particular design basis], ranging from integrating FeenoX
+as a back end for different front ends with a reasonably low effort
+(e.g. [SunCAE]), down to suitability for interaction with Large Language
+Models. As a reference, the reader is encouraged to compare the above
+input syntax with any other FEA solver and then consider how to ask
+ChatGPT & friends for help to create an input file from scratch. Good
+luck detecting hallucinations. Or how to write a Graphical User
+Interface that would need to create something the solver can read. Plus,
+it can be simply installed (even in WSL2) by doing
 
 ``` terminal
 sudo apt install feenox
@@ -129,30 +129,29 @@ work]):
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [free and open source]: #licensing
   [engineering-related problems]: #extents
-  [many computers in parallel]: https://www.seamplex.com/feenox/doc/sds.html#sec:scalability
+  [many computers in parallel]: https://seamplex.com/feenox/doc/sds.html#sec:scalability
   [particular design basis]: https://seamplex.com/feenox/doc/sds.html
-  [input file]: https://www.seamplex.com/feenox/doc/sds.html#sec:input
-  [simple]: https://www.seamplex.com/feenox/doc/sds.html#sec:simple
-  [self-descriptive English]: https://www.seamplex.com/feenox/doc/sds.html#sec:sugar
-  [keywords]: https://www.seamplex.com/feenox/doc/sds.html#sec:nouns_verbs
-  [Material properties and boundary conditions]: https://www.seamplex.com/feenox/doc/sds.html#sec:flexibility
-  [expressions of $`x`$, $`y`$ and $`z`$]: https://www.seamplex.com/feenox/doc/sds.html#sec:expression
-  [Gmsh’s format `.msh`]: https://www.seamplex.com/feenox/doc/sds.html#sec:interoperability
-  [Software Design Specification]: https://www.seamplex.com/feenox/doc/sds.html
+  [input file]: https://seamplex.com/feenox/doc/sds.html#sec:input
+  [simple]: https://seamplex.com/feenox/doc/sds.html#sec:simple
+  [self-descriptive English]: https://seamplex.com/feenox/doc/sds.html#sec:sugar
+  [keywords]: https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs
+  [Material properties and boundary conditions]: https://seamplex.com/feenox/doc/sds.html#sec:flexibility
+  [expressions of $`x`$, $`y`$ and $`z`$]: https://seamplex.com/feenox/doc/sds.html#sec:expression
+  [Gmsh’s format `.msh`]: https://seamplex.com/feenox/doc/sds.html#sec:interoperability
   [SunCAE]: https://www.seamplex.com/suncae
-  [Industry Engineer]: README4engineers.markdown
-  [Unix Hacker]: README4hackers.markdown
-  [Academic Professor]: README4academics.markdown
-  [cite FeenoX in your work]: doc/FAQ.markdown#how-should-i-cite-feenox
+  [Industry Engineer]: ./README4engineers.markdown
+  [Unix Hacker]: ./README4hackers.markdown
+  [Academic Professor]: ./README4academics.markdown
+  [cite FeenoX in your work]: ./doc/FAQ.markdown#how-should-i-cite-feenox
   [10.21105/joss.05846]: https://doi.org/10.21105/joss.05846
   [one-dimensional nuclear power plant transients]: https://seamplex.com/feenox/examples/thermal_hydraulics.html
   [“Why FeenoX is different”]: https://seamplex.com/feenox/doc/whitepaper/
-  [NAFEMS GNL5 “Large-deformation beam”]: https://www.seamplex.com/feenox/examples/mechanical.html#nafems-gnl5-large-deformation-beam
+  [NAFEMS GNL5 “Large-deformation beam”]: https://seamplex.com/feenox/examples/mechanical.html#nafems-gnl5-large-deformation-beam
   [Trixie backports]: https://packages.debian.org/trixie-backports/feenox
   [Forky]: https://packages.debian.org/forky/feenox
   [Sid]: https://packages.debian.org/sid/feenox
   [Ubuntu]: https://launchpad.net/ubuntu/+source/feenox
-  [Setting up your workspace]: https://www.seamplex.com/feenox/doc/tutorials/000-setup/
+  [Setting up your workspace]: https://seamplex.com/feenox/doc/tutorials/000-setup/
 
 ## Extents
 
@@ -277,7 +276,7 @@ The [`tests`] directory in the repository has hundreds of
 - Separate [repository to profile and study code performance] using
   [Google’s benchmark library]
 
-  [problem]: https://www.seamplex.com/feenox/doc/feenox-manual.html#problem
+  [problem]: https://seamplex.com/feenox/doc/feenox-manual.html#problem
   [syntactically-sugared]: https://seamplex.com/feenox/doc/sds.html#sec:syntactic
   [self-descriptive English-like plain-text input file]: https://seamplex.com/feenox/doc/sds.html#sec:input
   [resemble the original human-friendly problem formulation]: https://seamplex.com/feenox/doc/sds.html#sec:matching-formulations
@@ -286,7 +285,7 @@ The [`tests`] directory in the repository has hundreds of
   [simple problems need simple inputs]: https://seamplex.com/feenox/doc/sds.html#sec:simple
   [everything is an expression]: https://seamplex.com/feenox/doc/sds.html#sec:expression
   [100%-defined user output]: https://seamplex.com/feenox/doc/sds.html#sec:output
-  [`WRITE_RESULTS`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results
+  [`WRITE_RESULTS`]: https://seamplex.com/feenox/doc/feenox-manual.html#write_results
   [Cloud-first design]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [MPI parallelization]: https://seamplex.com/feenox/doc/sds.html#sec:scalability
   [general mathematical problems]: https://seamplex.com/feenox/examples/basic.html
@@ -306,7 +305,7 @@ The [`tests`] directory in the repository has hundreds of
   [Paraview]: https://www.paraview.org/
   [VTU/VTK]: https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html
   [flexibility]: https://seamplex.com/feenox/doc/sds.html#sec:flexibility
-  [non-uniform multi-solid material properties from ASME tables]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#from-a-steady-state
+  [non-uniform multi-solid material properties from ASME tables]: https://seamplex.com/feenox/doc/tutorials/320-thermal/#from-a-steady-state
   [Unix programming philosophy]: https://seamplex.com/feenox/doc/sds.html#sec:unix
   [rule of separation]: https://seamplex.com/feenox/doc/sds.html#sec:separation
   [rule of silence]: https://seamplex.com/feenox/doc/sds.html#sec:silence
@@ -322,10 +321,10 @@ The [`tests`] directory in the repository has hundreds of
   [increased flexibility]: https://seamplex.com/feenox/examples/basic.html#computing-the-derivative-of-a-function-as-a-unix-filter
   [parametric sweeps]: https://seamplex.com/feenox/doc/sds.html#sec:parametric
   [optimization loops]: https://seamplex.com/feenox/doc/sds.html#optimization-loops
-  [Steady-state]: https://www.seamplex.com/feenox/doc/tutorials/120-mazes/#solving-the-steady-state-laplace-equation
-  [transient problems]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#sec:transient
-  [Linear]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#linear-steady-state-problems
-  [non-linear]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#non-linear-state-state-problems
+  [Steady-state]: https://seamplex.com/feenox/doc/tutorials/120-mazes/#solving-the-steady-state-laplace-equation
+  [transient problems]: https://seamplex.com/feenox/doc/tutorials/320-thermal/#sec:transient
+  [Linear]: https://seamplex.com/feenox/doc/tutorials/320-thermal/#linear-steady-state-problems
+  [non-linear]: https://seamplex.com/feenox/doc/tutorials/320-thermal/#non-linear-state-state-problems
   [Method of Manufactured Solutions]: https://github.com/seamplex/feenox/tree/main/tests/mms
   [repository to profile and study code performance]: https://github.com/seamplex/feenox-benchmark
   [Google’s benchmark library]: https://github.com/google/benchmark
@@ -367,7 +366,7 @@ of the [Github repository] for
 - [Manual]
 - [Description]
 - [Software Design Requirements]
-- [Software Design Specification][4]
+- [Software Design Specification]
 - [Unix man page] (accessible through `man feenox` after installation)
 - [History]
 - [Compilation guide]
@@ -376,22 +375,22 @@ of the [Github repository] for
   [documentation index]: doc
   [`doc`]: https://github.com/seamplex/feenox/tree/main/doc
   [Github repository]: https://github.com/seamplex/feenox/
-  [FAQs]: doc/FAQ.markdown
+  [FAQs]: ./doc/FAQ.markdown
   [what FeenoX means]: https://seamplex.com/feenox/doc/FAQ.html#what-does-feenox-mean
   [Manual]: https://seamplex.com/feenox/doc/feenox-manual.html
-  [Description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
+  [Description]: https://seamplex.com/feenox/doc/feenox-desc.html
   [Software Design Requirements]: https://seamplex.com/feenox/doc/srs.html
-  [4]: https://seamplex.com/feenox/doc/sds.html
+  [Software Design Specification]: https://seamplex.com/feenox/doc/sds.html
   [Unix man page]: https://seamplex.com/feenox/doc/feenox.1.html
-  [History]: doc/history.markdown
-  [Compilation guide]: doc/compilation.markdown
-  [Programming guide]: doc/programming.markdown
+  [History]: ./doc/history.markdown
+  [Compilation guide]: ./doc/compilation.markdown
+  [Programming guide]: ./doc/programming.markdown
 
 # Quickstart
 
 ## Install from apt
 
-If you use [Debian] (either [Sid][5], or [Trixie] with [backports]) or
+If you use [Debian] (either [Sid][4], or [Trixie] with [backports]) or
 [Ubuntu 25.04] or higher, you can do
 
 ``` terminal
@@ -404,7 +403,7 @@ See these links for details about the packages:
 - <https://launchpad.net/ubuntu/+source/feenox>
 
   [Debian]: https://www.debian.org
-  [5]: https://wiki.debian.org/DebianUnstable
+  [4]: https://wiki.debian.org/DebianUnstable
   [Trixie]: https://www.debian.org/releases/trixie
   [backports]: https://backports.debian.org
   [Ubuntu 25.04]: https://releases.ubuntu.com/plucky
@@ -425,16 +424,16 @@ optimization flags. Please compile from source for high-end
 applications. See [detailed compilation instructions].
 
 > - Be aware that FeenoX **does not have a GUI**. Read the
->   [documentation], especially the [description] and the [FAQs][6]. Ask
->   for help on the [GitHub discussions page] if you do now understand
->   what this means.
+>   [documentation], especially the [description][5] and the [FAQs][6].
+>   Ask for help on the [GitHub discussions page] if you do now
+>   understand what this means.
 >
 > - You can still use FeenoX through a **web-based UI** through
 >   [SunCAE].
 
-  [detailed compilation instructions]: docompilation.markdown
+  [detailed compilation instructions]: doc/compilation.md
   [documentation]: https://seamplex.com/feenox/doc/
-  [description]: https://www.seamplex.com/feenox/doc/feenox-desc.html
+  [5]: https://www.seamplex.com/feenox/doc/feenox-desc.html
   [6]: https://seamplex.com/feenox/doc/FAQ.html
   [GitHub discussions page]: https://github.com/seamplex/feenox/discussions
   [SunCAE]: https://www.seamplex.com/suncae
@@ -531,10 +530,10 @@ information.
 
   [discussion page]: https://github.com/seamplex/feenox/discussions
   [source tarball]: https://seamplex.com/feenox/dist/src/
-  [these instructions]: dosource.markdown
+  [these instructions]: doc/source.md
   [7]: compilation.md
   [download page]: https://seamplex.com/feenox/download.html
-  [compilation guide]: doc/compilation.markdown
+  [compilation guide]: ./doc/compilation.markdown
 
 # Licensing
 

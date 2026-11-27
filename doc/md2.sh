@@ -222,6 +222,7 @@ pandoc hash.yaml ${in}.md \
     --lua-filter=${rootdir}/doc/not-in-format.lua \
     --lua-filter=${rootdir}/doc/only-in-format.lua \
     --lua-filter=${rootdir}/doc/img-width.lua \
+    --lua-filter=${rootdir}/doc/markdown-links.lua \
     --filter pandoc-crossref \
     --number-sections --toc-depth=4 \
     ${template_args} ${format_args} -o ${out}
@@ -264,7 +265,6 @@ if [ "x${format}" = "x.html" ]; then
   sed -i 's/\(.*\)\.md/\1.html/g'  ${out}
   
 elif [ "x${format}" = "x.markdown" ]; then
-  sed -i 's/.\/\(.*\)\.md/\1.markdown/g'  ${out}
   sed -i '/hash:/d' ${out}
   
 fi

@@ -134,9 +134,9 @@ solutions].
 
   [FeenoX]: https://www.seamplex.com/feenox/
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
-  [Unix]: README4hackers.markdown
+  [Unix]: ./README4hackers.markdown
   [run]: https://www.seamplex.com/feenox/doc/feenox-manual.html#running-feenox
-  [engineering-related problem]: README4engineers.markdown
+  [engineering-related problem]: ./README4engineers.markdown
   [plain-text file containing definitions and instructions]: https://seamplex.com/feenox/doc/sds.html#sec:input
   [`PROBLEM`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#problem
   [`src/pdes`]: https://github.com/seamplex/feenox/tree/main/src/pdes
@@ -357,12 +357,12 @@ further details about how to contribute to the code base.
   [`neutron_sn`]: https://github.com/seamplex/feenox/tree/main/src/pdes/neutron_sn
   [`thermal_hydraulics`]: https://github.com/seamplex/feenox/tree/main/src/pdes/thermal_hydraulics
   [the community]: https://github.com/seamplex/feenox/discussions
-  [FeenoX for hackers]: README4hackers.markdown
+  [FeenoX for hackers]: ./README4hackers.markdown
   [Alan Kay]: https://en.wikipedia.org/wiki/Alan_Kay
   [“simple things should be simple and complex things should be possible.”]:
     https://www.quora.com/What-is-the-story-behind-Alan-Kay-s-adage-Simple-things-should-be-simple-complex-things-should-be-possible
-  [programming guide]: doprogramming.markdown
-  [FeenoX for engineers]: README4engineers.markdown
+  [programming guide]: doc/programming.md
+  [FeenoX for engineers]: ./README4engineers.markdown
 
 # Why
 
@@ -414,4 +414,4 @@ different from other computational tools.
   [Unix philosophy]: https://seamplex.com/feenox/doc/sds.html#sec:unix
   [separates policy from mechanism]: https://seamplex.com/feenox/doc/sds.html#sec:unix-separation
   [CAEplex]: https://www.caeplex.com
-  [FeenoX for hackers]: README4hackers.markdown
+  [FeenoX for hackers]: ./README4hackers.markdown

@@ -20,7 +20,7 @@ chaptersDepth: 1
 codeBlockCaptions: false
 cref: false
 crossrefYaml: pandoc-crossref.yaml
-date: 2026-11-19
+date: 2026-11-27
 eqLabels: arabic
 eqnBlockInlineMath: false
 eqnBlockTemplate: |
@@ -533,7 +533,7 @@ compiled with [Cygwin] and have no support whatsoever. Really, really,
 >
 > <https://lists.mcs.anl.gov/pipermail/petsc-users/2015-July/026388.html>
 
-  [Unix philosophy]: unix.markdown
+  [Unix philosophy]: ./unix.markdown
   [CAEplex]: https://www.caeplex.com
   [Cygwin]: http://cygwin.com/
 

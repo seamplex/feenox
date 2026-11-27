@@ -234,8 +234,8 @@ and will not compute things that are not actually needed).
   [self-explanatory ASCII file]: https://seamplex.com/feenox/doc/sds.html#sec:input
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [`PROBLEM`]: https://www.seamplex.com/feenox/doc/feenox-manual.html#problem
-  [academics]: README4academics.markdown
-  [regular user]: README4engineers.markdown
+  [academics]: ./README4academics.markdown
+  [regular user]: ./README4engineers.markdown
   [multi-material non-uniform conductivities]: https://www.seamplex.com/feenox/doc/tutorials/320-thermal/
   [users]: README4engineers.md
   [Git repository]: https://github.com/seamplex/feenox
@@ -396,7 +396,7 @@ workflows to solve [engineering-related problems][]:
 
   [cloud-first]: https://seamplex.com/feenox/doc/sds.html#cloud-first
   [back end]: https://en.wikipedia.org/wiki/Frontend_and_backend
-  [engineering-related problems]: README4engineers.markdown
+  [engineering-related problems]: ./README4engineers.markdown
   [Basic mathematics]: https://seamplex.com/feenox/examples/basic.html
   [Systems of ODEs/DAEs]: https://seamplex.com/feenox/examples/daes.html
   [Laplace’s equation]: https://seamplex.com/feenox/examples/laplace.html

@@ -163,7 +163,7 @@ sudo make install
   [download]: https://www.seamplex.com/feenox/#download
   [discussion page]: https://github.com/seamplex/feenox/discussions
   [source tarball]: https://seamplex.com/feenox/dist/src/
-  [these instructions]: dosource.markdown
+  [these instructions]: doc/source.md
   [detailed compilation instructions]: compilation.md
 
 # Detailed configuration and compilation

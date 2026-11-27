@@ -106,13 +106,13 @@ reference.
 
   [Writing FeenoX input files]: https://www.seamplex.com/feenox/doc/feenox-manual.html#writing-feenox-input-files
   [Unix manpage]: https://www.seamplex.com/feenox/doc/feenox.1.html
-  [Frequently Asked Questions]: FAQ.markdown
+  [Frequently Asked Questions]: ./FAQ.markdown
   [PDF]: https://www.seamplex.com/feenox/doc/FAQ.pdf
-  [Compilation Guide]: compilation.markdown
+  [Compilation Guide]: ./compilation.markdown
   [6]: https://www.seamplex.com/feenox/doc/compilation.pdf
-  [Programming Guide]: programming.markdown
+  [Programming Guide]: ./programming.markdown
   [7]: https://www.seamplex.com/feenox/doc/programming.pdf
-  [History]: history.markdown
+  [History]: ./history.markdown
   [8]: https://www.seamplex.com/feenox/doc/history.pdf
 
 ## Youtube videos

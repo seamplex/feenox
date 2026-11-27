@@ -14,7 +14,7 @@ toc: true
 
 # About FeenoX
 
-[FeenoX](https://seamplex.com/feenox) is a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [free and open source](#licensing)  tool to solve [engineering-related problems](#extents) using a computer (or [many computers in parallel](https://www.seamplex.com/feenox/doc/sds.html#sec:scalability)) with a [particular design basis](https://seamplex.com/feenox/doc/sds.html).
+[FeenoX](https://seamplex.com/feenox) is a [cloud-first](https://seamplex.com/feenox/doc/sds.html#cloud-first) [free and open source](#licensing)  tool to solve [engineering-related problems](#extents) using a computer (or [many computers in parallel](https://seamplex.com/feenox/doc/sds.html#sec:scalability)) with a [particular design basis](https://seamplex.com/feenox/doc/sds.html).
 
 Consider the following input file:
 
@@ -33,13 +33,13 @@ WRITE_RESULTS FORMAT vtu
 
 Note that
 
- * The [input file](https://www.seamplex.com/feenox/doc/sds.html#sec:input) is made of [simple](https://www.seamplex.com/feenox/doc/sds.html#sec:simple) [self-descriptive English](https://www.seamplex.com/feenox/doc/sds.html#sec:sugar) [keywords](https://www.seamplex.com/feenox/doc/sds.html#sec:nouns_verbs)
+ * The [input file](https://seamplex.com/feenox/doc/sds.html#sec:input) is made of [simple](https://seamplex.com/feenox/doc/sds.html#sec:simple) [self-descriptive English](https://seamplex.com/feenox/doc/sds.html#sec:sugar) [keywords](https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs)
     - Note that if one asks an LLM to create an input---which is a straightforward task---hallucinations are easily detected.
- * [Material properties and boundary conditions](https://www.seamplex.com/feenox/doc/sds.html#sec:flexibility) can be [expressions of $x$, $y$ and $z$](https://www.seamplex.com/feenox/doc/sds.html#sec:expression)
- * Input mesh is in [Gmsh's format `.msh`](https://www.seamplex.com/feenox/doc/sds.html#sec:interoperability)
- * Output results are in [Paraview's `.vtk`/`.vtu` formats](https://www.seamplex.com/feenox/doc/sds.html#sec:interoperability)
+ * [Material properties and boundary conditions](https://seamplex.com/feenox/doc/sds.html#sec:flexibility) can be [expressions of $x$, $y$ and $z$](https://seamplex.com/feenox/doc/sds.html#sec:expression)
+ * Input mesh is in [Gmsh's format `.msh`](https://seamplex.com/feenox/doc/sds.html#sec:interoperability)
+ * Output results are in [Paraview's `.vtk`/`.vtu` formats](https://seamplex.com/feenox/doc/sds.html#sec:interoperability)
   
-Each of these items has a lot of design and usage implications, thoroughly discussed in the [Software Design Specification](https://www.seamplex.com/feenox/doc/sds.html), ranging from integrating FeenoX as a back end for different front ends with a reasonably low effort (e.g. [SunCAE](https://www.seamplex.com/suncae)), down to suitability for interaction with Large Language Models.
+Each of these items has a lot of design and usage implications, thoroughly discussed in the [Software Design Specification](https://seamplex.com/feenox/doc/sds.html), ranging from integrating FeenoX as a back end for different front ends with a reasonably low effort (e.g. [SunCAE](https://www.seamplex.com/suncae)), down to suitability for interaction with Large Language Models.
 As a reference, the reader is encouraged to compare the above input syntax with any other FEA solver and then consider how to ask ChatGPT & friends for help to create an input file from scratch. Good luck detecting hallucinations.
 Or how to write a Graphical User Interface that would need to create something the solver can read.
 Plus, it can be simply installed (even in WSL2) by doing
@@ -76,7 +76,7 @@ no. 95, p. 5846, Mar. 2024, doi: [10.21105/joss.05846](https://doi.org/10.21105/
 >
 > * White paper [“Why FeenoX is different”](https://seamplex.com/feenox/doc/whitepaper/)
 >
-> * First non-trivial large-deformation mechanical example: [NAFEMS GNL5 “Large-deformation beam”](https://www.seamplex.com/feenox/examples/mechanical.html#nafems-gnl5-large-deformation-beam)
+> * First non-trivial large-deformation mechanical example: [NAFEMS GNL5 “Large-deformation beam”](https://seamplex.com/feenox/examples/mechanical.html#nafems-gnl5-large-deformation-beam)
 >
 > * FeenoX is now in Debian ([Trixie backports](https://packages.debian.org/trixie-backports/feenox), [Forky](https://packages.debian.org/forky/feenox) and [Sid](https://packages.debian.org/sid/feenox)) and [Ubuntu](https://launchpad.net/ubuntu/+source/feenox) (25.04 onward).
 >
@@ -92,7 +92,7 @@ no. 95, p. 5846, Mar. 2024, doi: [10.21105/joss.05846](https://doi.org/10.21105/
 >
 > * IB students
 >
->   :    Remember that your first read should be the 0-th tutorial, [Setting up your workspace](https://www.seamplex.com/feenox/doc/tutorials/000-setup/)
+>   :    Remember that your first read should be the 0-th tutorial, [Setting up your workspace](https://seamplex.com/feenox/doc/tutorials/000-setup/)
 > 
 
 ## Extents
@@ -138,12 +138,12 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
 ## Capabilities
 
  * Both _free_ as in "free speech" and in "free beer"
- * The [problem](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) to solve is defined through a [syntactically-sugared](https://seamplex.com/feenox/doc/sds.html#sec:syntactic) [self-descriptive English-like plain-text input file](https://seamplex.com/feenox/doc/sds.html#sec:input) that should [resemble the original human-friendly problem formulation](https://seamplex.com/feenox/doc/sds.html#sec:matching-formulations) as much as possible:
+ * The [problem](https://seamplex.com/feenox/doc/feenox-manual.html#problem) to solve is defined through a [syntactically-sugared](https://seamplex.com/feenox/doc/sds.html#sec:syntactic) [self-descriptive English-like plain-text input file](https://seamplex.com/feenox/doc/sds.html#sec:input) that should [resemble the original human-friendly problem formulation](https://seamplex.com/feenox/doc/sds.html#sec:matching-formulations) as much as possible:
    - [no need to recompile if the problem changes](https://seamplex.com/feenox/doc/sds.html#sec:introduction) (FeenoX is a _program_, not a library)
    - [nouns are definitions and verbs are instructions](https://seamplex.com/feenox/doc/sds.html#sec:nouns_verbs)
    - [simple problems need simple inputs](https://seamplex.com/feenox/doc/sds.html#sec:simple)
    - [everything is an expression](https://seamplex.com/feenox/doc/sds.html#sec:expression)
-   - [100%-defined user output](https://seamplex.com/feenox/doc/sds.html#sec:output) (no [`PRINT`](https://www.seamplex.com/feenox/doc/feenox-manual.html#problem) nor [`WRITE_RESULTS`](https://www.seamplex.com/feenox/doc/feenox-manual.html#write_results) instructions, no output)
+   - [100%-defined user output](https://seamplex.com/feenox/doc/sds.html#sec:output) (no [`PRINT`](https://seamplex.com/feenox/doc/feenox-manual.html#problem) nor [`WRITE_RESULTS`](https://seamplex.com/feenox/doc/feenox-manual.html#write_results) instructions, no output)
  * [Cloud-first design](https://seamplex.com/feenox/doc/sds.html#cloud-first) (cloud friendliness is not enough)
  * [MPI parallelization](https://seamplex.com/feenox/doc/sds.html#sec:scalability)
  * Leverages high-quality well-established free and open source libraries to solve...
@@ -157,7 +157,7 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
        - time-dependent systems ([TS](https://petsc.org/release/manual/ts/))
        - generalized eigen-value problems ([EPS](https://slepc.upv.es/documentation/current/docs/manualpages/EPS/index.html))
      - writes results in  Gmsh's [.msh](http://gmsh.info/doc/texinfo/gmsh.html#MSH-file-format) format and/or [Paraview](https://www.paraview.org/)'s [VTU/VTK](https://docs.vtk.org/en/latest/design_documents/VTKFileFormats.html) formats
- * Focuses on [flexibility](https://seamplex.com/feenox/doc/sds.html#sec:flexibility), especially when defining [non-uniform multi-solid material properties from ASME tables](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#from-a-steady-state)
+ * Focuses on [flexibility](https://seamplex.com/feenox/doc/sds.html#sec:flexibility), especially when defining [non-uniform multi-solid material properties from ASME tables](https://seamplex.com/feenox/doc/tutorials/320-thermal/#from-a-steady-state)
  * Follows the [Unix programming philosophy](https://seamplex.com/feenox/doc/sds.html#sec:unix)
    - [rule of separation](https://seamplex.com/feenox/doc/sds.html#sec:separation)
    - [rule of silence](https://seamplex.com/feenox/doc/sds.html#sec:silence)
@@ -175,8 +175,8 @@ The [`tests`](https://github.com/seamplex/feenox/tree/main/tests) directory in t
    - [increased flexibility](https://seamplex.com/feenox/examples/basic.html#computing-the-derivative-of-a-function-as-a-unix-filter),
    - [parametric sweeps](https://seamplex.com/feenox/doc/sds.html#sec:parametric), and/or
    - [optimization loops](https://seamplex.com/feenox/doc/sds.html#optimization-loops)
- * [Steady-state](https://www.seamplex.com/feenox/doc/tutorials/120-mazes/#solving-the-steady-state-laplace-equation), [quasi-static] and/or [transient problems](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#sec:transient)
- * [Linear](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#linear-steady-state-problems) and [non-linear](https://www.seamplex.com/feenox/doc/tutorials/320-thermal/#non-linear-state-state-problems) problems
+ * [Steady-state](https://seamplex.com/feenox/doc/tutorials/120-mazes/#solving-the-steady-state-laplace-equation), [quasi-static] and/or [transient problems](https://seamplex.com/feenox/doc/tutorials/320-thermal/#sec:transient)
+ * [Linear](https://seamplex.com/feenox/doc/tutorials/320-thermal/#linear-steady-state-problems) and [non-linear](https://seamplex.com/feenox/doc/tutorials/320-thermal/#non-linear-state-state-problems) problems
  * Possibility to verify the code using the [Method of Manufactured Solutions](https://github.com/seamplex/feenox/tree/main/tests/mms)
  * Separate [repository to profile and study code performance](https://github.com/seamplex/feenox-benchmark) using [Google's benchmark library](https://github.com/google/benchmark) 
  
@@ -215,7 +215,7 @@ Browse through the [documentation index](doc) and/or the [`doc`](https://github.
 
  * [FAQs](./doc/FAQ.md), including [what FeenoX means](https://seamplex.com/feenox/doc/FAQ.html#what-does-feenox-mean)
  * [Manual](https://seamplex.com/feenox/doc/feenox-manual.html)
- * [Description](https://www.seamplex.com/feenox/doc/feenox-desc.html)
+ * [Description](https://seamplex.com/feenox/doc/feenox-desc.html)
  * [Software Design Requirements](https://seamplex.com/feenox/doc/srs.html)
  * [Software Design Specification](https://seamplex.com/feenox/doc/sds.html)
  * [Unix man page](https://seamplex.com/feenox/doc/feenox.1.html) (accessible through `man feenox` after installation)
